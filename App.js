@@ -1,7 +1,11 @@
-// import { StatusBar } from "expo-status-bar";
-// import { AppRegistry } from "react-native";
 import "react-native-gesture-handler";
-import { StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
@@ -13,12 +17,16 @@ import Login from "./app/Login";
 import MyProfile from "./app/MyProfile";
 import People from "./app/People";
 import PeopleProfile from "./app/PeopleProfile";
-// import DrawerNavigator from "./components/DrawerNavigator";
-// import { createDrawerNavigator } from "@react-navigation/drawer";
-// import DrawerNavigator from "./components/DrawerNavigator";
+import { Entypo } from "@expo/vector-icons";
+import HeaderMenu from "./components/HeaderMenu";
+import { Drawer } from "react-native-drawer-layout";
+import { useState } from "react";
+import Feeds from "./app/Feeds";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+const TopTab = createMaterialTopTabNavigator();
 // const Drawer = createDrawerNavigator();
 
 const screenOptions = {
@@ -58,9 +66,6 @@ const StackNavigator = () => {
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
-      {/* <Stack.Screen name="Web" component={Web} />
-      <Stack.Screen name="Bookmarks" component={Bookmarks} />
-      <Stack.Screen name="Profile" component={Profile} /> */}
       <Stack.Screen name="Article" component={Article} />
       <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="Signup" component={SignUp} />
@@ -88,10 +93,39 @@ const StackNavigator = () => {
   );
 };
 
+// const MainDrawer = () => {
+//   const [drawer, setDrawer] = useState(false);
+//   <Drawer
+//     open={drawer}
+//     drawerWidth={500}
+//     // drawerPosition="right"
+//     onOpen={() => {
+//       setDrawer(true);
+//     }}
+//     onClose={() => {
+//       setDrawer(false);
+//     }}
+//     renderDrawerContent={() => {
+//       return <DrawerContent />;
+//     }}
+//   >
+//     <Home />
+//   </Drawer>;
+// };
+
+const HomeTopNavigator = () => {
+  return (
+    <TopTab.Navigator initialRouteName="News">
+      <TopTab.Screen name="News" component={Home} />
+      <TopTab.Screen name="Feed" component={Feeds} />
+    </TopTab.Navigator>
+  );
+};
+
 const navigationItems = [
   {
     name: "Home",
-    component: Home,
+    component: HomeTopNavigator,
     icon: "home"
   },
   {
@@ -121,7 +155,12 @@ const TabNavigator = () => {
             name={item.name}
             component={item.component}
             options={{
-              headerShown: item.name === "Home" ? false : true,
+              headerShown: true,
+              // headerStyle: {
+              //   height: item.name === "Home" ? 120 : undefined
+              // },
+              headerTitle:
+                item.name == "Home" ? () => <HeaderMenu /> : item.name,
               tabBarIcon: ({ focused }) => (
                 <View
                   style={

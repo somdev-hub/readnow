@@ -45,21 +45,8 @@ const Profile = () => {
   ];
 
   return (
-    <SafeAreaView>
-      {/* <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "start",
-          marginTop: 20,
-          borderBottomWidth: 1,
-          paddingBottom: 15,
-          borderBottomColor: "#ddd"
-        }}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 18, marginLeft: 20 }}>
-          Profile
-        </Text>
-      </View> */}
+    <View>
+     
       <View style={{ marginHorizontal: 20, marginTop: 30 }}>
         <TouchableOpacity
           onPress={() => navigator.navigate("Myprofile")}
@@ -180,7 +167,7 @@ const Profile = () => {
           );
         })}
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 

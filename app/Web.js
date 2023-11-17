@@ -204,19 +204,19 @@ const Web = () => {
                         <Text
                           style={{
                             fontWeight: "bold",
-                            fontSize: 16,
+                            fontSize: 14,
                             // marginVertical: 1,
                             lineHeight: 20
                           }}
                         >
-                          {item?.title?.length > 50
-                            ? item.title.slice(0, 70) + "..."
+                          {item?.title?.length > 80
+                            ? item.title.slice(0, 80) + "..."
                             : item.title}
                         </Text>
                         <View
                           style={{
                             flexDirection: "row",
-                            marginTop: 5,
+                            marginTop: 10,
                             gap: 20,
                             justifyContent: "space-between"
                           }}

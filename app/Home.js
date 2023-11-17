@@ -63,21 +63,21 @@ const Home = () => {
       });
   }, []);
   return (
-    <Drawer
-      open={drawer}
-      drawerWidth={500}
-      // drawerPosition="right"
-      onOpen={() => {
-        setDrawer(true);
-      }}
-      onClose={() => {
-        setDrawer(false);
-      }}
-      renderDrawerContent={() => {
-        return <DrawerContent />;
-      }}
-    >
-      <SafeAreaView>
+    // <Drawer
+    //   open={drawer}
+    //   drawerWidth={500}
+    //   // drawerPosition="right"
+    //   onOpen={() => {
+    //     setDrawer(true);
+    //   }}
+    //   onClose={() => {
+    //     setDrawer(false);
+    //   }}
+    //   renderDrawerContent={() => {
+    //     return <DrawerContent />;
+    //   }}
+    // >
+      <View>
         <StatusBar
           translucent={true}
           barStyle="dark-content"
@@ -85,16 +85,21 @@ const Home = () => {
         />
         <ScrollView>
           <View style={{ marginHorizontal: 0 }}>
-            <View
+            {/* <View
               style={{
                 marginHorizontal: 10,
                 flexDirection: "row",
                 justifyContent: "space-between"
               }}
             >
-              <View style={[styles.iconCircle]}>
+              <Pressable
+                onPress={() => {
+                  setDrawer(true);
+                }}
+                style={[styles.iconCircle]}
+              >
                 <Feather name="menu" size={24} color="black" />
-              </View>
+              </Pressable>
               <View style={[styles.flexBox, { gap: 10 }]}>
                 <Pressable
                   onPress={() => navigator.navigate("Web")}
@@ -106,7 +111,7 @@ const Home = () => {
                   <Feather name="bell" size={24} color="black" />
                 </View>
               </View>
-            </View>
+            </View> */}
             <View>
               <View
                 style={[
@@ -114,7 +119,7 @@ const Home = () => {
                   { marginTop: 20, marginHorizontal: 10 }
                 ]}
               >
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                <Text style={{ fontSize: 16, fontWeight: "500" }}>
                   Breaking News
                 </Text>
                 <Pressable>
@@ -166,7 +171,7 @@ const Home = () => {
                   }
                 ]}
               >
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
                   Recommendation
                 </Text>
                 <Pressable>
@@ -228,19 +233,19 @@ const Home = () => {
                           <Text
                             style={{
                               fontWeight: "bold",
-                              fontSize: 16,
+                              fontSize: 14,
                               // marginVertical: 1,
                               lineHeight: 20
                             }}
                           >
-                            {item.title.length > 50
-                              ? item.title.slice(0, 70) + "..."
+                            {item.title.length > 80
+                              ? item.title.slice(0, 80) + "..."
                               : item.title}
                           </Text>
                           <View
                             style={{
                               flexDirection: "row",
-                              marginTop: 5,
+                              marginTop: 10,
                               gap: 20,
                               justifyContent: "space-between"
                             }}
@@ -264,8 +269,8 @@ const Home = () => {
             </View>
           </View>
         </ScrollView>
-      </SafeAreaView>
-    </Drawer>
+      </View>
+    // </Drawer>
   );
 };
 

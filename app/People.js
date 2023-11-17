@@ -53,7 +53,7 @@ const People = () => {
       </View> */}
       <ScrollView
         style={{
-          marginTop: 20,
+          paddingTop: 20,
           paddingHorizontal: 20
           // backgroundColor: "white"
         }}
