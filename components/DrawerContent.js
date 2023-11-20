@@ -1,8 +1,9 @@
-import { View, Text, Image, Dimensions } from "react-native";
+import { View, Text, Image, Dimensions, Pressable } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const DrawerContent = () => {
   const drawerItems = [
@@ -19,6 +20,7 @@ const DrawerContent = () => {
       icon: "bulb1"
     }
   ];
+  const navigator = useNavigation();
   const { height } = Dimensions.get("window");
   return (
     <SafeAreaView>
@@ -34,7 +36,6 @@ const DrawerContent = () => {
         <View>
           <View
             style={{
-              
               backgroundColor: "#39A7FF",
               padding: 15,
               borderRadius: 20,
@@ -71,12 +72,15 @@ const DrawerContent = () => {
             <FontAwesome name="angle-right" size={24} color="white" />
           </View>
           <View style={{ marginTop: 30, gap: 30, marginHorizontal: 10 }}>
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <Pressable
+              onPress={() => navigator.navigate("Add Post")}
+              style={{ flexDirection: "row", gap: 10 }}
+            >
               <AntDesign name="pluscircle" size={24} color="#39A7FF" />
               <Text style={{ color: "#39A7FF", fontWeight: "bold" }}>
                 Create
               </Text>
-            </View>
+            </Pressable>
             {drawerItems.map((item, index) => {
               return (
                 <View

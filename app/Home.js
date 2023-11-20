@@ -52,7 +52,7 @@ const Home = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get("http://192.168.39.254:3500")
+      .get("http://192.168.39.254:3500/get-headlines")
       .then((response) => {
         setNewsData(response.data);
         setHeadlines(response.data.slice(0, 3));

@@ -2,8 +2,12 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
+import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const MyProfile = () => {
+  const navigator = useNavigation();
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -22,6 +26,9 @@ const MyProfile = () => {
               }}
               style={{ width: "100%", height: "100%", resizeMode: "cover" }}
             />
+            <View style={{ position: "absolute", bottom: 10, right: 20 }}>
+              <FontAwesome name="pencil-square" size={24} color="#39A7FF" />
+            </View>
             <View
               style={{
                 width: 100,
@@ -33,8 +40,13 @@ const MyProfile = () => {
                 backgroundColor: "#eeeeee",
                 bottom: -40,
                 left: 20
+                // position:"relative"
               }}
-            ></View>
+            >
+              <View style={{ position: "absolute", bottom: 10, left: 75 }}>
+                <AntDesign name="pluscircle" size={24} color="#39A7FF" />
+              </View>
+            </View>
           </View>
           <View style={{ marginTop: 50 }}>
             <View style={{ marginHorizontal: 20 }}>
@@ -68,6 +80,7 @@ const MyProfile = () => {
               </View>
             </View>
             <TouchableOpacity
+              onPress={() => navigator.navigate("Add Post")}
               style={{
                 backgroundColor: "#39A7FF",
                 marginHorizontal: 20,

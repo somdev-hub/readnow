@@ -7,31 +7,37 @@ import {
   View
 } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Feather } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { Home, Web, Bookmarks, Profile, Article } from "./app/index";
 import { createStackNavigator } from "@react-navigation/stack";
+import { Entypo } from "@expo/vector-icons";
+import HeaderMenu from "./components/HeaderMenu";
+// import { Drawer } from "react-native-drawer-layout";
+import { useState } from "react";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import Feeds from "./app/Feeds";
 import Welcome from "./app/Welcome";
 import SignUp from "./app/SignUp";
 import Login from "./app/Login";
 import MyProfile from "./app/MyProfile";
 import People from "./app/People";
 import PeopleProfile from "./app/PeopleProfile";
-import { Entypo } from "@expo/vector-icons";
-import HeaderMenu from "./components/HeaderMenu";
-import { Drawer } from "react-native-drawer-layout";
-import { useState } from "react";
-import Feeds from "./app/Feeds";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import Story from "./app/Story";
+import DrawerContent from "./components/DrawerContent";
+import AddPost from "./app/AddPost";
+import AddInfo from "./app/AddInfo";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
-// const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator();
 
 const screenOptions = {
   headerShown: false,
   tabBarShowLabel: false,
+
   tabBarStyle: {
     backgroundColor: "#fff",
     borderTopColor: "#eeeeee",
@@ -70,6 +76,42 @@ const StackNavigator = () => {
       <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="Signup" component={SignUp} />
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Story" component={Story} />
+      <Stack.Screen name="AddInfo" component={AddInfo} />
+      <Stack.Screen
+        name="Add Post"
+        component={AddPost}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Add Post
+                </Text>
+                <TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#39A7FF"
+                    }}
+                  >
+                    Post
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+        }}
+      />
       <Stack.Screen
         name="Myprofile"
         component={MyProfile}
@@ -93,29 +135,27 @@ const StackNavigator = () => {
   );
 };
 
-// const MainDrawer = () => {
-//   const [drawer, setDrawer] = useState(false);
-//   <Drawer
-//     open={drawer}
-//     drawerWidth={500}
-//     // drawerPosition="right"
-//     onOpen={() => {
-//       setDrawer(true);
-//     }}
-//     onClose={() => {
-//       setDrawer(false);
-//     }}
-//     renderDrawerContent={() => {
-//       return <DrawerContent />;
-//     }}
-//   >
-//     <Home />
-//   </Drawer>;
-// };
+const DrawerNavigator = () => {
+  return (
+    <Drawer.Navigator
+      screenOptions={{ headerShown: false, drawerIcon: () => null }}
+      drawerContent={(props) => <DrawerContent {...props} />}
+    >
+      <Drawer.Screen
+        name="HomePage"
+        component={HomeTopNavigator}
+        options={{
+          headerShown: true,
+          headerTitle: () => <HeaderMenu />
+        }}
+      />
+    </Drawer.Navigator>
+  );
+};
 
 const HomeTopNavigator = () => {
   return (
-    <TopTab.Navigator initialRouteName="News">
+    <TopTab.Navigator>
       <TopTab.Screen name="News" component={Home} />
       <TopTab.Screen name="Feed" component={Feeds} />
     </TopTab.Navigator>
@@ -125,7 +165,7 @@ const HomeTopNavigator = () => {
 const navigationItems = [
   {
     name: "Home",
-    component: HomeTopNavigator,
+    component: DrawerNavigator,
     icon: "home"
   },
   {
@@ -155,12 +195,12 @@ const TabNavigator = () => {
             name={item.name}
             component={item.component}
             options={{
-              headerShown: true,
+              headerShown: item.name === "Home" ? false : true,
               // headerStyle: {
               //   height: item.name === "Home" ? 120 : undefined
               // },
-              headerTitle:
-                item.name == "Home" ? () => <HeaderMenu /> : item.name,
+              // headerTitle:
+              //   item.name == "Home" ? () => <HeaderMenu /> : item.name,
               tabBarIcon: ({ focused }) => (
                 <View
                   style={

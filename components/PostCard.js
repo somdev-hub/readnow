@@ -1,6 +1,7 @@
 import { View, Text, Image, Dimensions } from "react-native";
 import React from "react";
 import { Feather } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const size = Dimensions.get("window");
@@ -15,29 +16,42 @@ const PostCard = ({
   comments
 }) => {
   return (
-    <View style={{ backgroundColor: "#ffffff", marginVertical: 10,elevation:1 }}>
+    <View
+      style={{ backgroundColor: "#ffffff", marginVertical: 10, elevation: 1 }}
+    >
       <View
         style={{
           marginHorizontal: 15,
           flexDirection: "row",
-          gap: 10,
+          justifyContent: "space-between",
           paddingVertical: 10,
           alignItems: "center"
         }}
       >
         <View
           style={{
-            width: 55,
-            height: 55,
-            borderRadius: 50,
-            backgroundColor: "#eeeeee"
+            flexDirection: "row",
+            gap: 10,
+            alignItems: "center"
           }}
         >
-          <Image />
+          <View
+            style={{
+              width: 55,
+              height: 55,
+              borderRadius: 50,
+              backgroundColor: "#eeeeee"
+            }}
+          >
+            <Image />
+          </View>
+          <View>
+            <Text style={{ fontWeight: "500", fontSize: 16 }}>{user}</Text>
+            <Text style={{ color: "#A9A9A9", marginTop: 2 }}>{header}</Text>
+          </View>
         </View>
         <View>
-          <Text style={{ fontWeight: "500", fontSize: 16 }}>{user}</Text>
-          <Text style={{ color: "#A9A9A9", marginTop: 2 }}>{header}</Text>
+          <Entypo name="dots-three-vertical" size={20} color="black" />
         </View>
       </View>
       <View>

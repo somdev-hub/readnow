@@ -17,31 +17,32 @@ const HeaderMenu = () => {
     following: false
   });
   return (
-    <View>
+    <View >
       <View
         style={{
           flexDirection: "row",
           width: "100%",
-          justifyContent: "space-between"
+          justifyContent: "flex-end",
+          alignItems: "center",
         }}
       >
-        <Pressable
+        {/* <Pressable
           onPress={() => {
             setDrawer(true);
           }}
           style={[styles.iconCircle]}
         >
           <Feather name="menu" size={24} color="black" />
-        </Pressable>
+        </Pressable> */}
         <View style={[styles.flexBox, { gap: 10 }]}>
           <Pressable
             onPress={() => navigator.navigate("Web")}
             style={[styles.iconCircle]}
           >
-            <Entypo name="magnifying-glass" size={24} color="black" />
+            <Entypo name="magnifying-glass" size={22} color="black" />
           </Pressable>
           <View style={[styles.iconCircle]}>
-            <Feather name="bell" size={24} color="black" />
+            <Feather name="bell" size={22} color="black" />
           </View>
         </View>
       </View>
