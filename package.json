@@ -36,7 +36,8 @@
     "react-native-screens": "~3.22.0",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-tab-view": "^3.5.2",
-    "expo-image-picker": "~14.3.2"
+    "expo-image-picker": "~14.3.2",
+    "expo-secure-store": "~12.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

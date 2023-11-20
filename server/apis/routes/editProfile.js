@@ -13,7 +13,10 @@ router.post("/", async (req, res) => {
         name: name,
         header: header,
         description: description,
-        tags: tags
+        tags: tags,
+        followers: 0,
+        following: 0,
+        posts: 0
       },
       { upsert: true, new: true }
     );

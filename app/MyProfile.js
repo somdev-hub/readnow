@@ -12,25 +12,36 @@ import { ScrollView } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-// import ImagePicker, { launchImageLibrary } from "react-native-image-picker";
 import * as ImagePicker from "expo-image-picker";
+import { editBackgroundPicture, editProfilePicture } from "../api/apis";
 
 const MyProfile = () => {
   const navigator = useNavigation();
   const [profilePicture, setProfilePicture] = useState(null);
   const [backgroundPicture, setBackgroundPicture] = useState(null);
-  const selectImage = async (setPicture) => {
+  const selectImage = async (setPicture, type) => {
     const options = {
       mediaTypes: ImagePicker.MediaTypeOptions.Images
-      // allowsEditing: true,
-      // aspect: [1, 1],
-      // quality: 1
     };
     const response = await ImagePicker.launchImageLibraryAsync(options);
-    console.log(response);
 
     if (!response.canceled) {
       setPicture(response.assets[0].uri);
+      if (type === "profile") {
+        editProfilePicture({
+          image: response.assets[0].uri,
+          email: "emmafrost@gmail.com"
+        }).then((response) => {
+          console.log(response);
+        });
+      } else {
+        editBackgroundPicture({
+          image: response.assets[0].uri,
+          email: "emmafrost@gmail.com"
+        }).then((response) => {
+          console.log(response);
+        });
+      }
     }
   };
 
@@ -55,8 +66,7 @@ const MyProfile = () => {
               style={{ width: "100%", height: "100%", resizeMode: "cover" }}
             />
             <Pressable
-              onPress={() => selectImage(setBackgroundPicture)}
-              // style={{ position: "absolute", bottom: 10, right: 20 }}
+              onPress={() => selectImage(setBackgroundPicture, "background")}
               style={{ position: "absolute", bottom: 10, right: 20 }}
             >
               <FontAwesome name="pencil-square" size={24} color="#fff" />
@@ -72,7 +82,6 @@ const MyProfile = () => {
                 backgroundColor: "#eeeeee",
                 bottom: -40,
                 left: 20
-                // position:"relative"
               }}
             >
               <Image
@@ -89,10 +98,7 @@ const MyProfile = () => {
                 }}
               />
               <Pressable
-                onPress={
-                  () => selectImage(setProfilePicture)
-                  // console.log("Profile Picture")
-                }
+                onPress={() => selectImage(setProfilePicture, "profile")}
                 style={{ position: "absolute", bottom: 10, left: 75 }}
               >
                 <AntDesign name="pluscircle" size={24} color="#39A7FF" />
@@ -106,7 +112,6 @@ const MyProfile = () => {
                 style={{
                   marginTop: 5,
                   color: "#A9A9A9",
-                  //   fontWeight: "500",
                   fontSize: 16
                 }}
               >

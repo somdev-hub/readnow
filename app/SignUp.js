@@ -31,8 +31,7 @@ const SignUp = () => {
       if (value === userCredentials.password) {
         setMatchPassword(true);
       }
-    }
-    setUserCredentials({ ...userCredentials, [key]: value });
+    } else setUserCredentials({ ...userCredentials, [key]: value });
   };
   const handleSubmit = () => {
     if (userCredentials.password !== rePassword) {

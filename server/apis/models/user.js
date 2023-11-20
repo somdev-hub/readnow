@@ -8,7 +8,10 @@ const userSchema = new mongoose.Schema({
   description: String,
   profilePicture: String,
   backgroundPicture: String,
-  tags: Array
+  tags: Array,
+  followers: Number,
+  following: Number,
+  posts: Number,
 });
 
 const User = mongoose.model("User", userSchema);

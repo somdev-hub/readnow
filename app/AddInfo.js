@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   ScrollView
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import {
@@ -16,12 +16,16 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import axios from "axios";
+import { editProfile, signup } from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
+import { CommonActions } from "@react-navigation/native";
 
 const AddInfo = () => {
   const route = useRoute();
   const { userCredentials } = route.params;
   const [userData, setUserData] = useState({
-    ...userCredentials,
+    email: userCredentials.email,
     name: "",
     header: "",
     tags: [],
@@ -33,20 +37,50 @@ const AddInfo = () => {
     }
     setUserData({ ...userData, [key]: value });
   };
+  // const signup = () => {
+  //   axios
+  //     .post("http://192.168.33.115:3500/add-user", userCredentials)
+  //     .then((response) => {
+  //       console.log(response.data);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
+  const navigator = useNavigation();
   const handleSubmit = () => {
-    // console.log(userCredentials);
     console.log(userData);
-    // console.log(userCredentials.email);
-    // console.log(userCredentials.password);
+    signup(userCredentials)
+      .then((Response) => {
+        console.log(Response);
+        editProfile(userData).then((response) => {
+          console.log(response);
+          if (Response.status === 200 && response.status === 200) {
+            SecureStorage.setItemAsync("email", userCredentials.email);
+            SecureStorage.setItemAsync("token", Response.token).then(() => {
+              console.log("token saved");
+              navigator.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: "HomeScreen" }]
+                })
+              );
+            });
+          }
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   const [fontsLoaded] = useFonts({
     Montserrat_500Medium,
     Montserrat_600SemiBold
   });
-  const navigator = useNavigation();
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
   }
+
   return (
     <SafeAreaView>
       <ScrollView>
