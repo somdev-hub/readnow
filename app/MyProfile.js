@@ -1,13 +1,39 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable
+} from "react-native";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+// import ImagePicker, { launchImageLibrary } from "react-native-image-picker";
+import * as ImagePicker from "expo-image-picker";
 
 const MyProfile = () => {
   const navigator = useNavigation();
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [backgroundPicture, setBackgroundPicture] = useState(null);
+  const selectImage = async (setPicture) => {
+    const options = {
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
+      // allowsEditing: true,
+      // aspect: [1, 1],
+      // quality: 1
+    };
+    const response = await ImagePicker.launchImageLibraryAsync(options);
+    console.log(response);
+
+    if (!response.canceled) {
+      setPicture(response.assets[0].uri);
+    }
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -22,13 +48,19 @@ const MyProfile = () => {
           <View style={{ height: 120, position: "relative" }}>
             <Image
               source={{
-                uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
+                uri: backgroundPicture
+                  ? backgroundPicture
+                  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
               }}
               style={{ width: "100%", height: "100%", resizeMode: "cover" }}
             />
-            <View style={{ position: "absolute", bottom: 10, right: 20 }}>
-              <FontAwesome name="pencil-square" size={24} color="#39A7FF" />
-            </View>
+            <Pressable
+              onPress={() => selectImage(setBackgroundPicture)}
+              // style={{ position: "absolute", bottom: 10, right: 20 }}
+              style={{ position: "absolute", bottom: 10, right: 20 }}
+            >
+              <FontAwesome name="pencil-square" size={24} color="#fff" />
+            </Pressable>
             <View
               style={{
                 width: 100,
@@ -43,9 +75,28 @@ const MyProfile = () => {
                 // position:"relative"
               }}
             >
-              <View style={{ position: "absolute", bottom: 10, left: 75 }}>
+              <Image
+                source={{
+                  uri: profilePicture
+                    ? profilePicture
+                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
+                }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  resizeMode: "cover",
+                  borderRadius: 50
+                }}
+              />
+              <Pressable
+                onPress={
+                  () => selectImage(setProfilePicture)
+                  // console.log("Profile Picture")
+                }
+                style={{ position: "absolute", bottom: 10, left: 75 }}
+              >
                 <AntDesign name="pluscircle" size={24} color="#39A7FF" />
-              </View>
+              </Pressable>
             </View>
           </View>
           <View style={{ marginTop: 50 }}>
