@@ -15,7 +15,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Entypo } from "@expo/vector-icons";
 import HeaderMenu from "./components/HeaderMenu";
 // import { Drawer } from "react-native-drawer-layout";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Feeds from "./app/Feeds";
 import Welcome from "./app/Welcome";
@@ -28,6 +28,9 @@ import Story from "./app/Story";
 import DrawerContent from "./components/DrawerContent";
 import AddPost from "./app/AddPost";
 import AddInfo from "./app/AddInfo";
+import * as SecureStorage from "expo-secure-store";
+import { useNavigation, CommonActions } from "@react-navigation/native";
+import { decodeUser } from "./api/apis";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -65,6 +68,42 @@ const navStyles = StyleSheet.create({
 });
 
 const StackNavigator = () => {
+  const [token, setToken] = useState(null);
+  const navigator = useNavigation();
+  useEffect(() => {
+    const decodeToken = async () => {
+      const token = await SecureStorage.getItemAsync("token");
+
+      if (token) {
+        setToken(token);
+        decodeUser(token)
+          .then((response) => {
+            console.log(response);
+            if (response.status != 200) {
+              SecureStorage.deleteItemAsync("token");
+              SecureStorage.deleteItemAsync("email");
+              navigator.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: "Welcome" }]
+                })
+              );
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } else {
+        navigator.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Welcome" }]
+          })
+        );
+      }
+    };
+    decodeToken();
+  }, [navigator, token]);
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}

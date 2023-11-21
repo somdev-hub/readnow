@@ -6,19 +6,25 @@ import {
   StyleSheet,
   Pressable
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { editBackgroundPicture, editProfilePicture } from "../api/apis";
+import {
+  editBackgroundPicture,
+  editProfilePicture,
+  getProfile
+} from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
 
 const MyProfile = () => {
   const navigator = useNavigation();
   const [profilePicture, setProfilePicture] = useState(null);
   const [backgroundPicture, setBackgroundPicture] = useState(null);
+  const [userData, setUserData] = useState(null);
   const selectImage = async (setPicture, type) => {
     const options = {
       mediaTypes: ImagePicker.MediaTypeOptions.Images
@@ -30,20 +36,35 @@ const MyProfile = () => {
       if (type === "profile") {
         editProfilePicture({
           image: response.assets[0].uri,
-          email: "emmafrost@gmail.com"
+          email: userData.email
         }).then((response) => {
           console.log(response);
         });
       } else {
         editBackgroundPicture({
           image: response.assets[0].uri,
-          email: "emmafrost@gmail.com"
+          email: userData.email
         }).then((response) => {
           console.log(response);
         });
       }
     }
   };
+
+  useEffect(() => {
+    SecureStorage.getItemAsync("email").then((email) => {
+      getProfile(email).then((response) => {
+        console.log(response);
+        setUserData(response.data);
+        setProfilePicture(response.data.profilePicture);
+        setBackgroundPicture(response.data.backgroundPicture);
+      });
+    });
+    // const fetchData = async () => {
+    //   const response = await getProfile();
+    // };
+    console.log(userData);
+  }, []);
 
   return (
     <View style={{ flex: 1 }}>
@@ -107,7 +128,9 @@ const MyProfile = () => {
           </View>
           <View style={{ marginTop: 50 }}>
             <View style={{ marginHorizontal: 20 }}>
-              <Text style={{ fontWeight: "bold", fontSize: 22 }}>John Doe</Text>
+              <Text style={{ fontWeight: "bold", fontSize: 22 }}>
+                {userData?.name}
+              </Text>
               <Text
                 style={{
                   marginTop: 5,
@@ -115,12 +138,20 @@ const MyProfile = () => {
                   fontSize: 16
                 }}
               >
-                Article Writer
+                {userData?.header}
               </Text>
-              <Text style={{ marginTop: 10, color: "#00A9FF" }}>
-                #Article #post #tech #something #Article #post #tech #something
-                #Article #post #tech #something
-              </Text>
+              <View style={{ flexDirection: "row" }}>
+                {userData?.tags.map((item, index) => {
+                  return (
+                    <Text
+                      style={{ marginTop: 10, color: "#00A9FF" }}
+                      key={index}
+                    >
+                      {item + " "}
+                    </Text>
+                  );
+                })}
+              </View>
               <View
                 style={{
                   marginTop: 20,
@@ -128,11 +159,15 @@ const MyProfile = () => {
                   justifyContent: "space-between"
                 }}
               >
-                <Text style={styles.textStyle}>200 followers</Text>
+                <Text style={styles.textStyle}>
+                  {userData?.followers} followers
+                </Text>
                 <Text style={styles.textStyle}>|</Text>
-                <Text style={styles.textStyle}>100 following</Text>
+                <Text style={styles.textStyle}>
+                  {userData?.following} following
+                </Text>
                 <Text style={styles.textStyle}>|</Text>
-                <Text style={styles.textStyle}>20 posts</Text>
+                <Text style={styles.textStyle}>{userData?.posts} posts</Text>
               </View>
             </View>
             <TouchableOpacity
@@ -161,15 +196,7 @@ const MyProfile = () => {
         >
           <Text style={{ fontWeight: "500", fontSize: 16 }}>Description</Text>
           <Text style={{ marginTop: 10, fontSize: 12 }}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of versions of ve Lorem Ipsum.{" "}
+            {userData?.description}
             <Text style={{ fontWeight: "500", fontSize: 14 }}>
               Read more...
             </Text>{" "}

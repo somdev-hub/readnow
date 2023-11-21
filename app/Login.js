@@ -15,6 +15,10 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import { login } from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
+// import { useNavigation } from "@react-navigation/native";
+import { CommonActions } from "@react-navigation/native";
 
 const Login = () => {
   const [userCredentials, setUserCredentials] = useState({
@@ -24,14 +28,36 @@ const Login = () => {
   const setFormData = (key, value) => {
     setUserCredentials({ ...userCredentials, [key]: value });
   };
+  const navigator = useNavigation();
   const handleSubmit = () => {
     console.log(userCredentials);
+    login(userCredentials)
+      .then((Response) => {
+        console.log(Response);
+        if (Response.status === 200) {
+          console.log("token saved");
+          SecureStorage.deleteItemAsync("email");
+          SecureStorage.setItemAsync("email", userCredentials.email);
+          SecureStorage.setItemAsync("token", Response.token).then(() => {
+            console.log("token saved");
+            navigator.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "HomeScreen" }]
+              })
+            );
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
   const [fontsLoaded] = useFonts({
     Montserrat_500Medium,
     Montserrat_600SemiBold
   });
-  const navigator = useNavigation();
+  // const navigator = useNavigation();
   if (!fontsLoaded) {
     return <Text>Loading...</Text>;
   }

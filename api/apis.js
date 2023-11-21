@@ -23,7 +23,10 @@ const signup = async (userCredentials) => {
 
 const login = async (userCredentials) => {
   try {
-    const response = await axios.post(`${ADDRESS}/login`, userCredentials);
+    const response = await axios.post(
+      `${ADDRESS}/authenticate`,
+      userCredentials
+    );
     return response.data;
   } catch (error) {
     console.log(error);
@@ -69,7 +72,11 @@ const editProfilePicture = async (data) => {
 
 const editBackgroundPicture = async (data) => {
   const formData = new FormData();
-  formData.append("backgroundPicture", data.image);
+  formData.append("backgroundPicture", {
+    uri: data.image,
+    name: "profilePicture.jpg",
+    type: "image/jpg"
+  });
   formData.append("email", data.email);
   const response = await axios.post(
     `${ADDRESS}/edit-background-picture`,
@@ -83,6 +90,16 @@ const editBackgroundPicture = async (data) => {
   return response.data;
 };
 
+const decodeUser = async (token) => {
+  const response = await axios.post(`${ADDRESS}/decode`, { token: token });
+  return response.data;
+};
+
+const getProfile = async (email) => {
+  const response = await axios.post(`${ADDRESS}/get-profile`, { email: email });
+  return response.data;
+};
+
 export {
   getHeadlines,
   searchHeadlines,
@@ -90,5 +107,7 @@ export {
   login,
   editProfile,
   editProfilePicture,
-  editBackgroundPicture
+  editBackgroundPicture,
+  decodeUser,
+  getProfile
 };

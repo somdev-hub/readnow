@@ -37,16 +37,6 @@ const AddInfo = () => {
     }
     setUserData({ ...userData, [key]: value });
   };
-  // const signup = () => {
-  //   axios
-  //     .post("http://192.168.33.115:3500/add-user", userCredentials)
-  //     .then((response) => {
-  //       console.log(response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
   const navigator = useNavigation();
   const handleSubmit = () => {
     console.log(userData);
@@ -56,6 +46,7 @@ const AddInfo = () => {
         editProfile(userData).then((response) => {
           console.log(response);
           if (Response.status === 200 && response.status === 200) {
+            SecureStorage.deleteItemAsync("email");
             SecureStorage.setItemAsync("email", userCredentials.email);
             SecureStorage.setItemAsync("token", Response.token).then(() => {
               console.log("token saved");

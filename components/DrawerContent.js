@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import * as SecureStorage from "expo-secure-store";
 
 const DrawerContent = () => {
   const drawerItems = [
@@ -114,10 +115,17 @@ const DrawerContent = () => {
               paddingTop: 20
             }}
           >
-            <View style={{ flexDirection: "row", gap: 10 }}>
+            <Pressable
+              onPress={() => {
+                SecureStorage.deleteItemAsync("token");
+                SecureStorage.deleteItemAsync("email");
+                navigator.navigate("Login");
+              }}
+              style={{ flexDirection: "row", gap: 10 }}
+            >
               <AntDesign name="logout" size={24} color="red" />
               <Text style={{ color: "red", fontWeight: "400" }}>Logout</Text>
-            </View>
+            </Pressable>
             <FontAwesome name="angle-right" size={22} color="red" />
           </View>
         </View>
