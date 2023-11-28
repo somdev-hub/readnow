@@ -16,7 +16,8 @@ import * as ImagePicker from "expo-image-picker";
 import {
   editBackgroundPicture,
   editProfilePicture,
-  getProfile
+  getProfile,
+  submitPost
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 
@@ -25,6 +26,7 @@ const MyProfile = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [backgroundPicture, setBackgroundPicture] = useState(null);
   const [userData, setUserData] = useState(null);
+
   const selectImage = async (setPicture, type) => {
     const options = {
       mediaTypes: ImagePicker.MediaTypeOptions.Images
@@ -40,6 +42,17 @@ const MyProfile = () => {
         }).then((response) => {
           console.log(response);
         });
+        // const form = new FormData();
+        // form.append("description", "test");
+        // form.append("postedBy", "test");
+        // form.append("image", {
+        //   uri: response.assets[0].uri,
+        //   name: "postImage.jpg",
+        //   type: "image/jpg"
+        // });
+        // submitPost(form).then((response) => {
+        //   console.log(response);
+        // });
       } else {
         editBackgroundPicture({
           image: response.assets[0].uri,
@@ -60,9 +73,6 @@ const MyProfile = () => {
         setBackgroundPicture(response.data.backgroundPicture);
       });
     });
-    // const fetchData = async () => {
-    //   const response = await getProfile();
-    // };
     console.log(userData);
   }, []);
 
@@ -276,8 +286,6 @@ const MyProfile = () => {
 const styles = StyleSheet.create({
   textStyle: {
     fontWeight: "500"
-    // fontSize: 18
-    // marginLeft: 20
   }
 });
 

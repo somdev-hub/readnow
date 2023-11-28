@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.39.254:3500";
+const ADDRESS = "http://192.168.33.115:3500";
 
 const getHeadlines = async () => {
   const response = await axios.get(`${ADDRESS}/get-headlines`);
@@ -100,6 +100,16 @@ const getProfile = async (email) => {
   return response.data;
 };
 
+const submitPost = async (data) => {
+  try {
+    console.log("hello");
+    const response = await axios.post(`${ADDRESS}/add-post`, data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getHeadlines,
   searchHeadlines,
@@ -109,5 +119,6 @@ export {
   editProfilePicture,
   editBackgroundPicture,
   decodeUser,
-  getProfile
+  getProfile,
+  submitPost
 };

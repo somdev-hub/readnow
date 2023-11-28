@@ -133,6 +133,8 @@ const Login = () => {
                 Enter your email
               </Text>
               <TextInput
+                inputMode="email"
+                
                 onChangeText={(value) => setFormData("email", value)}
                 placeholder="something@gmail.com"
                 style={{
@@ -149,6 +151,7 @@ const Login = () => {
                 Enter password
               </Text>
               <TextInput
+                secureTextEntry={true}
                 onChangeText={(value) => setFormData("password", value)}
                 placeholder="min. 8 character"
                 style={{

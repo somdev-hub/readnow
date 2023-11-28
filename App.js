@@ -31,6 +31,10 @@ import AddInfo from "./app/AddInfo";
 import * as SecureStorage from "expo-secure-store";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import { decodeUser } from "./api/apis";
+import { store } from "./redux/store";
+import { Provider, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { addPost, postFormData } from "./redux/postSlice";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -70,6 +74,8 @@ const navStyles = StyleSheet.create({
 const StackNavigator = () => {
   const [token, setToken] = useState(null);
   const navigator = useNavigation();
+  const dispatch = useDispatch();
+  const postData = useSelector((state) => state.post.postData);
   useEffect(() => {
     const decodeToken = async () => {
       const token = await SecureStorage.getItemAsync("token");
@@ -103,7 +109,7 @@ const StackNavigator = () => {
       }
     };
     decodeToken();
-  }, [navigator, token]);
+  }, [token]);
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
@@ -135,7 +141,10 @@ const StackNavigator = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
                   Add Post
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                  dispatch(postFormData(postData))
+                  // navigator.navigate("HomeScreen")
+                }}>
                   <Text
                     style={{
                       fontSize: 16,
@@ -276,9 +285,11 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StackNavigator />
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <StackNavigator />
+      </NavigationContainer>
+    </Provider>
   );
 }
 
