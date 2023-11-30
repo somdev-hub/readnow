@@ -142,6 +142,16 @@ const getShortProfileInfo = async (email) => {
   }
 };
 
+const getAIResponse = async (data) => {
+  try {
+    // console.log(data);
+    const response = await axios.post(`${ADDRESS}/get-ai`, { text: data });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getHeadlines,
   searchHeadlines,
@@ -154,5 +164,6 @@ export {
   getProfile,
   submitPost,
   getFeeds,
-  getShortProfileInfo
+  getShortProfileInfo,
+  getAIResponse
 };
