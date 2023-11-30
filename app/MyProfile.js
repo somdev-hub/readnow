@@ -20,12 +20,14 @@ import {
   submitPost
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
+import PostCard from "../components/PostCard";
 
 const MyProfile = () => {
   const navigator = useNavigation();
   const [profilePicture, setProfilePicture] = useState(null);
   const [backgroundPicture, setBackgroundPicture] = useState(null);
   const [userData, setUserData] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
 
   const selectImage = async (setPicture, type) => {
     const options = {
@@ -42,17 +44,6 @@ const MyProfile = () => {
         }).then((response) => {
           console.log(response);
         });
-        // const form = new FormData();
-        // form.append("description", "test");
-        // form.append("postedBy", "test");
-        // form.append("image", {
-        //   uri: response.assets[0].uri,
-        //   name: "postImage.jpg",
-        //   type: "image/jpg"
-        // });
-        // submitPost(form).then((response) => {
-        //   console.log(response);
-        // });
       } else {
         editBackgroundPicture({
           image: response.assets[0].uri,
@@ -67,13 +58,14 @@ const MyProfile = () => {
   useEffect(() => {
     SecureStorage.getItemAsync("email").then((email) => {
       getProfile(email).then((response) => {
-        console.log(response);
-        setUserData(response.data);
-        setProfilePicture(response.data.profilePicture);
-        setBackgroundPicture(response.data.backgroundPicture);
+        // console.log(response.data);
+        setUserData(response.data.userData);
+        setUserPosts(response.data.postData);
+        setProfilePicture(response.data.userData.profilePicture);
+        setBackgroundPicture(response.data.userData.backgroundPicture);
       });
     });
-    console.log(userData);
+    // console.log(userData);
   }, []);
 
   return (
@@ -151,7 +143,7 @@ const MyProfile = () => {
                 {userData?.header}
               </Text>
               <View style={{ flexDirection: "row" }}>
-                {userData?.tags.map((item, index) => {
+                {/* {userData?.tags.map((item, index) => {
                   return (
                     <Text
                       style={{ marginTop: 10, color: "#00A9FF" }}
@@ -160,7 +152,7 @@ const MyProfile = () => {
                       {item + " "}
                     </Text>
                   );
-                })}
+                })} */}
               </View>
               <View
                 style={{
@@ -277,6 +269,22 @@ const MyProfile = () => {
               </Text>
             </View>
           </ScrollView>
+        </View>
+        <View>
+          {userPosts?.map((item, index) => {
+            return (
+              <PostCard
+                key={index}
+                user={userData.name}
+                header={userData.header}
+                description={item.description}
+                image={item.image}
+                likes={item.likes}
+                comments={item.comments}
+                profilePicture={userData.profilePicture}
+              />
+            );
+          })}
         </View>
       </ScrollView>
     </View>

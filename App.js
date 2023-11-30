@@ -35,6 +35,7 @@ import { store } from "./redux/store";
 import { Provider, useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { addPost, postFormData } from "./redux/postSlice";
+import { PaperProvider } from "react-native-paper";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -76,6 +77,7 @@ const StackNavigator = () => {
   const navigator = useNavigation();
   const dispatch = useDispatch();
   const postData = useSelector((state) => state.post.postData);
+  const Switch = useSelector((state) => state.post.switch);
   useEffect(() => {
     const decodeToken = async () => {
       const token = await SecureStorage.getItemAsync("token");
@@ -141,10 +143,17 @@ const StackNavigator = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
                   Add Post
                 </Text>
-                <TouchableOpacity onPress={() => {
-                  dispatch(postFormData(postData))
-                  // navigator.navigate("HomeScreen")
-                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log(postData);
+                    dispatch(postFormData(postData));
+                    // dispatch({
+                    //   type: "post/updateSwitch",
+                    //   payload: true
+                    // });
+                    // navigator.navigate("HomeScreen")
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 16,
@@ -203,10 +212,12 @@ const DrawerNavigator = () => {
 
 const HomeTopNavigator = () => {
   return (
+    //<PaperProvider>
     <TopTab.Navigator>
       <TopTab.Screen name="News" component={Home} />
       <TopTab.Screen name="Feed" component={Feeds} />
     </TopTab.Navigator>
+    // </PaperProvider>
   );
 };
 
@@ -285,11 +296,13 @@ const TabNavigator = () => {
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <NavigationContainer>
-        <StackNavigator />
-      </NavigationContainer>
-    </Provider>
+    <PaperProvider>
+      <Provider store={store}>
+        <NavigationContainer>
+          <StackNavigator />
+        </NavigationContainer>
+      </Provider>
+    </PaperProvider>
   );
 }
 

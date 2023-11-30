@@ -4,18 +4,27 @@ import {
   ScrollView,
   Image,
   Dimensions,
-  Pressable
+  Pressable,
+  RefreshControl
 } from "react-native";
-import React from "react";
-import { Feather } from "@expo/vector-icons";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useEffect } from "react";
 import PostCard from "../components/PostCard";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
+import { getFeeds, getProfile, getShortProfileInfo } from "../api/apis";
+// import {PaperProvider} from 'react-native-paper'
 
 const size = Dimensions.get("window");
 const Feeds = () => {
   const navigator = useNavigation();
+  const [feeds, setFeeds] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    // setRefreshing(true);
+    fetchData();
+    // setRefreshing(false);
+  }, []);
 
   const posts = [
     {
@@ -91,8 +100,39 @@ const Feeds = () => {
         "https://i.pinimg.com/736x/24/54/01/2454011963c028872ef467f41257aeb9.jpg"
     }
   ];
+  const fetchData = async () => {
+    setRefreshing(true);
+    const response = await getFeeds();
+    const feedsWithProfile = await Promise.all(
+      response.posts.map(async (feed) => {
+        const profileResponse = await getShortProfileInfo(feed.postedBy);
+        // if (feed.postedBy === profileResponse?.email) {
+        // console.log(profileResponse.data);
+        setRefreshing(false);
+        return {
+          ...feed,
+          user: profileResponse?.data.name,
+          header: profileResponse?.data.header,
+          profilePicture: profileResponse?.data.profilePicture
+        };
+        // } else {
+        //   return feed;
+        // }
+      })
+    );
+    setFeeds(feedsWithProfile);
+  };
+  useEffect(() => {
+    fetchData();
+    // console.log(feeds[0]);
+  }, []);
   return (
-    <ScrollView style={{ flex: 1 }}>
+    <ScrollView
+      style={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View
         style={{
           backgroundColor: "white",
@@ -195,7 +235,7 @@ const Feeds = () => {
         </ScrollView>
       </View>
       <View>
-        {posts.map((item, index) => {
+        {feeds.map((item, index) => {
           return (
             <PostCard
               key={index}
@@ -205,6 +245,7 @@ const Feeds = () => {
               image={item.image}
               likes={item.likes}
               comments={item.comments}
+              profilePicture={item.profilePicture}
             />
           );
         })}

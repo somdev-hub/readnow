@@ -9,7 +9,7 @@ import {
   Image,
   Pressable
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
@@ -19,38 +19,77 @@ import * as SecureStorage from "expo-secure-store";
 import { submitPost } from "../api/apis";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmail } from "../redux/postSlice";
+import BufferModule from "buffer";
+
+
 
 const screenHeights = Dimensions.get("window").height;
 const AddPost = () => {
   // const userMail = SecureStorage.getItemAsync("userMail");
   const [postImage, setPostImage] = useState(null);
   const [userMail, setUserMail] = useState("");
+  // const [postData, setPostData] = useState({
+  //   description: "",
+  //   postedBy: "",
+  //   image: null
+  // });
+  const Buffer = BufferModule.Buffer;
   SecureStorage.getItemAsync("email").then((res) => setUserMail(res));
-spatch = useDispatch();
+  const dispatch = useDispatch();
   const postData = useSelector((state) => state.post.postData);
+  const switchValue = useSelector((state) => state.post.switch);
+
+  const firstRender = useRef(true);
+  // console.log(userMail);
 
   const handleInputChanges = (text) => {
-    // setPostData({ ...postData, description: text });
-    dispatch({ type: "post/updatePostData", payload: { description: text } });
+
+    dispatch({
+      type: "post/updatePostData",
+      payload: {
+        description: text,
+        postedBy: postData.postedBy,
+        image: postData.image
+      }
+    });
+  };
+  const handleSubmit = () => {
+    console.log(postData);
   };
 
   const selectImage = async () => {
     const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      base64: true,
     };
     const response = await ImagePicker.launchImageLibraryAsync(options);
 
     if (!response.canceled) {
       setPostImage(response.assets[0].uri);
-      // setPostData({ ...postData, image: response.assets[0].uri });
       dispatch({
         type: "post/updatePostData",
-        payload: { image: response.assets[0].uri }
+        payload: {
+          image: response.assets[0].uri,
+          postedBy: postData.postedBy,
+          description: postData.description
+        }
       });
     }
   };
 
   useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      dispatch({
+        type: "post/updatePostData",
+        payload: {
+          description: "",
+          postedBy: "",
+          image: null
+        }
+      });
+    }
+   
     dispatch(fetchEmail());
   }, []);
   return (
@@ -65,7 +104,7 @@ spatch = useDispatch();
           height: screenHeights * 0.8
         }}
       >
-        <View>
+        <ScrollView>
           <TextInput
             multiline
             textAlignVertical="top"
@@ -73,22 +112,20 @@ spatch = useDispatch();
             style={{ fontSize: 16, height: "100%", padding: 10 }}
             onChangeText={(text) => handleInputChanges(text)}
           />
-        </View>
-        <View
+        </ScrollView>
+        {postImage && (<View
           style={{
             height: 75,
             width: "100%",
-            // elevation: 1,
             position: "fixed",
-            bottom: 80,
+            bottom: 0,
             backgroundColor: "#fff",
-            // position: "relative",
             padding: 10,
             borderTopRightRadius: 10,
-            borderTopLeftRadius: 10
+            borderTopLeftRadius: 10,
           }}
         >
-          {postImage && (
+          
             <View style={{ position: "relative", width: 60 }}>
               <Image
                 source={{
@@ -103,6 +140,14 @@ spatch = useDispatch();
               <Pressable
                 onPress={() => {
                   setPostImage(null);
+                  dispatch({
+                    type: "post/updatePostData",
+                    payload: {
+                      image: null,
+                      postedBy: postData.postedBy,
+                      description: postData.description
+                    }
+                  });
                 }}
                 style={{
                   width: 20,
@@ -126,8 +171,8 @@ spatch = useDispatch();
                 />
               </Pressable>
             </View>
-          )}
         </View>
+          )}
       </View>
       <View
         style={{

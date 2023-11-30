@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.33.115:3500";
+const ADDRESS = "http://192.168.39.254:3500";
 
 const getHeadlines = async () => {
   const response = await axios.get(`${ADDRESS}/get-headlines`);
@@ -102,8 +102,40 @@ const getProfile = async (email) => {
 
 const submitPost = async (data) => {
   try {
+    const formData = new FormData();
+    formData.append("description", data.description);
+    formData.append("postedBy", data.postedBy);
+    formData.append("image", {
+      uri: data.image,
+      name: "postImage.jpg",
+      type: "image/jpg"
+    });
     console.log("hello");
-    const response = await axios.post(`${ADDRESS}/add-post`, data);
+    const response = await axios.post(`${ADDRESS}/add-post`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getFeeds = async () => {
+  try {
+    const response = await axios.get(`${ADDRESS}/get-feeds`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getShortProfileInfo = async (email) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/get-short-profile-info`, {
+      email
+    });
     return response.data;
   } catch (error) {
     console.log(error);
@@ -120,5 +152,7 @@ export {
   editBackgroundPicture,
   decodeUser,
   getProfile,
-  submitPost
+  submitPost,
+  getFeeds,
+  getShortProfileInfo
 };

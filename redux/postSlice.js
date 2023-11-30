@@ -1,6 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
 import { getHeadlines, submitPost } from "../api/apis";
+import axios from "axios";
+
+const ADDRESS = "http://192.168.33.115:3500";
 
 export const postFormData = createAsyncThunk(
   "post/postFormData",
@@ -8,12 +11,29 @@ export const postFormData = createAsyncThunk(
     const formData = new FormData();
     formData.append("description", postData.description);
     formData.append("postedBy", postData.postedBy);
-    formData.append("image", {
-        uri: postData.image,
-        name: "postImage.jpg",
-        type: "image/jpg"
-    });
-    const response = await submitPost(formData);
+
+    const res=await fetch(postData.image);
+    const blob=await res.blob();
+    formData.append("image",postData.image);
+    // const submitPost = async (data) => {
+    //   try {
+    //     // console.log("hello");
+    //     axios
+    //       .post(`${ADDRESS}/add-post`, data)
+    //       .then((response) => {
+    //         console.log(response.data);
+    //       })
+    //       .catch((error) => {
+    //         console.log(error);
+    //       });
+    //   } catch (error) {
+    //     console.log(error);
+    //   }
+    // };
+    // console.log(postData.description);
+    const response = await submitPost(postData);
+    console.log(formData);
+    // console.log("hello");
     // const response = await getHeadlines();
     console.log(response);
     return response;
@@ -34,12 +54,16 @@ const postSlice = createSlice({
       image: null
     },
     loading: false,
-    error: ""
+    error: "",
+    switch: false
   },
   reducers: {
     updatePostData: (state, action) => {
       state.postData.description = action.payload.description;
       state.postData.image = action.payload.image;
+    },
+    updateSwitch: (state, action) => {
+      state.switch = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -58,6 +82,9 @@ const postSlice = createSlice({
         // state.postData = action.payload;
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchEmail.fulfilled, (state, action) => {
+        state.postData.postedBy = action.payload;
       });
   }
 });
