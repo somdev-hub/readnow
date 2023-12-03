@@ -12,6 +12,11 @@ const searchHeadlines = async (query) => {
   return response.data;
 };
 
+const getArticle = async (url) => {
+  const response = await axios.get(`${ADDRESS}/article`, { url:url });
+  return response.data;
+};
+
 const signup = async (userCredentials) => {
   try {
     const response = await axios.post(`${ADDRESS}/add-user`, userCredentials);
@@ -155,6 +160,7 @@ const getAIResponse = async (data) => {
 export {
   getHeadlines,
   searchHeadlines,
+  getArticle,
   signup,
   login,
   editProfile,

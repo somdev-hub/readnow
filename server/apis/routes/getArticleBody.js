@@ -6,6 +6,7 @@ const { Readability } = require("@mozilla/readability");
 
 router.get("/", async (req, res) => {
   const url = req.body.url;
+  console.log(req.body);
   try {
     async function getArticle() {
       try {

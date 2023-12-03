@@ -14,7 +14,6 @@ import { Home, Web, Bookmarks, Profile, Article } from "./app/index";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Entypo } from "@expo/vector-icons";
 import HeaderMenu from "./components/HeaderMenu";
-// import { Drawer } from "react-native-drawer-layout";
 import { useEffect, useState } from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import Feeds from "./app/Feeds";
@@ -35,7 +34,8 @@ import { store } from "./redux/store";
 import { Provider, useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { addPost, postFormData } from "./redux/postSlice";
-import { PaperProvider } from "react-native-paper";
+import { PaperProvider, Menu } from "react-native-paper";
+import ArticlePage from "./app/ArticlePage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -78,6 +78,11 @@ const StackNavigator = () => {
   const dispatch = useDispatch();
   const postData = useSelector((state) => state.post.postData);
   const Switch = useSelector((state) => state.post.switch);
+  const [visible, setVisible] = useState(false);
+
+  const openMenu = () => setVisible(true);
+
+  const closeMenu = () => setVisible(false);
   useEffect(() => {
     const decodeToken = async () => {
       const token = await SecureStorage.getItemAsync("token");
@@ -115,11 +120,49 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Add Post"
+      initialRouteName="HomeScreen"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
-      <Stack.Screen name="Article" component={Article} />
+      <Stack.Screen
+        name="Article"
+        component={ArticlePage}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Article</Text>
+                <Menu
+                  visible={visible}
+                  onDismiss={closeMenu}
+                  anchor={
+                    <Entypo
+                      onPress={openMenu}
+                      name="dots-three-vertical"
+                      size={20}
+                      color="black"
+                    />
+                  }
+                >
+                  <Menu.Item onPress={() => {}} title="Add to Bookmark" />
+                  <Menu.Item onPress={() => {}} title="Add to Story" />
+                  <Menu.Item onPress={() => {}} title="Repost" />
+                  <Menu.Item onPress={() => {}} title="Share" />
+                  <Menu.Item onPress={() => {}} title="Send" />
+                </Menu>
+              </View>
+            );
+          }
+        }}
+      />
       <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="Signup" component={SignUp} />
       <Stack.Screen name="Login" component={Login} />
@@ -147,11 +190,6 @@ const StackNavigator = () => {
                   onPress={() => {
                     console.log(postData);
                     dispatch(postFormData(postData));
-                    // dispatch({
-                    //   type: "post/updateSwitch",
-                    //   payload: true
-                    // });
-                    // navigator.navigate("HomeScreen")
                   }}
                 >
                   <Text
