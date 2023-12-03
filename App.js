@@ -29,7 +29,7 @@ import AddPost from "./app/AddPost";
 import AddInfo from "./app/AddInfo";
 import * as SecureStorage from "expo-secure-store";
 import { useNavigation, CommonActions } from "@react-navigation/native";
-import { decodeUser } from "./api/apis";
+import { addBookmark, decodeUser } from "./api/apis";
 import { store } from "./redux/store";
 import { Provider, useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
@@ -78,6 +78,7 @@ const StackNavigator = () => {
   const dispatch = useDispatch();
   const postData = useSelector((state) => state.post.postData);
   const Switch = useSelector((state) => state.post.switch);
+  const bookmarkSelector = useSelector((state) => state.bookmark);
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -152,7 +153,19 @@ const StackNavigator = () => {
                     />
                   }
                 >
-                  <Menu.Item onPress={() => {}} title="Add to Bookmark" />
+                  <Menu.Item
+                    onPress={() => {
+                      addBookmark(
+                        bookmarkSelector.bookmark,
+                        bookmarkSelector.type,
+                        bookmarkSelector.email
+                      ).then((data) => {
+                        console.log(data);
+                      });
+                      closeMenu();
+                    }}
+                    title="Add to Bookmark"
+                  />
                   <Menu.Item onPress={() => {}} title="Add to Story" />
                   <Menu.Item onPress={() => {}} title="Repost" />
                   <Menu.Item onPress={() => {}} title="Share" />

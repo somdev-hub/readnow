@@ -18,7 +18,9 @@ const addPostRouter = require("./routes/addPost");
 const { MongoClient } = require("mongodb");
 const getFeedsRouter = require("./routes/getFeeds");
 const getShortProfileInfoRouter = require("./routes/getShortProfileInfo");
-const getAIRouter=require("./routes/getAI")
+const getAIRouter = require("./routes/getAI");
+const addBookmarkRouter = require("./routes/addBookmark");
+const getBookmarkRouter = require("./routes/getBookmark");
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -66,9 +68,11 @@ app.use("/edit-profile-picture", editProfilePictureRouter);
 app.use("/edit-background-picture", editBackgroundPictureRouter);
 app.use("/get-profile", getProfileRouter);
 app.use("/add-post", addPostRouter);
-app.use("/get-feeds",getFeedsRouter)
+app.use("/get-feeds", getFeedsRouter);
 app.use("/get-short-profile-info", getShortProfileInfoRouter);
-app.use("/get-ai",getAIRouter)
+app.use("/get-ai", getAIRouter);
+app.use("/add-bookmark", addBookmarkRouter);
+app.use("/get-bookmarks", getBookmarkRouter);
 
 app.listen(3500, (error) => {
   if (error) {

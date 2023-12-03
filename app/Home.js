@@ -158,16 +158,13 @@ const Home = () => {
             >
               {newsData.map((item, index) => {
                 return (
-                  // <Link href={"./article"} key={index}>
                   <Pressable
                     key={index}
-                    // onPress={() => navigator.push("article", { item })}
                     onPress={() =>
                       navigator.navigate("Article", { item: item })
                     }
                   >
                     <View
-                      // key={index}
                       style={{
                         flexDirection: "row",
                         gap: 7,
@@ -189,7 +186,6 @@ const Home = () => {
                           justifyContent: "space-between"
                         }}
                       >
-                        {/* <Text style={{ color: "#A9A9A9" }}>{item.category}</Text> */}
                         <Text
                           style={{
                             fontWeight: "bold",
@@ -222,7 +218,6 @@ const Home = () => {
                       </View>
                     </View>
                   </Pressable>
-                  // {/* </Link> */}
                 );
               })}
             </View>

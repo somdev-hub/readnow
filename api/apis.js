@@ -13,7 +13,8 @@ const searchHeadlines = async (query) => {
 };
 
 const getArticle = async (url) => {
-  const response = await axios.get(`${ADDRESS}/article`, { url:url });
+  const response = await axios.post(`${ADDRESS}/article`, { url: url });
+  // console.log(response.data);
   return response.data;
 };
 
@@ -149,9 +150,31 @@ const getShortProfileInfo = async (email) => {
 
 const getAIResponse = async (data) => {
   try {
-    // console.log(data);
     const response = await axios.post(`${ADDRESS}/get-ai`, { text: data });
     return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const addBookmark = async (item, type, email) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/add-bookmark`, {
+      item,
+      type,
+      email
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getBookmarks = async (email) => {
+  console.log(email);
+  try {
+    const response = await axios.post(`${ADDRESS}/get-bookmarks`, { email });
+    return response.data;
   } catch (error) {
     console.log(error);
   }
@@ -171,5 +194,7 @@ export {
   submitPost,
   getFeeds,
   getShortProfileInfo,
-  getAIResponse
+  getAIResponse,
+  addBookmark,
+  getBookmarks
 };

@@ -2,40 +2,54 @@ import { View, Text, ScrollView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { getArticle } from "../api/apis";
+import { useDispatch } from "react-redux";
+import { fetchEmail } from "../redux/bookmarkSlice";
+import { Button, Snackbar } from 'react-native-paper';
 
 const ArticlePage = () => {
   const router = useRoute();
   const article = router.params.item;
   const [articleContent, setArticleContent] = useState("");
+  const dispatch = useDispatch();
+  const [visible, setVisible] = React.useState(false);
+
+  const onToggleSnackBar = () => setVisible(!visible);
+
+  const onDismissSnackBar = () => setVisible(false);
 
   useEffect(() => {
+    dispatch({
+      type: "bookmark/addBookmark",
+      payload: { bookmark: article, type: "news" }
+    });
+    dispatch(fetchEmail());
     getArticle(article.url).then((data) => {
       setArticleContent(data);
     });
   }, []);
+
   return (
     <ScrollView>
+      <Image
+        source={{
+          uri: article.urlToImage
+        }}
+        style={{
+          width: "100%",
+          height: 250,
+          borderRadius: 5,
+          resizeMode: "cover"
+        }}
+      />
       <View
         style={{
           marginHorizontal: 10,
-          marginTop: 20,
-          alignItems: "center",
+          // marginTop: 20,
+          // alignItems: "center"
           justifyContent: "center"
         }}
       >
-        <Image
-          source={{
-            uri: article.urlToImage
-          }}
-          style={{
-            width: "100%",
-            height: 250,
-            // marginTop: 20,
-            borderRadius: 5,
-            resizeMode: "cover"
-          }}
-        />
-        <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 10 }}>
+        <Text style={{ fontSize: 18, fontWeight: "500", marginTop: 20 }}>
           {article.title}
         </Text>
         <View
@@ -55,7 +69,7 @@ const ArticlePage = () => {
             >
               Posted by
             </Text>
-            <Text>{article.author}</Text>
+            <Text>{article.author ? article.author : article.source.name}</Text>
           </View>
           <View style={{}}>
             <Text
@@ -77,6 +91,17 @@ const ArticlePage = () => {
           <Text style={{ textAlign: "justify" }}>{articleContent}</Text>
         </View>
       </View>
+      <Snackbar
+        visible={visible}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: 'Undo',
+          onPress: () => {
+            // Do something
+          },
+        }}>
+        Hey there! I'm a Snackbar.
+      </Snackbar>
     </ScrollView>
   );
 };

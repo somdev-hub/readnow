@@ -12,29 +12,11 @@ export const postFormData = createAsyncThunk(
     formData.append("description", postData.description);
     formData.append("postedBy", postData.postedBy);
 
-    const res=await fetch(postData.image);
-    const blob=await res.blob();
-    formData.append("image",postData.image);
-    // const submitPost = async (data) => {
-    //   try {
-    //     // console.log("hello");
-    //     axios
-    //       .post(`${ADDRESS}/add-post`, data)
-    //       .then((response) => {
-    //         console.log(response.data);
-    //       })
-    //       .catch((error) => {
-    //         console.log(error);
-    //       });
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    // };
-    // console.log(postData.description);
+    const res = await fetch(postData.image);
+    // const blob=await res.blob();
+    formData.append("image", postData.image);
     const response = await submitPost(postData);
     console.log(formData);
-    // console.log("hello");
-    // const response = await getHeadlines();
     console.log(response);
     return response;
   }
@@ -69,17 +51,14 @@ const postSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(postFormData.pending, (state, action) => {
-        // state.postData = action.payload;
         state.loading = true;
         state.error = null;
       })
       .addCase(postFormData.fulfilled, (state, action) => {
-        // state.postData = action.payload;
         state.loading = false;
-        // state.error = action.payload
+
       })
       .addCase(postFormData.rejected, (state, action) => {
-        // state.postData = action.payload;
         state.loading = false;
         state.error = action.payload;
       })

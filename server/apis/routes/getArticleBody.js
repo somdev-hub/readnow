@@ -4,9 +4,9 @@ const axios = require("axios");
 const { JSDOM } = require("jsdom");
 const { Readability } = require("@mozilla/readability");
 
-router.get("/", async (req, res) => {
+router.post("/", async (req, res) => {
   const url = req.body.url;
-  console.log(req.body);
+  // console.log(req.body);
   try {
     async function getArticle() {
       try {
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
 
         return reader.textContent;
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       }
     }
     const content = await getArticle();
