@@ -54,10 +54,9 @@ const AddPost = () => {
     console.log(postData);
   };
   const handleAI = async () => {
-    // console.log(aiPrompt);
     setIsAILoading(true);
     const response = await getAIResponse(aiPrompt);
-    // console.log(response.data);
+
     dispatch({
       type: "post/updatePostData",
       payload: {

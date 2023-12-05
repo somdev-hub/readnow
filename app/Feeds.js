@@ -11,8 +11,14 @@ import React, { useEffect } from "react";
 import PostCard from "../components/PostCard";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
-import { getFeeds, getProfile, getShortProfileInfo } from "../api/apis";
+import {
+  addBookmark,
+  getFeeds,
+  getProfile,
+  getShortProfileInfo
+} from "../api/apis";
 // import {PaperProvider} from 'react-native-paper'
+import * as SecureStorage from "expo-secure-store";
 
 const size = Dimensions.get("window");
 const Feeds = () => {
@@ -21,9 +27,7 @@ const Feeds = () => {
   const [refreshing, setRefreshing] = React.useState(false);
 
   const onRefresh = React.useCallback(() => {
-    // setRefreshing(true);
     fetchData();
-    // setRefreshing(false);
   }, []);
 
   const posts = [
@@ -100,14 +104,19 @@ const Feeds = () => {
         "https://i.pinimg.com/736x/24/54/01/2454011963c028872ef467f41257aeb9.jpg"
     }
   ];
+  const addToBookmark = async (feed) => {
+    const userMail = await SecureStorage.getItemAsync("email");
+
+    addBookmark(feed, "post", userMail).then((data) => {
+      console.log(data);
+    });
+  };
   const fetchData = async () => {
     setRefreshing(true);
     const response = await getFeeds();
     const feedsWithProfile = await Promise.all(
       response.posts.map(async (feed) => {
         const profileResponse = await getShortProfileInfo(feed.postedBy);
-        // if (feed.postedBy === profileResponse?.email) {
-        // console.log(profileResponse.data);
         setRefreshing(false);
         return {
           ...feed,
@@ -115,16 +124,12 @@ const Feeds = () => {
           header: profileResponse?.data.header,
           profilePicture: profileResponse?.data.profilePicture
         };
-        // } else {
-        //   return feed;
-        // }
       })
     );
     setFeeds(feedsWithProfile);
   };
   useEffect(() => {
     fetchData();
-    // console.log(feeds[0]);
   }, []);
   return (
     <ScrollView
@@ -236,6 +241,7 @@ const Feeds = () => {
       </View>
       <View>
         {feeds.map((item, index) => {
+          const { user, profilePicture, header, ...rest } = item;
           return (
             <PostCard
               key={index}
@@ -243,9 +249,13 @@ const Feeds = () => {
               header={item.header}
               description={item.description}
               image={item.image}
-              likes={item.likes}
+              likes={item.likedBy}
               comments={item.comments}
               profilePicture={item.profilePicture}
+              onPressBookmark={() => {
+                addToBookmark(rest);
+                console.log(rest);
+              }}
             />
           );
         })}

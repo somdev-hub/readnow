@@ -28,6 +28,26 @@ router.post("/", async (req, res) => {
           });
         }
         break;
+      case "post":
+        const newPostBookmark = {
+          type,
+          item
+        };
+        if (bookmarks) {
+          // console.log(bookmarks);
+          bookmarks.bookmarks.push(newPostBookmark);
+          bookmarks.save();
+        } else {
+          const newBookmarks = new Bookmarks({
+            user: email,
+            bookmarks: [newPostBookmark]
+          });
+          newBookmarks.save();
+          res.status(200).json({
+            message: "Bookmark added successfully"
+          });
+        }
+        break;
 
       default:
         break;

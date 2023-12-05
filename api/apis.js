@@ -131,6 +131,7 @@ const submitPost = async (data) => {
 const getFeeds = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/get-feeds`);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -171,7 +172,7 @@ const addBookmark = async (item, type, email) => {
 };
 
 const getBookmarks = async (email) => {
-  console.log(email);
+  // console.log(email);
   try {
     const response = await axios.post(`${ADDRESS}/get-bookmarks`, { email });
     return response.data;

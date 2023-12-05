@@ -4,7 +4,7 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { email } = req.body;
-  // console.log(req.body);
+  console.log(req.body);
   try {
     const bookmarks = await Bookmarks.findOne({ user: email });
     res.status(200).json({

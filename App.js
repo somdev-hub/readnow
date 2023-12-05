@@ -129,6 +129,7 @@ const StackNavigator = () => {
         name="Article"
         component={ArticlePage}
         options={{
+          // headerTintColor:"#fff",
           headerShown: true,
           headerTitle: () => {
             return (
@@ -254,6 +255,9 @@ const DrawerNavigator = () => {
         component={HomeTopNavigator}
         options={{
           headerShown: true,
+          headerStyle: {
+            // backgroundColor: "#39A7FF"
+          },
           headerTitle: () => <HeaderMenu />
         }}
       />
@@ -263,12 +267,22 @@ const DrawerNavigator = () => {
 
 const HomeTopNavigator = () => {
   return (
-    //<PaperProvider>
-    <TopTab.Navigator>
+    <TopTab.Navigator
+      // screenOptions={{
+      //   tabBarStyle: {
+      //     backgroundColor: "#39A7FF"
+      //   },
+      //   // tabBarLabel: {
+      //   //   color: "#fff"
+      //   // }
+      //   tabBarLabelStyle:{
+      //     color:"#fff"
+      //   }
+      // }}
+    >
       <TopTab.Screen name="News" component={Home} />
       <TopTab.Screen name="Feed" component={Feeds} />
     </TopTab.Navigator>
-    // </PaperProvider>
   );
 };
 
@@ -306,11 +320,11 @@ const TabNavigator = () => {
             component={item.component}
             options={{
               headerShown: item.name === "Home" ? false : true,
-              // headerStyle: {
-              //   height: item.name === "Home" ? 120 : undefined
-              // },
-              // headerTitle:
-              //   item.name == "Home" ? () => <HeaderMenu /> : item.name,
+              headerStyle: {
+                backgroundColor: "#39A7FF",
+                elevation: 10
+              },
+              headerTintColor: "#fff",
               tabBarIcon: ({ focused }) => (
                 <View
                   style={

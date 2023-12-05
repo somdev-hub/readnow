@@ -17,23 +17,15 @@ const HeaderMenu = () => {
     following: false
   });
   return (
-    <View >
+    <View>
       <View
         style={{
           flexDirection: "row",
           width: "100%",
           justifyContent: "flex-end",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
-        {/* <Pressable
-          onPress={() => {
-            setDrawer(true);
-          }}
-          style={[styles.iconCircle]}
-        >
-          <Feather name="menu" size={24} color="black" />
-        </Pressable> */}
         <View style={[styles.flexBox, { gap: 10 }]}>
           <Pressable
             onPress={() => navigator.navigate("Web")}
@@ -46,46 +38,6 @@ const HeaderMenu = () => {
           </View>
         </View>
       </View>
-      {/* <View style={{ flexDirection: "row", marginTop: 5 }}>
-        <TouchableOpacity
-          onPress={() => {
-            setMenuItem({ news: true, following: false });
-            navigator.navigate("News");
-          }}
-          style={[
-            styles.menuItem,
-            { borderBottomWidth: menuItem.news ? 2 : 0 }
-          ]}
-        >
-          <Text
-            style={{
-              fontWeight: "500",
-              color: menuItem.news ? "#39A7FF" : "#000"
-            }}
-          >
-            News
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            setMenuItem({ news: false, following: true });
-            navigator.navigate("Feed");
-          }}
-          style={[
-            styles.menuItem,
-            { borderBottomWidth: menuItem.following ? 2 : 0 }
-          ]}
-        >
-          <Text
-            style={{
-              fontWeight: "500",
-              color: menuItem.following ? "#39A7FF" : "#000"
-            }}
-          >
-            Following
-          </Text>
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 };
