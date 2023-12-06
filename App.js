@@ -36,6 +36,7 @@ import { useDispatch } from "react-redux";
 import { addPost, postFormData } from "./redux/postSlice";
 import { PaperProvider, Menu } from "react-native-paper";
 import ArticlePage from "./app/ArticlePage";
+import { Snackbar } from "react-native-paper";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -268,17 +269,17 @@ const DrawerNavigator = () => {
 const HomeTopNavigator = () => {
   return (
     <TopTab.Navigator
-      // screenOptions={{
-      //   tabBarStyle: {
-      //     backgroundColor: "#39A7FF"
-      //   },
-      //   // tabBarLabel: {
-      //   //   color: "#fff"
-      //   // }
-      //   tabBarLabelStyle:{
-      //     color:"#fff"
-      //   }
-      // }}
+    // screenOptions={{
+    //   tabBarStyle: {
+    //     backgroundColor: "#39A7FF"
+    //   },
+    //   // tabBarLabel: {
+    //   //   color: "#fff"
+    //   // }
+    //   tabBarLabelStyle:{
+    //     color:"#fff"
+    //   }
+    // }}
     >
       <TopTab.Screen name="News" component={Home} />
       <TopTab.Screen name="Feed" component={Feeds} />
@@ -310,52 +311,78 @@ const navigationItems = [
 ];
 
 const TabNavigator = () => {
+  const bookmarkNotification = useSelector(
+    (state) => state.notify.addedToBookmark
+  );
+  const dispatch = useDispatch();
   return (
-    <Tab.Navigator screenOptions={screenOptions}>
-      {navigationItems.map((item, index) => {
-        return (
-          <Tab.Screen
-            key={index}
-            name={item.name}
-            component={item.component}
-            options={{
-              headerShown: item.name === "Home" ? false : true,
-              headerStyle: {
-                backgroundColor: "#39A7FF",
-                elevation: 10
-              },
-              headerTintColor: "#fff",
-              tabBarIcon: ({ focused }) => (
-                <View
-                  style={
-                    focused
-                      ? [navStyles.activeButton]
-                      : { alignItems: "center", justifyContent: "center" }
-                  }
-                >
-                  <Feather
-                    name={item.icon}
-                    size={focused ? 18 : 24}
-                    color={focused ? "#fff" : "#A9A9A9"}
-                  />
-                  {focused && (
-                    <Text
-                      style={{
-                        color: "#fff",
-                        fontSize: 12,
-                        fontWeight: "500"
-                      }}
-                    >
-                      {item.name}
-                    </Text>
-                  )}
-                </View>
-              )
-            }}
-          />
-        );
-      })}
-    </Tab.Navigator>
+    <View style={{ flex: 1, position: "relative" }}>
+      <Tab.Navigator screenOptions={screenOptions}>
+        {navigationItems.map((item, index) => {
+          return (
+            <Tab.Screen
+              key={index}
+              name={item.name}
+              component={item.component}
+              options={{
+                headerShown: item.name === "Home" ? false : true,
+                headerStyle: {
+                  backgroundColor: "#39A7FF",
+                  elevation: 10
+                },
+                headerTintColor: "#fff",
+                tabBarIcon: ({ focused }) => (
+                  <View
+                    style={
+                      focused
+                        ? [navStyles.activeButton]
+                        : { alignItems: "center", justifyContent: "center" }
+                    }
+                  >
+                    <Feather
+                      name={item.icon}
+                      size={focused ? 18 : 24}
+                      color={focused ? "#fff" : "#A9A9A9"}
+                    />
+                    {focused && (
+                      <Text
+                        style={{
+                          color: "#fff",
+                          fontSize: 12,
+                          fontWeight: "500"
+                        }}
+                      >
+                        {item.name}
+                      </Text>
+                    )}
+                  </View>
+                )
+              }}
+            />
+          );
+        })}
+      </Tab.Navigator>
+      <Snackbar
+        visible={bookmarkNotification.addToBookmark}
+        style={{ position: "absolute", bottom: 60 }}
+        onDismiss={() => {}}
+        // duration={200}
+        action={{
+          label: "Done",
+          onPress: () => {
+            // console.log("click");
+            dispatch({
+              type: "notify/addBookmark",
+              payload: {
+                addToBookmark: false
+              }
+            });
+          }
+        }}
+      >
+        Added to Bookmarks
+      </Snackbar>
+    </View>
   );
 };
 

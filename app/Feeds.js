@@ -17,8 +17,7 @@ import {
   getProfile,
   getShortProfileInfo
 } from "../api/apis";
-import * as SecureStorage from "expo-secure-store";
-import { Snackbar } from "react-native-paper";
+import { useDispatch } from "react-redux";
 
 const size = Dimensions.get("window");
 const Feeds = () => {
@@ -26,10 +25,11 @@ const Feeds = () => {
   const [feeds, setFeeds] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const [visible, setVisible] = React.useState(false);
+  const dispatch = useDispatch();
 
   const onToggleSnackBar = () => setVisible(!visible);
 
-  const onDismissSnackBar = () => setVisible(false);
+  const onDismissSnackBar = () => setVisible(true);
 
   const onRefresh = React.useCallback(() => {
     fetchData();
@@ -110,12 +110,19 @@ const Feeds = () => {
     }
   ];
   const addToBookmark = async (feed) => {
-    const userMail = await SecureStorage.getItemAsync("email");
+    // const userMail = await SecureStorage.getItemAsync("email");
 
-    addBookmark(feed, "post", userMail).then((data) => {
-      console.log(data);
-      onToggleSnackBar();
-    });
+    // addBookmark(feed, "post", userMail).then((data) => {
+    //   console.log(data);
+    //   onToggleSnackBar();
+    // });
+    // onToggleSnackBar();
+    dispatch({
+      type:"notify/addBookmark",
+      payload:{
+        addToBookmark:true
+      }
+    })
   };
 
   const optionsContent = [
@@ -173,7 +180,7 @@ const Feeds = () => {
   }, []);
   return (
     <ScrollView
-      style={{ flex: 1 }}
+      style={{ flex: 1, position: "relative", marginBottom: 60 }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
@@ -307,18 +314,21 @@ const Feeds = () => {
           );
         })}
       </View>
-      <Snackbar
-        visible={visible}
-        onDismiss={onDismissSnackBar}
-        action={{
-          label: "Undo",
-          onPress: () => {
-            // Do something
-          }
-        }}
-      >
-        Added to Bookmarks
-      </Snackbar>
+      {/* <View style={{flex:1}}>
+        <Snackbar
+          visible={true}
+         
+          onDismiss={onDismissSnackBar}
+          action={{
+            label: "Undo",
+            onPress: () => {
+              // Do something
+            }
+          }}
+        >
+          Added to Bookmarks
+        </Snackbar>
+      </View> */}
     </ScrollView>
   );
 };

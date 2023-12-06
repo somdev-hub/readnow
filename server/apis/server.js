@@ -22,6 +22,12 @@ const getAIRouter = require("./routes/getAI");
 const addBookmarkRouter = require("./routes/addBookmark");
 const getBookmarkRouter = require("./routes/getBookmark");
 
+const postRouter = require("./routes/postRoute");
+const profileRouter = require("./routes/profileRoute");
+const newsRouter = require("./routes/newsRoute");
+const authRouter = require("./routes/authRoute");
+const bookmarkRouter = require("./routes/bookmarkRoute");
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const app = express();
@@ -39,40 +45,32 @@ mongoose
     if (error) console.log(error);
   });
 
-// let gfs, gridFsBucket;
-// connection();
-// const conn = mongoose.connection;
-// conn.once("open", function () {
-//   // Add this line in the code
-//   gridFsBucket = new mongoose.mongo.GridFSBucket(conn.db, {
-//     bucketName: "posts"
-//   });
-//   gfs = Grid(conn.db, mongoose.mongo);
-//   gfs.collection("photos");
-// });
+// app.use("/get-headlines", getHeadlinesRouter);
 
-var client = new MongoClient(process.env.MONGO_URI);
+// app.use("/search", searchHeadlinesRouter);
 
-app.use("/get-headlines", getHeadlinesRouter);
+// app.use("/article", getArticleBodyRouter);
 
-app.use("/search", searchHeadlinesRouter);
+// app.use("/add-user", addUserRouter);
 
-app.use("/article", getArticleBodyRouter);
-
-app.use("/add-user", addUserRouter);
-
-app.use("/authenticate", authenticateRouter);
-app.use("/decode", decodeUserRouter);
-app.use("/edit-profile", editProfileRouter);
-app.use("/edit-profile-picture", editProfilePictureRouter);
-app.use("/edit-background-picture", editBackgroundPictureRouter);
-app.use("/get-profile", getProfileRouter);
-app.use("/add-post", addPostRouter);
-app.use("/get-feeds", getFeedsRouter);
-app.use("/get-short-profile-info", getShortProfileInfoRouter);
+// app.use("/authenticate", authenticateRouter);
+// app.use("/decode", decodeUserRouter);
+// app.use("/edit-profile", editProfileRouter);
+// app.use("/edit-profile-picture", editProfilePictureRouter);
+// app.use("/edit-background-picture", editBackgroundPictureRouter);
+// app.use("/get-profile", getProfileRouter);
+// app.use("/add-post", addPostRouter);
+// app.use("/get-feeds", getFeedsRouter);
+// app.use("/get-short-profile-info", getShortProfileInfoRouter);
 app.use("/get-ai", getAIRouter);
-app.use("/add-bookmark", addBookmarkRouter);
-app.use("/get-bookmarks", getBookmarkRouter);
+// app.use("/add-bookmark", addBookmarkRouter);
+// app.use("/get-bookmarks", getBookmarkRouter);
+
+app.use("/post", postRouter);
+app.use("/profile", profileRouter);
+app.use("/news", newsRouter);
+app.use("/auth", authRouter);
+app.use("/bookmark", bookmarkRouter);
 
 app.listen(3500, (error) => {
   if (error) {

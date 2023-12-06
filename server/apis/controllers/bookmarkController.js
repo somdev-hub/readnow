@@ -1,10 +1,6 @@
-const express = require("express");
 const Bookmarks = require("../models/bookmarks");
-const { Types } = require("mongoose");
 
-const router = express.Router();
-
-router.post("/", async (req, res) => {
+const addBookmarkController = async (req, res) => {
   const { email, type, item } = req.body;
   console.log(req.body);
   try {
@@ -12,7 +8,7 @@ router.post("/", async (req, res) => {
     switch (type) {
       case "news":
         const newBookmark = {
-          _id: Types.ObjectId(),
+          //   _id: Types.ObjectId(),
           type,
           item
         };
@@ -61,6 +57,32 @@ router.post("/", async (req, res) => {
       message: "server error"
     });
   }
-});
+};
 
-module.exports = router;
+const getBookmarkController = async (req, res) => {
+  const { email } = req.body;
+  // console.log(req.body);
+  try {
+    const bookmarks = await Bookmarks.findOne({ user: email });
+    if (bookmarks) {
+      res.status(200).json({
+        bookmarks: bookmarks.bookmarks
+      });
+    } else {
+      res.status(200).json({
+        bookmarks: [],
+        message: "No bookmarks found"
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message: "server error"
+    });
+  }
+};
+
+module.exports = {
+  addBookmarkController,
+  getBookmarkController
+};

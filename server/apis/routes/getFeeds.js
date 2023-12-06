@@ -52,6 +52,7 @@ router.get("/", async (req, res) => {
     const posts = response.data.data.reverse().map((post) => {
       return {
         ...post.attributes,
+        id: post.id,
         image: `http://192.168.39.254:1337${post.attributes.image.data.attributes?.url}`
       };
     });

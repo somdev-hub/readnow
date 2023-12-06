@@ -6,13 +6,14 @@ import {
   TouchableOpacity,
   Pressable
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Button, Menu, Divider, PaperProvider } from "react-native-paper";
 import * as SecureStorage from "expo-secure-store";
-import { addBookmark } from "../api/apis";
+import { addBookmark, likePost } from "../api/apis";
+import { Snackbar } from "react-native-paper";
 
 const size = Dimensions.get("window");
 
@@ -29,32 +30,39 @@ const PostCard = ({
   post,
   optionsContent
 }) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
-  const [visible, setVisible] = React.useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  // const addToBookmark = async () => {
-  //   const userMail = await SecureStorage.getItemAsync("email");
+  const [visible, setVisible] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const email = SecureStorage.getItemAsync("email").then((res) => res);
+  // console.log(email);
 
-  //   addBookmark(
-  //     {
-  //       user,
-  //       header,
-  //       userImage,
-  //       description,
-  //       image,
-  //       likes,
-  //       comments
-  //     },
-  //     "post",
-  //     userMail
-  //   ).then((data) => {
-  //     console.log(data);
-  //   });
-  // };
+  const handleLike = async () => {
+    const userId = await SecureStorage.getItemAsync("email");
+    // console.log(post.id);
+    // console.log(userId);
+    const response = await likePost(post.id, userId);
+    console.log(response);
+    setLiked(!liked);
+  };
 
   const openMenu = () => setVisible(true);
 
   const closeMenu = () => setVisible(false);
+
+  useEffect(() => {
+    console.log(likes);
+    // const userId = async () => await SecureStorage.getItemAsync("email");
+    // // console.log(userId());
+    // const value = userId().then((userId) => {
+    //   return userId;
+    // });
+    // console.log(value);
+    if (likes.includes(email)) {
+      console.log("true");
+      setLiked(true);
+    }
+  }, []);
   return (
     // <PaperProvider>
     <View
@@ -112,21 +120,13 @@ const PostCard = ({
             />
           }
         >
-          {/* <Menu.Item
-            onPress={() => {
-              onPressBookmark();
-              closeMenu();
-            }}
-            title="Add to Bookmark"
-          />
-          <Menu.Item onPress={() => {}} title="Add to Story" />
-          <Menu.Item onPress={() => {}} title="Repost" />
-          <Menu.Item onPress={() => {}} title="Share" />
-        <Menu.Item onPress={() => {}} title="Send" /> */}
           {optionsContent?.map((option, index) => {
             return (
               <Menu.Item
-                onPress={option.function}
+                onPress={() => {
+                  option.function();
+                  closeMenu();
+                }}
                 title={option.option}
                 key={index}
               />
@@ -184,12 +184,25 @@ const PostCard = ({
             justifyContent: "space-around"
           }}
         >
-          <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
-            <Feather name="heart" size={22} color="#000" />
-            <Text style={{ color: "#000", fontSize: 14, fontWeight: "400" }}>
+          <Pressable
+            style={{ flexDirection: "row", gap: 5, alignItems: "center" }}
+            onPress={handleLike}
+          >
+            <Feather
+              name="heart"
+              size={22}
+              color={liked ? "#39A7FF" : "#000"}
+            />
+            <Text
+              style={{
+                color: liked ? "#39A7FF" : "#000",
+                fontSize: 14,
+                fontWeight: "400"
+              }}
+            >
               Like
             </Text>
-          </View>
+          </Pressable>
           <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
             <MaterialCommunityIcons
               name="android-messages"
@@ -202,6 +215,20 @@ const PostCard = ({
           </View>
         </View>
       </View>
+      {/* <View style={{ flex: 1 }}>
+        <Snackbar
+          visible={true}
+          onDismiss={onDismissSnackBar}
+          action={{
+            label: "Undo",
+            onPress: () => {
+              // Do something
+            }
+          }}
+        >
+          Added to Bookmarks
+        </Snackbar>
+      </View> */}
     </View>
   );
 };

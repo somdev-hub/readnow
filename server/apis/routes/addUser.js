@@ -47,10 +47,6 @@ router.post("/", async (req, res) => {
           }
         }
       );
-      // return res.send({
-      //   status: 200,
-      //   message: "User added successfully"
-      // });
     } catch (error) {
       console.log(error);
       return res.send({
