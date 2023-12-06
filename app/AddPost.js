@@ -20,6 +20,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchEmail } from "../redux/postSlice";
 import { FAB, Surface, ActivityIndicator, MD2Colors } from "react-native-paper";
 import { getAIResponse } from "../api/apis";
+// import Markeddown from "react-native-marked"
+import Markdown from 'react-native-easy-markdown';
+
 
 const screenHeights = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -56,6 +59,7 @@ const AddPost = () => {
   const handleAI = async () => {
     setIsAILoading(true);
     const response = await getAIResponse(aiPrompt);
+    
 
     dispatch({
       type: "post/updatePostData",
@@ -104,6 +108,7 @@ const AddPost = () => {
 
     dispatch(fetchEmail());
   }, []);
+
   return (
     <View>
       {/* <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}> */}
@@ -125,6 +130,9 @@ const AddPost = () => {
             onChangeText={(text) => handleInputChanges(text)}
             value={postData.description}
           />
+         {/* <Markdown>
+          {postData.description}
+         </Markdown> */}
         </ScrollView>
         {postImage && (
           <View
@@ -198,9 +206,11 @@ const AddPost = () => {
               position: "absolute",
               bottom: 100,
               borderRadius: 10
+              // borderColor:"#39A7FF",
+              // borderWidth:1
               // alignItems: "center",
             }}
-            elevation={2}
+            elevation={1}
           >
             <TextInput
               multiline

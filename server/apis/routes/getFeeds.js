@@ -46,15 +46,20 @@ router.get("/", async (req, res) => {
   const strapi_api = "http://192.168.39.254:1337/api/posts?populate=*";
 
   try {
-    const response = await axios.get(strapi_api);
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/posts?populate=*`
+    );
     const posts = response.data.data.reverse().map((post) => {
       return {
         ...post.attributes,
         image: `http://192.168.39.254:1337${post.attributes.image.data.attributes?.url}`
       };
     });
-
-    res.status(200).json({ posts });
+    if (posts.length > 0) {
+      res.status(200).json({ posts });
+    } else {
+      res.status(200).json({ posts: [] });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "An error occurred while fetching posts" });

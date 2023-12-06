@@ -11,6 +11,7 @@ const router = express.Router();
 const axios = require("axios");
 const { Readable } = require("stream");
 const FormData = require("form-data");
+const { v4: uuidv4 } = require('uuid');
 
 var client = new MongoClient(process.env.MONGO_URI);
 
@@ -59,7 +60,7 @@ router.post("/", upload.single("image"), async (req, res) => {
   });
 
   try {
-    const imageResponse = await axios.post(image_strapi_api, formData, {
+    const imageResponse = await axios.post(`${process.env.STRAPI_API}/api/upload`, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -67,6 +68,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     const data = {
       data: {
+        unique_id: uuidv4(),
         description,
         postedOn: new Date().toISOString(),
         image: imageResponse.data[0].id,
@@ -76,7 +78,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       }
     };
 
-    const response = await axios.post(strapi_api, JSON.stringify(data), {
+    const response = await axios.post(`${process.env.STRAPI_API}/api/posts`, JSON.stringify(data), {
       headers: {
         "Content-Type": "application/json"
       }

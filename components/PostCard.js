@@ -25,7 +25,9 @@ const PostCard = ({
   image,
   likes,
   comments,
-  onPressBookmark
+  onPressBookmark,
+  post,
+  optionsContent
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
   const [visible, setVisible] = React.useState(false);
@@ -110,19 +112,33 @@ const PostCard = ({
             />
           }
         >
-          <Menu.Item onPress={onPressBookmark} title="Add to Bookmark" />
+          {/* <Menu.Item
+            onPress={() => {
+              onPressBookmark();
+              closeMenu();
+            }}
+            title="Add to Bookmark"
+          />
           <Menu.Item onPress={() => {}} title="Add to Story" />
           <Menu.Item onPress={() => {}} title="Repost" />
-          {/* <Divider /> */}
           <Menu.Item onPress={() => {}} title="Share" />
-          <Menu.Item onPress={() => {}} title="Send" />
+        <Menu.Item onPress={() => {}} title="Send" /> */}
+          {optionsContent?.map((option, index) => {
+            return (
+              <Menu.Item
+                onPress={option.function}
+                title={option.option}
+                key={index}
+              />
+            );
+          })}
         </Menu>
       </View>
       <View>
         <Text style={{ marginHorizontal: 15 }}>
-          {isExpanded ? description : `${description.substring(0, 100)}...`}
+          {isExpanded ? description : `${description?.substring(0, 100)}...`}
         </Text>
-        {description.length > 100 && (
+        {description?.length > 100 && (
           <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
             <Text style={{ color: "blue", marginHorizontal: 15 }}>
               {isExpanded ? "Read Less" : "Read More"}

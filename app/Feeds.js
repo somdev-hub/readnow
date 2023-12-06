@@ -17,14 +17,19 @@ import {
   getProfile,
   getShortProfileInfo
 } from "../api/apis";
-// import {PaperProvider} from 'react-native-paper'
 import * as SecureStorage from "expo-secure-store";
+import { Snackbar } from "react-native-paper";
 
 const size = Dimensions.get("window");
 const Feeds = () => {
   const navigator = useNavigation();
   const [feeds, setFeeds] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [visible, setVisible] = React.useState(false);
+
+  const onToggleSnackBar = () => setVisible(!visible);
+
+  const onDismissSnackBar = () => setVisible(false);
 
   const onRefresh = React.useCallback(() => {
     fetchData();
@@ -109,15 +114,49 @@ const Feeds = () => {
 
     addBookmark(feed, "post", userMail).then((data) => {
       console.log(data);
+      onToggleSnackBar();
     });
   };
+
+  const optionsContent = [
+    {
+      option: "Add to Bookmark",
+      function: () => {
+        addToBookmark();
+      }
+    },
+    {
+      option: "Add to Story",
+      function: () => {
+        console.log("Add to Story");
+      }
+    },
+    {
+      option: "Share",
+      function: () => {
+        console.log("Share");
+      }
+    },
+    {
+      option: "Send",
+      function: () => {
+        console.log("Send");
+      }
+    },
+    {
+      option: "Report",
+      function: () => {
+        console.log("Report");
+      }
+    }
+  ];
+
   const fetchData = async () => {
     setRefreshing(true);
     const response = await getFeeds();
     const feedsWithProfile = await Promise.all(
       response.posts.map(async (feed) => {
         const profileResponse = await getShortProfileInfo(feed.postedBy);
-        setRefreshing(false);
         return {
           ...feed,
           user: profileResponse?.data.name,
@@ -127,6 +166,7 @@ const Feeds = () => {
       })
     );
     setFeeds(feedsWithProfile);
+    setRefreshing(false);
   };
   useEffect(() => {
     fetchData();
@@ -240,6 +280,11 @@ const Feeds = () => {
         </ScrollView>
       </View>
       <View>
+        {feeds.length === 0 && (
+          <Text style={{ marginTop: 20, textAlign: "center" }}>
+            No Posts found
+          </Text>
+        )}
         {feeds.map((item, index) => {
           const { user, profilePicture, header, ...rest } = item;
           return (
@@ -256,10 +301,24 @@ const Feeds = () => {
                 addToBookmark(rest);
                 console.log(rest);
               }}
+              post={rest}
+              optionsContent={optionsContent}
             />
           );
         })}
       </View>
+      <Snackbar
+        visible={visible}
+        onDismiss={onDismissSnackBar}
+        action={{
+          label: "Undo",
+          onPress: () => {
+            // Do something
+          }
+        }}
+      >
+        Added to Bookmarks
+      </Snackbar>
     </ScrollView>
   );
 };

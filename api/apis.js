@@ -116,7 +116,7 @@ const submitPost = async (data) => {
       name: "postImage.jpg",
       type: "image/jpg"
     });
-    console.log("hello");
+    // console.log("hello");
     const response = await axios.post(`${ADDRESS}/add-post`, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
@@ -175,6 +175,7 @@ const getBookmarks = async (email) => {
   // console.log(email);
   try {
     const response = await axios.post(`${ADDRESS}/get-bookmarks`, { email });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.log(error);

@@ -4,12 +4,20 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { email } = req.body;
-  console.log(req.body);
+  // console.log(req.body);
   try {
     const bookmarks = await Bookmarks.findOne({ user: email });
-    res.status(200).json({
-      bookmarks: bookmarks.bookmarks
-    });
+    if (bookmarks) {
+      res.status(200).json({
+        bookmarks: bookmarks.bookmarks,
+
+      });
+    } else {
+      res.status(200).json({
+        bookmarks: [],
+        message: "No bookmarks found"
+      });
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({

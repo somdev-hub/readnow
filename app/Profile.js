@@ -1,12 +1,15 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import * as SecureStorage from "expo-secure-store";
+import { getShortProfileInfo } from "../api/apis";
 
 const Profile = () => {
   const navigator = useNavigation();
+  const [userData, setUserData] = useState(null);
   const options = [
     {
       name: "Your Account",
@@ -44,9 +47,18 @@ const Profile = () => {
     }
   ];
 
+  useEffect(() => {
+    SecureStorage.getItemAsync("email").then((email) => {
+      // console.log(email);
+      getShortProfileInfo(email).then((response) => {
+        // console.log(response.data);
+        setUserData(response.data);
+      });
+    });
+  }, []);
+
   return (
     <View>
-     
       <View style={{ marginHorizontal: 20, marginTop: 30 }}>
         <TouchableOpacity
           onPress={() => navigator.navigate("Myprofile")}
@@ -73,24 +85,29 @@ const Profile = () => {
                 borderRadius: 50,
                 backgroundColor: "#fff",
                 justifyContent: "center",
-                alignItems: "center"
+                alignItems: "center",
+                borderColor: "#fff",
+                borderWidth: 1
               }}
             >
               <Image
                 source={{
-                  uri: "https://cdn-icons-png.flaticon.com/512/3106/3106773.png"
+                  uri: userData?.profilePicture
                 }}
-                width={40}
-                height={40}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: 50
+                }}
               />
             </View>
             <View style={{ gap: 3 }}>
               <Text
                 style={{ fontWeight: "bold", fontSize: 18, color: "white" }}
               >
-                John Doe
+                {userData?.name}
               </Text>
-              <Text style={{ color: "#fff" }}>johndoe@gmail.com</Text>
+              <Text style={{ color: "#fff" }}>{userData?.email}</Text>
             </View>
           </View>
           <View

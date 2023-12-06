@@ -3,10 +3,11 @@ const router = express.Router();
 const { TextServiceClient } = require("@google-ai/generativelanguage").v1beta2;
 const { GoogleAuth } = require("google-auth-library");
 require("dotenv").config();
+const { marked } = require("marked");
 
 router.post("/", (req, res) => {
   const { text } = req.body;
-//   console.log(text);
+  //   console.log(text);
   const MODEL_NAME = "models/text-bison-001";
 
   const client = new TextServiceClient({
@@ -21,6 +22,8 @@ router.post("/", (req, res) => {
       }
     })
     .then((response) => {
+      // const parsedContent = marked(response[0].candidates[0].output);
+      // console.log(parsedContent);
       res.send(response[0].candidates[0].output);
     })
     .catch((error) => {

@@ -58,14 +58,14 @@ const MyProfile = () => {
   useEffect(() => {
     SecureStorage.getItemAsync("email").then((email) => {
       getProfile(email).then((response) => {
-        // console.log(response.data);
+        // console.log(response.data.postData[0].description);
         setUserData(response.data.userData);
         setUserPosts(response.data.postData);
         setProfilePicture(response.data.userData.profilePicture);
         setBackgroundPicture(response.data.userData.backgroundPicture);
       });
     });
-    // console.log(userData);
+    // console.log(userPosts);
   }, []);
 
   return (
@@ -272,14 +272,15 @@ const MyProfile = () => {
         </View>
         <View>
           {userPosts?.map((item, index) => {
+            console.log(item.description.length);
             return (
               <PostCard
                 key={index}
                 user={userData.name}
                 header={userData.header}
-                description={item.description}
+                description={item.description || ''}
                 image={item.image}
-                likes={item.likes}
+                likes={item.likedBy}
                 comments={item.comments}
                 profilePicture={userData.profilePicture}
               />

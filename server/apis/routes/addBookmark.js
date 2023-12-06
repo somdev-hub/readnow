@@ -1,5 +1,7 @@
 const express = require("express");
 const Bookmarks = require("../models/bookmarks");
+const { Types } = require("mongoose");
+
 const router = express.Router();
 
 router.post("/", async (req, res) => {
@@ -10,6 +12,7 @@ router.post("/", async (req, res) => {
     switch (type) {
       case "news":
         const newBookmark = {
+          _id: Types.ObjectId(),
           type,
           item
         };
@@ -30,11 +33,11 @@ router.post("/", async (req, res) => {
         break;
       case "post":
         const newPostBookmark = {
+          _id: Types.ObjectId(),
           type,
           item
         };
         if (bookmarks) {
-          // console.log(bookmarks);
           bookmarks.bookmarks.push(newPostBookmark);
           bookmarks.save();
         } else {

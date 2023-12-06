@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 const NewsCard = (item) => {
   const sliderWidth = Dimensions.get("window").width;
   const navigator = useNavigation();
+  console.log(item);
   return (
     <Pressable
       onPress={() => navigator.navigate("Article", { item: item.item })}
