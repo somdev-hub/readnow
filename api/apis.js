@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.39.254:3500";
+const ADDRESS = "http://192.168.33.67:3500";
 
 const getHeadlines = async () => {
   const response = await axios.get(`${ADDRESS}/news/get-headlines`);
@@ -123,7 +123,6 @@ const submitPost = async (data) => {
       name: "postImage.jpg",
       type: "image/jpg"
     });
-    // console.log("hello");
     const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
       headers: {
         "Content-Type": "multipart/form-data"
@@ -139,6 +138,17 @@ const getFeeds = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/post/get-feeds`);
     // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deletePost = async (postId) => {
+  try {
+    const response = await axios.delete(
+      `${ADDRESS}/post/delete-post/${postId}`
+    );
     return response.data;
   } catch (error) {
     console.log(error);
@@ -183,10 +193,22 @@ const addBookmark = async (item, type, email) => {
 
 const getBookmarks = async (email) => {
   try {
-    const response = await axios.post(`${ADDRESS}/bookmark/get-bookmarks`, {
-      email
-    });
-    console.log(response.data);
+    const response = await axios.get(
+      `${ADDRESS}/bookmark/get-bookmarks/${email}`
+    );
+    // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const deleteBookmark = async (bookmarkIds, email, type) => {
+  try {
+    const response =
+      await axios.delete(`${ADDRESS}/bookmark/delete-bookmark/${email}/${bookmarkIds}/${type}
+    
+    `);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -199,6 +221,28 @@ const likePost = async (postId, userId) => {
       postId,
       userId
     });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const commentPost = async (postId, userId, comment) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/post/comment-post`, {
+      postId,
+      userId,
+      comment
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getPeople = async () => {
+  try {
+    const response = await axios.get(`${ADDRESS}/people/get-people`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -222,5 +266,9 @@ export {
   getAIResponse,
   addBookmark,
   getBookmarks,
-  likePost
+  likePost,
+  commentPost,
+  deleteBookmark,
+  deletePost,
+  getPeople
 };

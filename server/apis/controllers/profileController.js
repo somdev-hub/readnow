@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
+const client = require("../sanity");
 
 const addUserController = async (req, res) => {
   const { email, password } = req.body;
@@ -171,6 +172,7 @@ const getProfileController = async (req, res) => {
     const posts = response.data.data.reverse().map((post) => {
       return {
         ...post.attributes,
+        id: post.id,
         image: `http://192.168.39.254:1337${post.attributes.image.data.attributes?.url}`
       };
     });
@@ -203,7 +205,9 @@ const getProfileController = async (req, res) => {
 const getShortProfileInfoController = async (req, res) => {
   try {
     const { email } = req.body;
+    // console.log(email)
     const users = await User.findOne({ email });
+    // console.log(users)
 
     const shortData = {
       name: users.name,

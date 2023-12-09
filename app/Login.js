@@ -37,7 +37,10 @@ const Login = () => {
         if (Response.status === 200) {
           console.log("token saved");
           SecureStorage.deleteItemAsync("email");
-          SecureStorage.setItemAsync("email", userCredentials.email);
+          SecureStorage.setItemAsync(
+            "email",
+            userCredentials.email.toLowerCase()
+          );
           SecureStorage.setItemAsync("token", Response.token).then(() => {
             console.log("token saved");
             navigator.dispatch(
@@ -134,7 +137,6 @@ const Login = () => {
               </Text>
               <TextInput
                 inputMode="email"
-                
                 onChangeText={(value) => setFormData("email", value)}
                 placeholder="something@gmail.com"
                 style={{

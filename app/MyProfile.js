@@ -7,13 +7,14 @@ import {
   Pressable
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+// import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import {
+  deletePost,
   editBackgroundPicture,
   editProfilePicture,
   getProfile,
@@ -21,6 +22,7 @@ import {
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import PostCard from "../components/PostCard";
+import { Snackbar } from "react-native-paper";
 
 const MyProfile = () => {
   const navigator = useNavigation();
@@ -28,6 +30,11 @@ const MyProfile = () => {
   const [backgroundPicture, setBackgroundPicture] = useState(null);
   const [userData, setUserData] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  const handleSnackbar = () => {
+    setSnackbarVisible(!snackbarVisible);
+  };
 
   const selectImage = async (setPicture, type) => {
     const options = {
@@ -55,18 +62,44 @@ const MyProfile = () => {
     }
   };
 
-  useEffect(() => {
-    SecureStorage.getItemAsync("email").then((email) => {
-      getProfile(email).then((response) => {
-        // console.log(response.data.postData[0].description);
-        setUserData(response.data.userData);
-        setUserPosts(response.data.postData);
-        setProfilePicture(response.data.userData.profilePicture);
-        setBackgroundPicture(response.data.userData.backgroundPicture);
-      });
+  const getProfileInfo = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    getProfile(email).then((response) => {
+      setUserData(response.data.userData);
+      setUserPosts(response.data.postData);
+      setProfilePicture(response.data.userData.profilePicture);
+      setBackgroundPicture(response.data.userData.backgroundPicture);
     });
-    // console.log(userPosts);
+  };
+
+  useEffect(() => {
+    getProfileInfo();
   }, []);
+
+  const optionContents = [
+    {
+      option: "Delete post",
+      function: async (postId) => {
+        deletePost(postId).then((response) => {
+          console.log(response);
+          setSnackbarVisible(true);
+          getProfileInfo();
+        });
+      }
+    },
+    {
+      option: "Edit post",
+      function: () => {}
+    },
+    {
+      option: "Share post",
+      function: () => {}
+    },
+    {
+      option: "Send",
+      function: () => {}
+    }
+  ];
 
   return (
     <View style={{ flex: 1 }}>
@@ -272,22 +305,36 @@ const MyProfile = () => {
         </View>
         <View>
           {userPosts?.map((item, index) => {
-            console.log(item.description.length);
+            // console.log(item.description.length);
             return (
               <PostCard
                 key={index}
                 user={userData.name}
                 header={userData.header}
-                description={item.description || ''}
+                description={item.description || ""}
                 image={item.image}
                 likes={item.likedBy}
                 comments={item.comments}
                 profilePicture={userData.profilePicture}
+                optionsContent={optionContents}
+                post={item}
               />
             );
           })}
         </View>
       </ScrollView>
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => {}}
+        action={{
+          label: "Done",
+          onPress: () => {
+            setSnackbarVisible(false);
+          }
+        }}
+      >
+        Post deleted
+      </Snackbar>
     </View>
   );
 };

@@ -7,7 +7,7 @@ import {
   Pressable,
   RefreshControl
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PostCard from "../components/PostCard";
 import { useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
@@ -18,13 +18,14 @@ import {
   getShortProfileInfo
 } from "../api/apis";
 import { useDispatch } from "react-redux";
+import * as SecureStorage from "expo-secure-store";
 
 const size = Dimensions.get("window");
 const Feeds = () => {
   const navigator = useNavigation();
-  const [feeds, setFeeds] = React.useState([]);
-  const [refreshing, setRefreshing] = React.useState(false);
-  const [visible, setVisible] = React.useState(false);
+  const [feeds, setFeeds] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
 
   const onToggleSnackBar = () => setVisible(!visible);
@@ -109,14 +110,12 @@ const Feeds = () => {
         "https://i.pinimg.com/736x/24/54/01/2454011963c028872ef467f41257aeb9.jpg"
     }
   ];
-  const addToBookmark = async (feed) => {
-    // const userMail = await SecureStorage.getItemAsync("email");
-
-    // addBookmark(feed, "post", userMail).then((data) => {
-    //   console.log(data);
-    //   onToggleSnackBar();
-    // });
-    // onToggleSnackBar();
+  const addToBookmark = async (feedId) => {
+    const userMail = await SecureStorage.getItemAsync("email");
+    console.log(feedId);
+    addBookmark(feedId, "post", userMail).then((data) => {
+      console.log(data);
+    });
     dispatch({
       type:"notify/addBookmark",
       payload:{
@@ -128,8 +127,8 @@ const Feeds = () => {
   const optionsContent = [
     {
       option: "Add to Bookmark",
-      function: () => {
-        addToBookmark();
+      function: (feedId) => {
+        addToBookmark(feedId);
       }
     },
     {
@@ -309,26 +308,12 @@ const Feeds = () => {
                 console.log(rest);
               }}
               post={rest}
+              fetchData={fetchData}
               optionsContent={optionsContent}
             />
           );
         })}
       </View>
-      {/* <View style={{flex:1}}>
-        <Snackbar
-          visible={true}
-         
-          onDismiss={onDismissSnackBar}
-          action={{
-            label: "Undo",
-            onPress: () => {
-              // Do something
-            }
-          }}
-        >
-          Added to Bookmarks
-        </Snackbar>
-      </View> */}
     </ScrollView>
   );
 };

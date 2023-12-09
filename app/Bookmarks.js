@@ -9,7 +9,7 @@ import {
   StatusBar
 } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
-import { getBookmarks, getShortProfileInfo } from "../api/apis";
+import { deleteBookmark, getBookmarks, getShortProfileInfo } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import PostCard from "../components/PostCard";
@@ -24,6 +24,7 @@ const Bookmarks = () => {
   const navigator = useNavigation();
   const [refreshing, setRefreshing] = useState(false);
   const [selectedValue, setSelectedValue] = useState("News");
+  const [selectedNews, setSelectedNews] = useState([]);
 
   const onRefresh = useCallback(() => {
     fetchBookmarks();
@@ -50,6 +51,7 @@ const Bookmarks = () => {
         const profileResponse = await getShortProfileInfo(feed.item.postedBy);
         return {
           ...feed.item,
+          _id: feed._id,
           user: profileResponse?.data.name,
           header: profileResponse?.data.header,
           profilePicture: profileResponse?.data.profilePicture
@@ -60,6 +62,52 @@ const Bookmarks = () => {
     setStoryBookmarks(stories);
     setRefreshing(false);
   };
+  const deleteSelectedBookmarks = async () => {
+    const userMail = await SecureStorage.getItemAsync("email");
+    const newsIds = selectedNews.map((index) => newsBookmarks[index]._id);
+    console.log(newsIds);
+    const response = await deleteBookmark(newsIds, userMail);
+    console.log(response);
+    fetchBookmarks();
+  };
+
+  const optionsContent = [
+    {
+      option: "Remove",
+      function: async (feedId) => {
+        const userMail = await SecureStorage.getItemAsync("email");
+        deleteBookmark(feedId, userMail, "post").then((data) => {
+          console.log(data);
+          fetchBookmarks();
+        });
+      }
+    },
+    {
+      option: "Add to Story",
+      function: () => {
+        console.log("Add to Story");
+      }
+    },
+    {
+      option: "Share",
+      function: () => {
+        console.log("Share");
+      }
+    },
+    {
+      option: "Send",
+      function: () => {
+        console.log("Send");
+      }
+    },
+    {
+      option: "Report",
+      function: () => {
+        console.log("Report");
+      }
+    }
+  ];
+
   useEffect(() => {
     fetchBookmarks();
   }, []);
@@ -134,6 +182,8 @@ const Bookmarks = () => {
                 likes={item.likedBy}
                 comments={item.comments}
                 profilePicture={item.profilePicture}
+                optionsContent={optionsContent}
+                post={item}
               />
             );
           })}
@@ -142,16 +192,52 @@ const Bookmarks = () => {
       {selectedValue === "News" && (
         <View
           style={{
-            paddingHorizontal: 15,
             paddingVertical: 10
           }}
         >
+          {selectedNews.length > 0 && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                paddingHorizontal: 15,
+                paddingVertical: 10
+              }}
+            >
+              <Pressable
+                onPress={() => {
+                  setSelectedNews([]);
+                }}
+              >
+                <Text>Cancel</Text>
+              </Pressable>
+              <Text>{selectedNews.length} selected</Text>
+              <Pressable
+                onPress={() => {
+                  deleteSelectedBookmarks();
+                  setSelectedNews([]);
+                }}
+              >
+                <Text>Delete</Text>
+              </Pressable>
+            </View>
+          )}
           {newsBookmarks.length === 0 && (
             <Text style={{ textAlign: "center" }}>No bookmarked news</Text>
           )}
           <View style={{ marginTop: 10, gap: 15 }}>
             {newsBookmarks.map((item, index) => {
-              return <NewsCard key={index} item={item.item} />;
+              const isSelected = selectedNews.includes(index);
+              return (
+                <NewsCard
+                  key={index}
+                  index={index}
+                  item={item.item}
+                  isSelected={isSelected}
+                  setSelectedNews={setSelectedNews}
+                />
+              );
             })}
           </View>
         </View>

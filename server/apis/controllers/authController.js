@@ -7,7 +7,7 @@ const authenticationController = async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
   try {
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ email: { $regex: new RegExp(email, "i") } });
     console.log(user.password);
     if (!user) {
       return res.send({

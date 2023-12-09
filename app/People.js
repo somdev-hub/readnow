@@ -1,10 +1,11 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import PeopleCard from "../components/PeopleCard";
 
 const People = () => {
+  const [peopleList, setPeopleList] = useState([]);
   const people_list = [
     {
       name: "John Doe",
@@ -36,21 +37,6 @@ const People = () => {
   ];
   return (
     <View style={{ flex: 1 }}>
-      {/* <View
-        style={{
-          backgroundColor: "white",
-          flexDirection: "row",
-          justifyContent: "start",
-          marginTop: 20,
-          borderBottomWidth: 1,
-          paddingBottom: 15,
-          borderBottomColor: "#ddd"
-        }}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 18, marginLeft: 20 }}>
-          People
-        </Text>
-      </View> */}
       <ScrollView
         style={{
           paddingTop: 20,

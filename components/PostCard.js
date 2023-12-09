@@ -10,48 +10,47 @@ import React, { useEffect, useState } from "react";
 import { Feather } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { Button, Menu, Divider, PaperProvider } from "react-native-paper";
+import { Menu } from "react-native-paper";
 import * as SecureStorage from "expo-secure-store";
 import { addBookmark, likePost } from "../api/apis";
-import { Snackbar } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 
 const size = Dimensions.get("window");
 
 const PostCard = ({
   user,
   header,
-  userImage,
   profilePicture,
   description,
   image,
   likes,
   comments,
-  onPressBookmark,
   post,
+  fetchData,
   optionsContent
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
+  const route = useRoute();
+  // console.log(route.name);
   const [visible, setVisible] = useState(false);
   const [liked, setLiked] = useState(false);
   const email = SecureStorage.getItemAsync("email").then((res) => res);
-  // console.log(email);
+  const navigator = useNavigation();
 
   const handleLike = async () => {
     const userId = await SecureStorage.getItemAsync("email");
-    // console.log(post.id);
-    // console.log(userId);
     const response = await likePost(post.id, userId);
-    console.log(response);
+    // console.log(response);
     setLiked(!liked);
   };
-
+  // console.log(post.id);
   const openMenu = () => setVisible(true);
 
   const closeMenu = () => setVisible(false);
 
   useEffect(() => {
-    console.log(likes);
+    // console.log(likes);
     // const userId = async () => await SecureStorage.getItemAsync("email");
     // // console.log(userId());
     // const value = userId().then((userId) => {
@@ -59,12 +58,11 @@ const PostCard = ({
     // });
     // console.log(value);
     if (likes.includes(email)) {
-      console.log("true");
+      // console.log("true");
       setLiked(true);
     }
   }, []);
   return (
-    // <PaperProvider>
     <View
       style={{ backgroundColor: "#ffffff", marginVertical: 10, elevation: 1 }}
     >
@@ -124,7 +122,7 @@ const PostCard = ({
             return (
               <Menu.Item
                 onPress={() => {
-                  option.function();
+                  option.function(post.id);
                   closeMenu();
                 }}
                 title={option.option}
@@ -162,7 +160,6 @@ const PostCard = ({
             flexDirection: "row",
             justifyContent: "space-between",
             marginHorizontal: 15,
-            // marginTop: 20,
             borderBottomColor: "#A9A9A9",
             borderBottomWidth: 1,
             paddingBottom: 10,
@@ -203,7 +200,26 @@ const PostCard = ({
               Like
             </Text>
           </Pressable>
-          <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
+          <Pressable
+            onPress={() => {
+              route.name === "Feed" &&
+                navigator.navigate("Post", {
+                  item: {
+                    user,
+                    header,
+                    profilePicture,
+                    description,
+                    image,
+                    likes,
+                    comments,
+                    // fetchData,
+                    id: post.id,
+                    optionsContent
+                  }
+                });
+            }}
+            style={{ flexDirection: "row", gap: 5, alignItems: "center" }}
+          >
             <MaterialCommunityIcons
               name="android-messages"
               size={24}
@@ -212,23 +228,9 @@ const PostCard = ({
             <Text style={{ color: "#000", fontSize: 14, fontWeight: "400" }}>
               Comment
             </Text>
-          </View>
+          </Pressable>
         </View>
       </View>
-      {/* <View style={{ flex: 1 }}>
-        <Snackbar
-          visible={true}
-          onDismiss={onDismissSnackBar}
-          action={{
-            label: "Undo",
-            onPress: () => {
-              // Do something
-            }
-          }}
-        >
-          Added to Bookmarks
-        </Snackbar>
-      </View> */}
     </View>
   );
 };

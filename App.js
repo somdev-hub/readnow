@@ -37,6 +37,7 @@ import { addPost, postFormData } from "./redux/postSlice";
 import { PaperProvider, Menu } from "react-native-paper";
 import ArticlePage from "./app/ArticlePage";
 import { Snackbar } from "react-native-paper";
+import ViewPost from "./app/ViewPost";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -127,10 +128,16 @@ const StackNavigator = () => {
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
       <Stack.Screen
+        name="Post"
+        component={ViewPost}
+        options={{
+          headerShown: true
+        }}
+      />
+      <Stack.Screen
         name="Article"
         component={ArticlePage}
         options={{
-          // headerTintColor:"#fff",
           headerShown: true,
           headerTitle: () => {
             return (
@@ -164,6 +171,12 @@ const StackNavigator = () => {
                       ).then((data) => {
                         console.log(data);
                       });
+                     dispatch({
+                        type: "notify/addNewsBookmark",
+                        payload: {
+                          addToNewsBookmark: true
+                        }
+                     })
                       closeMenu();
                     }}
                     title="Add to Bookmark"
@@ -268,19 +281,7 @@ const DrawerNavigator = () => {
 
 const HomeTopNavigator = () => {
   return (
-    <TopTab.Navigator
-    // screenOptions={{
-    //   tabBarStyle: {
-    //     backgroundColor: "#39A7FF"
-    //   },
-    //   // tabBarLabel: {
-    //   //   color: "#fff"
-    //   // }
-    //   tabBarLabelStyle:{
-    //     color:"#fff"
-    //   }
-    // }}
-    >
+    <TopTab.Navigator>
       <TopTab.Screen name="News" component={Home} />
       <TopTab.Screen name="Feed" component={Feeds} />
     </TopTab.Navigator>

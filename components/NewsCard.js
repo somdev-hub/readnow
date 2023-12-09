@@ -1,25 +1,77 @@
 import { View, Text, Pressable, Image, Dimensions } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { Checkbox } from "react-native-paper";
+import { Animated } from "react-native";
 
-const NewsCard = (item) => {
+const NewsCard = ({ item, isSelected, setSelectedNews, index }) => {
   const sliderWidth = Dimensions.get("window").width;
   const navigator = useNavigation();
-  console.log(item);
+  const [checked, setChecked] = React.useState(false);
+  const scale = useRef(new Animated.Value(1)).current;
+
+  // console.log(item);
   return (
     <Pressable
-      onPress={() => navigator.navigate("Article", { item: item.item })}
+      onPress={() => navigator.navigate("Article", { item: item })}
+      onLongPress={() => {
+        console.log("long pressed");
+        setChecked(!checked);
+        setSelectedNews((prevSelectedItems) => {
+          if (prevSelectedItems.includes(index)) {
+            // If the item is already selected, unselect it
+            return prevSelectedItems.filter((i) => i !== index);
+          } else {
+            // If the item is not selected, select it
+            return [...prevSelectedItems, index];
+          }
+        });
+        Animated.timing(scale, {
+          toValue: 0.9,
+          duration: 200,
+          useNativeDriver: true
+        }).start();
+      }}
+      onPressOut={() => {
+        Animated.timing(scale, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true
+        }).start();
+      }}
     >
-      <View
+      <Animated.View
         style={{
+          transform: [{ scale: scale }],
           flexDirection: "row",
           gap: 7,
-          alignItems: "center"
+          flex: 1,
+          alignItems: "center",
+          paddingHorizontal:  15,
+          paddingVertical: isSelected ? 10 : 0,
+          backgroundColor: isSelected ? "#DDE6ED" : "transparent"
         }}
       >
+        {/* {isSelected && (
+          <Checkbox
+            status={checked ? "checked" : "unchecked"}
+            onPress={() => {
+              setChecked(!checked);
+              setSelectedNews((prevSelectedItems) => {
+                if (prevSelectedItems.includes(index)) {
+                  // If the item is already selected, unselect it
+                  return prevSelectedItems.filter((i) => i !== index);
+                } else {
+                  // If the item is not selected, select it
+                  return [...prevSelectedItems, index];
+                }
+              });
+            }}
+          />
+        )} */}
         <Image
           source={{
-            uri: item.item.urlToImage
+            uri: item.urlToImage
           }}
           height={sliderWidth * 0.3}
           width={sliderWidth * 0.3}
@@ -40,29 +92,30 @@ const NewsCard = (item) => {
               lineHeight: 20
             }}
           >
-            {item.item.title.length > 80
-              ? item.item.title.slice(0, 80) + "..."
-              : item.item.title}
+            {item.title.length > 80
+              ? item.title.slice(0, 80) + "..."
+              : item.title}
           </Text>
           <View
             style={{
               flexDirection: "row",
               marginTop: 10,
               gap: 20,
-              justifyContent: "space-between"
+              justifyContent: "space-between",
+              flexWrap: "wrap"
             }}
           >
             <Text style={{ color: "#A9A9A9" }}>
-              {item.item.source.name.length > 12
-                ? item.item.source.name.slice(0, 12) + "..."
-                : item.item.source.name}
+              {item.source.name.length > 12
+                ? item.source.name.slice(0, 12) + "..."
+                : item.source.name}
             </Text>
             <Text style={{ color: "#A9A9A9" }}>
-              {new Date(item.item.publishedAt).toDateString()}
+              {new Date(item.publishedAt).toDateString()}
             </Text>
           </View>
         </View>
-      </View>
+      </Animated.View>
     </Pressable>
   );
 };

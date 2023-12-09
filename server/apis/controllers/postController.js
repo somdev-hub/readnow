@@ -60,7 +60,7 @@ const getFeedsController = async (req, res) => {
       return {
         ...post.attributes,
         id: post.id,
-        image: `http://192.168.39.254:1337${post.attributes.image.data.attributes?.url}`
+        image: `${process.env.STRAPI_API}${post.attributes.image.data.attributes?.url}`
       };
     });
     if (posts.length > 0) {
@@ -116,4 +116,68 @@ const likePostController = async (req, res) => {
   }
 };
 
-module.exports = { addPostController, getFeedsController, likePostController };
+const commentPostController = async (req, res) => {
+  const { postId, userId, comment } = req.body;
+  console.log(req.body);
+  try {
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/posts/${postId}`
+    );
+
+    const post = response.data.data;
+    // console.log(post);
+    const comments = post.attributes.comments;
+    let newComments = [
+      ...comments,
+      {
+        comment,
+        commentedBy: userId,
+        commentedOn: new Date().toISOString()
+      }
+    ];
+
+    const data = {
+      data: {
+        comments: newComments
+      }
+    };
+
+    const commentResponse = await axios.put(
+      `${process.env.STRAPI_API}/api/posts/${postId}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    res.status(200).send("post commented");
+  } catch (error) {
+    // console.error(error);
+    res.status(500).send("An error occurred while commenting the post");
+  }
+};
+
+const deletePostController = async (req, res) => {
+  const { postId } = req.params;
+  console.log(req.body);
+  try {
+    const response = await axios.delete(
+      `${process.env.STRAPI_API}/api/posts/${postId}`
+    );
+
+    res.status(200).send("post deleted");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while deleting the post");
+  }
+};
+
+module.exports = {
+  addPostController,
+  getFeedsController,
+  likePostController,
+  commentPostController,
+  deletePostController
+};
