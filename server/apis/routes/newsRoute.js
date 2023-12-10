@@ -9,7 +9,7 @@
  * 
  * @routes {GET} /get-headlines Route for getting headlines.
  * @routes {GET} /search-headlines/:query Route for searching headlines.
- * @routes {GET} /get-article-body/:url Route for getting article body.
+ * @routes {POST} /get-article-body/:url Route for getting article body.
  */
 
 const express = require("express");
@@ -28,6 +28,6 @@ router.get("/get-headlines", getHeadlinesController);
 // hit this route to search headlines
 router.get("/search-headlines/:query", searchHeadlinesController);
 // hit this route to get article body
-router.get("/get-article-body/:url", getArticleBodyController);
+router.post("/get-article-body", getArticleBodyController);
 
 module.exports = router;

@@ -3,8 +3,12 @@ import axios from "axios";
 const ADDRESS = "http://192.168.33.67:3500";
 
 const getHeadlines = async () => {
-  const response = await axios.get(`${ADDRESS}/news/get-headlines`);
-  return response.data;
+  try {
+    const response = await axios.get(`${ADDRESS}/news/get-headlines`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const searchHeadlines = async (query) => {
@@ -13,7 +17,9 @@ const searchHeadlines = async (query) => {
 };
 
 const getArticle = async (url) => {
-  const response = await axios.get(`${ADDRESS}/news/get-article-body/${url}`);
+  const response = await axios.post(`${ADDRESS}/news/get-article-body/`, {
+    url
+  });
   return response.data;
 };
 

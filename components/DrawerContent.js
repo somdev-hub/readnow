@@ -10,19 +10,23 @@ const DrawerContent = () => {
   const drawerItems = [
     {
       name: "following",
-      icon: "user"
+      icon: "user",
+      route: ""
     },
     {
       name: "Groups",
-      icon: "team"
+      icon: "team",
+      route: "GroupsPage"
     },
     {
       name: "Publishers",
-      icon: "book"
+      icon: "book",
+      route: ""
     },
     {
       name: "Stories",
-      icon: "bulb1"
+      icon: "bulb1",
+      route: ""
     }
   ];
   const navigator = useNavigation();
@@ -88,7 +92,8 @@ const DrawerContent = () => {
             </Pressable>
             {drawerItems.map((item, index) => {
               return (
-                <View
+                <Pressable
+                  onPress={() => navigator.navigate(item.route)}
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between"
@@ -102,7 +107,7 @@ const DrawerContent = () => {
                     </Text>
                   </View>
                   <FontAwesome name="angle-right" size={24} color="black" />
-                </View>
+                </Pressable>
               );
             })}
           </View>

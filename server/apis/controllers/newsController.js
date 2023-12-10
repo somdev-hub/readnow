@@ -1,7 +1,35 @@
+/**
+ * @file newsController.js
+ * @description News Controller for handling news.
+ * @module News Controller
+ *
+ * @requires axios Axios for handling requests.
+ * @requires jsdom JSDOM for handling DOM.
+ * @requires Readability Readability for handling article content.
+ *
+ * @exports getHeadlinesController
+ * @exports searchHeadlinesController
+ * @exports getArticleBodyController
+ *
+ */
+
 const axios = require("axios");
 const { JSDOM } = require("jsdom");
 const { Readability } = require("@mozilla/readability");
 
+/**
+ * @function getHeadlinesController
+ * @description Controller for getting headlines.
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Response object with status and headlines.
+ *
+ * @example
+ * // GET /
+ * // Returns: { "status": 200, "headlines": [ ... ] }
+ *
+ */
 const getHeadlinesController = async (req, res) => {
   axios
     .get(
@@ -15,6 +43,20 @@ const getHeadlinesController = async (req, res) => {
     });
 };
 
+/**
+ * @function searchHeadlinesController
+ * @description handles searching headlines through query.
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {string} req.params.query - Query to search.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Response object with status and headlines.
+ *
+ * @example
+ * // GET /search/:query
+ * // Returns: { "status": 200, "headlines": [ ... ] }
+ *
+ */
 const searchHeadlinesController = async (req, res) => {
   const query = req.params.query;
   axios
@@ -29,14 +71,32 @@ const searchHeadlinesController = async (req, res) => {
     });
 };
 
+/**
+ * @function getArticleBodyController
+ * @description Controller for getting article body.
+ * @async
+ * @param {Object} req - Express request object.
+ * @param {Object} req.params - Request parameters.
+ * @param {string} req.params.url - URL of the article.
+ * @param {Object} res - Express response object.
+ * @returns {Object} Response object with status and article body.
+ *
+ * @example
+ * // GET /article-body/:url
+ * // Request params: { "url": "https://example.com" }
+ * // Returns: { "status": 200, "body": "..." }
+ *
+ * @throws {500} If there is a server error.
+ */
+
 const getArticleBodyController = async (req, res) => {
-  const { url } = req.params;
-  // console.log(req.body);
+  const { url } = req.body;
   try {
     async function getArticle() {
       try {
+        // get the article
         const response = await axios.get(url);
-
+        // parse the article using Readability and JSDOM to get the content of the article
         const dom = new JSDOM(response.data, { url: url });
         const reader = new Readability(dom.window.document).parse();
 

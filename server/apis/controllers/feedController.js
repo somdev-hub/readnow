@@ -1,7 +1,10 @@
+
+
 const PostModel = require("../models/post");
 const mongodb = require("mongodb");
 require("dotenv").config();
 
+//
 var client = new mongodb.MongoClient(process.env.MONGO_URI);
 
 const feedController = async (req, res) => {

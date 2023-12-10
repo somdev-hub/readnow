@@ -38,354 +38,366 @@ import { PaperProvider, Menu } from "react-native-paper";
 import ArticlePage from "./app/ArticlePage";
 import { Snackbar } from "react-native-paper";
 import ViewPost from "./app/ViewPost";
+import Groups from "./app/Groups";
+import TabNavigator from "./components/navigators/TabNavigator";
+import StackNavigator from "./components/navigators/StackNavigator";
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 const TopTab = createMaterialTopTabNavigator();
 const Drawer = createDrawerNavigator();
 
-const screenOptions = {
-  headerShown: false,
-  tabBarShowLabel: false,
+// const screenOptions = {
+//   headerShown: false,
+//   tabBarShowLabel: false,
 
-  tabBarStyle: {
-    backgroundColor: "#fff",
-    borderTopColor: "#eeeeee",
-    borderTopWidth: 2,
-    paddingVertical: 5,
-    paddingBottom: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    elevation: 0,
-    height: 60
-  }
-};
-const navStyles = StyleSheet.create({
-  activeButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#39A7FF",
-    flexDirection: "row",
-    gap: 3,
-    borderRadius: 50,
-    padding: 10
-  }
-});
+//   tabBarStyle: {
+//     backgroundColor: "#fff",
+//     borderTopColor: "#eeeeee",
+//     borderTopWidth: 2,
+//     paddingVertical: 5,
+//     paddingBottom: 10,
+//     position: "absolute",
+//     bottom: 0,
+//     left: 0,
+//     right: 0,
+//     elevation: 0,
+//     height: 60
+//   }
+// };
+// const navStyles = StyleSheet.create({
+//   activeButton: {
+//     alignItems: "center",
+//     justifyContent: "center",
+//     backgroundColor: "#39A7FF",
+//     flexDirection: "row",
+//     gap: 3,
+//     borderRadius: 50,
+//     padding: 10
+//   }
+// });
 
-const StackNavigator = () => {
-  const [token, setToken] = useState(null);
-  const navigator = useNavigation();
-  const dispatch = useDispatch();
-  const postData = useSelector((state) => state.post.postData);
-  const Switch = useSelector((state) => state.post.switch);
-  const bookmarkSelector = useSelector((state) => state.bookmark);
-  const [visible, setVisible] = useState(false);
+// const StackNavigator = () => {
+//   const [token, setToken] = useState(null);
+//   const navigator = useNavigation();
+//   const dispatch = useDispatch();
+//   const postData = useSelector((state) => state.post.postData);
+//   const Switch = useSelector((state) => state.post.switch);
+//   const bookmarkSelector = useSelector((state) => state.bookmark);
+//   const [visible, setVisible] = useState(false);
 
-  const openMenu = () => setVisible(true);
+//   const openMenu = () => setVisible(true);
 
-  const closeMenu = () => setVisible(false);
-  useEffect(() => {
-    const decodeToken = async () => {
-      const token = await SecureStorage.getItemAsync("token");
+//   const closeMenu = () => setVisible(false);
+//   useEffect(() => {
+//     const decodeToken = async () => {
+//       const token = await SecureStorage.getItemAsync("token");
 
-      if (token) {
-        setToken(token);
-        decodeUser(token)
-          .then((response) => {
-            console.log(response);
-            if (response.status != 200) {
-              SecureStorage.deleteItemAsync("token");
-              SecureStorage.deleteItemAsync("email");
-              navigator.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{ name: "Welcome" }]
-                })
-              );
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
-        navigator.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: "Welcome" }]
-          })
-        );
-      }
-    };
-    decodeToken();
-  }, [token]);
-  return (
-    <Stack.Navigator
-      screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
-    >
-      <Stack.Screen name="HomeScreen" component={TabNavigator} />
-      <Stack.Screen name="Web" component={Web} />
-      <Stack.Screen
-        name="Post"
-        component={ViewPost}
-        options={{
-          headerShown: true
-        }}
-      />
-      <Stack.Screen
-        name="Article"
-        component={ArticlePage}
-        options={{
-          headerShown: true,
-          headerTitle: () => {
-            return (
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  width: "100%"
-                }}
-              >
-                <Text style={{ fontSize: 20, fontWeight: "500" }}>Article</Text>
-                <Menu
-                  visible={visible}
-                  onDismiss={closeMenu}
-                  anchor={
-                    <Entypo
-                      onPress={openMenu}
-                      name="dots-three-vertical"
-                      size={20}
-                      color="black"
-                    />
-                  }
-                >
-                  <Menu.Item
-                    onPress={() => {
-                      addBookmark(
-                        bookmarkSelector.bookmark,
-                        bookmarkSelector.type,
-                        bookmarkSelector.email
-                      ).then((data) => {
-                        console.log(data);
-                      });
-                     dispatch({
-                        type: "notify/addNewsBookmark",
-                        payload: {
-                          addToNewsBookmark: true
-                        }
-                     })
-                      closeMenu();
-                    }}
-                    title="Add to Bookmark"
-                  />
-                  <Menu.Item onPress={() => {}} title="Add to Story" />
-                  <Menu.Item onPress={() => {}} title="Repost" />
-                  <Menu.Item onPress={() => {}} title="Share" />
-                  <Menu.Item onPress={() => {}} title="Send" />
-                </Menu>
-              </View>
-            );
-          }
-        }}
-      />
-      <Stack.Screen name="Welcome" component={Welcome} />
-      <Stack.Screen name="Signup" component={SignUp} />
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Story" component={Story} />
-      <Stack.Screen name="AddInfo" component={AddInfo} />
-      <Stack.Screen
-        name="Add Post"
-        component={AddPost}
-        options={{
-          headerShown: true,
-          headerTitle: () => {
-            return (
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  width: "100%"
-                }}
-              >
-                <Text style={{ fontSize: 20, fontWeight: "500" }}>
-                  Add Post
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log(postData);
-                    dispatch(postFormData(postData));
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 16,
-                      fontWeight: "bold",
-                      color: "#39A7FF"
-                    }}
-                  >
-                    Post
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            );
-          }
-        }}
-      />
-      <Stack.Screen
-        name="Myprofile"
-        component={MyProfile}
-        options={{
-          headerShown: true,
-          headerTitle: "Profile",
-          headerMode: "screen"
-        }}
-      />
-      <Stack.Screen name="People" component={People} />
-      <Stack.Screen
-        name="PeopleProfile"
-        component={PeopleProfile}
-        options={{
-          headerShown: true,
-          headerTitle: "Profile",
-          headerMode: "screen"
-        }}
-      />
-    </Stack.Navigator>
-  );
-};
+//       if (token) {
+//         setToken(token);
+//         decodeUser(token)
+//           .then((response) => {
+//             console.log(response);
+//             if (response.status != 200) {
+//               SecureStorage.deleteItemAsync("token");
+//               SecureStorage.deleteItemAsync("email");
+//               navigator.dispatch(
+//                 CommonActions.reset({
+//                   index: 0,
+//                   routes: [{ name: "Welcome" }]
+//                 })
+//               );
+//             }
+//           })
+//           .catch((error) => {
+//             console.log(error);
+//           });
+//       } else {
+//         navigator.dispatch(
+//           CommonActions.reset({
+//             index: 0,
+//             routes: [{ name: "Welcome" }]
+//           })
+//         );
+//       }
+//     };
+//     decodeToken();
+//   }, [token]);
+//   return (
+//     <Stack.Navigator
+//       screenOptions={{ headerShown: false }}
+//       initialRouteName="HomeScreen"
+//     >
+//       <Stack.Screen name="HomeScreen" component={TabNavigator} />
+//       <Stack.Screen name="Web" component={Web} />
+//       <Stack.Screen
+//         name="Post"
+//         component={ViewPost}
+//         options={{
+//           headerShown: true
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Article"
+//         component={ArticlePage}
+//         options={{
+//           headerShown: true,
+//           headerTitle: () => {
+//             return (
+//               <View
+//                 style={{
+//                   flexDirection: "row",
+//                   justifyContent: "space-between",
+//                   alignItems: "center",
+//                   width: "100%"
+//                 }}
+//               >
+//                 <Text style={{ fontSize: 20, fontWeight: "500" }}>Article</Text>
+//                 <Menu
+//                   visible={visible}
+//                   onDismiss={closeMenu}
+//                   anchor={
+//                     <Entypo
+//                       onPress={openMenu}
+//                       name="dots-three-vertical"
+//                       size={20}
+//                       color="black"
+//                     />
+//                   }
+//                 >
+//                   <Menu.Item
+//                     onPress={() => {
+//                       addBookmark(
+//                         bookmarkSelector.bookmark,
+//                         bookmarkSelector.type,
+//                         bookmarkSelector.email
+//                       ).then((data) => {
+//                         console.log(data);
+//                       });
+//                       dispatch({
+//                         type: "notify/addNewsBookmark",
+//                         payload: {
+//                           addToNewsBookmark: true
+//                         }
+//                       });
+//                       closeMenu();
+//                     }}
+//                     title="Add to Bookmark"
+//                   />
+//                   <Menu.Item onPress={() => {}} title="Add to Story" />
+//                   <Menu.Item onPress={() => {}} title="Repost" />
+//                   <Menu.Item onPress={() => {}} title="Share" />
+//                   <Menu.Item onPress={() => {}} title="Send" />
+//                 </Menu>
+//               </View>
+//             );
+//           }
+//         }}
+//       />
+//       <Stack.Screen name="Welcome" component={Welcome} />
+//       <Stack.Screen name="Signup" component={SignUp} />
+//       <Stack.Screen name="Login" component={Login} />
+//       <Stack.Screen name="Story" component={Story} />
+//       <Stack.Screen name="AddInfo" component={AddInfo} />
+//       <Stack.Screen
+//         name="Groups"
+//         component={Groups}
+//         options={{
+//           headerShown: true,
+//           headerTitle: "Groups",
+//           headerMode: "screen"
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Add Post"
+//         component={AddPost}
+//         options={{
+//           headerShown: true,
+//           headerTitle: () => {
+//             return (
+//               <View
+//                 style={{
+//                   flexDirection: "row",
+//                   justifyContent: "space-between",
+//                   alignItems: "center",
+//                   width: "100%"
+//                 }}
+//               >
+//                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
+//                   Add Post
+//                 </Text>
+//                 <TouchableOpacity
+//                   onPress={() => {
+//                     console.log(postData);
+//                     dispatch(postFormData(postData));
+//                   }}
+//                 >
+//                   <Text
+//                     style={{
+//                       fontSize: 16,
+//                       fontWeight: "bold",
+//                       color: "#39A7FF"
+//                     }}
+//                   >
+//                     Post
+//                   </Text>
+//                 </TouchableOpacity>
+//               </View>
+//             );
+//           }
+//         }}
+//       />
+//       <Stack.Screen
+//         name="Myprofile"
+//         component={MyProfile}
+//         options={{
+//           headerShown: true,
+//           headerTitle: "Profile",
+//           headerMode: "screen"
+//         }}
+//       />
+//       <Stack.Screen name="People" component={People} />
+//       <Stack.Screen
+//         name="PeopleProfile"
+//         component={PeopleProfile}
+//         options={{
+//           headerShown: true,
+//           headerTitle: "Profile",
+//           headerMode: "screen"
+//         }}
+//       />
+//     </Stack.Navigator>
+//   );
+// };
 
-const DrawerNavigator = () => {
-  return (
-    <Drawer.Navigator
-      screenOptions={{ headerShown: false, drawerIcon: () => null }}
-      drawerContent={(props) => <DrawerContent {...props} />}
-    >
-      <Drawer.Screen
-        name="HomePage"
-        component={HomeTopNavigator}
-        options={{
-          headerShown: true,
-          headerStyle: {
-            // backgroundColor: "#39A7FF"
-          },
-          headerTitle: () => <HeaderMenu />
-        }}
-      />
-    </Drawer.Navigator>
-  );
-};
+// const DrawerNavigator = () => {
+//   return (
+//     <Drawer.Navigator
+//       screenOptions={{ headerShown: false, drawerIcon: () => null }}
+//       drawerContent={(props) => <DrawerContent {...props} />}
+//     >
+//       <Drawer.Screen
+//         name="HomePage"
+//         component={HomeTopNavigator}
+//         options={{
+//           headerShown: true,
+//           headerStyle: {
+//             // backgroundColor: "#39A7FF"
+//           },
+//           headerTitle: () => <HeaderMenu />
+//         }}
+//       />
+//     </Drawer.Navigator>
+//   );
+// };
 
-const HomeTopNavigator = () => {
-  return (
-    <TopTab.Navigator>
-      <TopTab.Screen name="News" component={Home} />
-      <TopTab.Screen name="Feed" component={Feeds} />
-    </TopTab.Navigator>
-  );
-};
+// const HomeTopNavigator = () => {
+//   return (
+//     <TopTab.Navigator>
+//       <TopTab.Screen name="News" component={Home} />
+//       <TopTab.Screen name="Feed" component={Feeds} />
+//     </TopTab.Navigator>
+//   );
+// };
 
-const navigationItems = [
-  {
-    name: "Home",
-    component: DrawerNavigator,
-    icon: "home"
-  },
-  {
-    name: "People",
-    component: People,
-    icon: "globe"
-  },
-  {
-    name: "Bookmarks",
-    component: Bookmarks,
-    icon: "bookmark"
-  },
-  {
-    name: "Profile",
-    component: Profile,
-    icon: "user"
-  }
-];
+// const navigationItems = [
+//   {
+//     name: "Home",
+//     component: DrawerNavigator,
+//     icon: "home"
+//   },
+//   {
+//     name: "People",
+//     component: People,
+//     icon: "globe"
+//   },
+//   {
+//     name: "Bookmarks",
+//     component: Bookmarks,
+//     icon: "bookmark"
+//   },
+//   {
+//     name: "Profile",
+//     component: Profile,
+//     icon: "user"
+//   }
+// ];
 
-const TabNavigator = () => {
-  const bookmarkNotification = useSelector(
-    (state) => state.notify.addedToBookmark
-  );
-  const dispatch = useDispatch();
-  return (
-    <View style={{ flex: 1, position: "relative" }}>
-      <Tab.Navigator screenOptions={screenOptions}>
-        {navigationItems.map((item, index) => {
-          return (
-            <Tab.Screen
-              key={index}
-              name={item.name}
-              component={item.component}
-              options={{
-                headerShown: item.name === "Home" ? false : true,
-                headerStyle: {
-                  backgroundColor: "#39A7FF",
-                  elevation: 10
-                },
-                headerTintColor: "#fff",
-                tabBarIcon: ({ focused }) => (
-                  <View
-                    style={
-                      focused
-                        ? [navStyles.activeButton]
-                        : { alignItems: "center", justifyContent: "center" }
-                    }
-                  >
-                    <Feather
-                      name={item.icon}
-                      size={focused ? 18 : 24}
-                      color={focused ? "#fff" : "#A9A9A9"}
-                    />
-                    {focused && (
-                      <Text
-                        style={{
-                          color: "#fff",
-                          fontSize: 12,
-                          fontWeight: "500"
-                        }}
-                      >
-                        {item.name}
-                      </Text>
-                    )}
-                  </View>
-                )
-              }}
-            />
-          );
-        })}
-      </Tab.Navigator>
-      <Snackbar
-        visible={bookmarkNotification.addToBookmark}
-        style={{ position: "absolute", bottom: 60 }}
-        onDismiss={() => {}}
-        // duration={200}
-        action={{
-          label: "Done",
-          onPress: () => {
-            // console.log("click");
-            dispatch({
-              type: "notify/addBookmark",
-              payload: {
-                addToBookmark: false
-              }
-            });
-          }
-        }}
-      >
-        Added to Bookmarks
-      </Snackbar>
-    </View>
-  );
-};
+// const TabNavigator = () => {
+//   const bookmarkNotification = useSelector(
+//     (state) => state.notify.addedToBookmark
+//   );
+//   const dispatch = useDispatch();
+//   return (
+//     <View style={{ flex: 1, position: "relative" }}>
+//       <Tab.Navigator screenOptions={screenOptions}>
+//         {navigationItems.map((item, index) => {
+//           return (
+//             <Tab.Screen
+//               key={index}
+//               name={item.name}
+//               component={item.component}
+//               options={{
+//                 headerShown: item.name === "Home" ? false : true,
+//                 headerStyle: {
+//                   backgroundColor: "#39A7FF",
+//                   elevation: 10
+//                 },
+//                 headerTintColor: "#fff",
+//                 tabBarIcon: ({ focused }) => (
+//                   <View
+//                     style={
+//                       focused
+//                         ? [navStyles.activeButton]
+//                         : { alignItems: "center", justifyContent: "center" }
+//                     }
+//                   >
+//                     <Feather
+//                       name={item.icon}
+//                       size={focused ? 18 : 24}
+//                       color={focused ? "#fff" : "#A9A9A9"}
+//                     />
+//                     {focused && (
+//                       <Text
+//                         style={{
+//                           color: "#fff",
+//                           fontSize: 12,
+//                           fontWeight: "500"
+//                         }}
+//                       >
+//                         {item.name}
+//                       </Text>
+//                     )}
+//                   </View>
+//                 )
+//               }}
+//             />
+//           );
+//         })}
+//       </Tab.Navigator>
+//       <Snackbar
+//         visible={bookmarkNotification.addToBookmark}
+//         style={{ position: "absolute", bottom: 60 }}
+//         onDismiss={() => {}}
+//         // duration={200}
+//         action={{
+//           label: "Done",
+//           onPress: () => {
+//             // console.log("click");
+//             dispatch({
+//               type: "notify/addBookmark",
+//               payload: {
+//                 addToBookmark: false
+//               }
+//             });
+//           }
+//         }}
+//       >
+//         Added to Bookmarks
+//       </Snackbar>
+//     </View>
+//   );
+// };
 
 export default function App() {
   return (
