@@ -30,7 +30,7 @@ const searchHeadlinesController = async (req, res) => {
 };
 
 const getArticleBodyController = async (req, res) => {
-  const url = req.body.url;
+  const { url } = req.params;
   // console.log(req.body);
   try {
     async function getArticle() {

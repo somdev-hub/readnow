@@ -1,30 +1,41 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import { useRoute } from "@react-navigation/native";
+import { getProfile, handleFollow } from "../api/apis";
+import PostCard from "../components/PostCard";
+import * as SecureStorage from "expo-secure-store";
 
 const PeopleProfile = () => {
   const route = useRoute();
   const personData = route.params.item;
-  const [followed, setFollowed] = React.useState(false);
+  const [followed, setFollowed] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [userPosts, setUserPosts] = useState([]);
+  const handleFollowFunc = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await handleFollow(email, personData.userEmail);
+    console.log(response);
+    response.status === 200 && setFollowed(!followed);
+  };
+  const getProfileInfo = async () => {
+    // const email = await SecureStorage.getItemAsync("email");
+    getProfile(personData.userEmail).then((response) => {
+      // console.log(response.data.userData);
+      setUserData(response.data.userData);
+      setUserPosts(response.data.postData);
+    });
+  };
 
+  useEffect(() => {
+    getProfileInfo();
+    SecureStorage.getItemAsync("email").then((response) => {
+      setFollowed(userData?.followers.includes(response));
+    });
+  }, []);
   return (
     <View style={{ flex: 1 }}>
-      {/* <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "start",
-          marginTop: 20,
-          borderBottomWidth: 1,
-          paddingBottom: 15,
-          borderBottomColor: "#ddd"
-        }}
-      >
-        <Text style={{ fontWeight: "bold", fontSize: 18, marginLeft: 20 }}>
-          Your Profile
-        </Text>
-      </View> */}
       <ScrollView>
         <View
           style={{
@@ -37,7 +48,7 @@ const PeopleProfile = () => {
           <View style={{ height: 120, position: "relative" }}>
             <Image
               source={{
-                uri: personData.background
+                uri: userData?.backgroundPicture
               }}
               style={{ width: "100%", height: "100%", resizeMode: "cover" }}
             />
@@ -56,7 +67,7 @@ const PeopleProfile = () => {
             >
               <Image
                 source={{
-                  uri: personData.image
+                  uri: userData?.profilePicture
                 }}
                 style={{
                   width: "100%",
@@ -70,7 +81,7 @@ const PeopleProfile = () => {
           <View style={{ marginTop: 50 }}>
             <View style={{ marginHorizontal: 20 }}>
               <Text style={{ fontWeight: "bold", fontSize: 22 }}>
-                {personData.name}
+                {userData?.name}
               </Text>
               <Text
                 style={{
@@ -80,10 +91,10 @@ const PeopleProfile = () => {
                   fontSize: 16
                 }}
               >
-                {personData.header}
+                {userData?.header}
               </Text>
               <Text style={{ marginTop: 10, color: "#00A9FF" }}>
-                {personData.tags}
+                {userData?.tags}
               </Text>
               <View
                 style={{
@@ -92,40 +103,44 @@ const PeopleProfile = () => {
                   justifyContent: "space-between"
                 }}
               >
-                <Text style={styles.textStyle}>200 followers</Text>
+                <Text style={styles.textStyle}>
+                  {userData?.followers.length} followers
+                </Text>
                 <Text style={styles.textStyle}>|</Text>
-                <Text style={styles.textStyle}>100 following</Text>
+                <Text style={styles.textStyle}>
+                  {userData?.following.length} following
+                </Text>
                 <Text style={styles.textStyle}>|</Text>
-                <Text style={styles.textStyle}>20 posts</Text>
+                <Text style={styles.textStyle}>{userData?.posts} posts</Text>
               </View>
             </View>
             <TouchableOpacity
-            onPress={() => {
-              setFollowed(!followed);
-            }}
-            style={{
-              borderColor: "#39A7FF",
-              //   borderWidth: followed ? 0 : 1,
-              borderWidth: 2,
-              marginHorizontal: 20,
-              padding: 10,
-              borderRadius: 30,
-              marginTop: 20,
-            //   width: 80,
-              backgroundColor: followed ? "#39A7FF" : "white"
-            }}
-          >
-            <Text
+              onPress={() => {
+                handleFollowFunc();
+              }}
               style={{
-                fontSize: 14,
-                color: followed ? "white" : "#39A7FF",
-                textAlign: "center",
-                fontWeight: "500"
+                borderColor: "#39A7FF",
+                //   borderWidth: followed ? 0 : 1,
+                borderWidth: 2,
+                marginHorizontal: 20,
+                padding: 10,
+                borderRadius: 30,
+                marginTop: 20,
+                //   width: 80,
+                backgroundColor: followed ? "#39A7FF" : "white"
               }}
             >
-              {followed ? "Following" : "Follow"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: followed ? "white" : "#39A7FF",
+                  textAlign: "center",
+                  fontWeight: "500"
+                }}
+              >
+                {followed ? "Following" : "Follow"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         <View
@@ -136,20 +151,12 @@ const PeopleProfile = () => {
             backgroundColor: "white"
           }}
         >
-          <Text style={{ fontWeight: "500", fontSize: 16 }}>Description</Text>
+          <Text style={{ fontWeight: "500", fontSize: 16 }}>About</Text>
           <Text style={{ marginTop: 10, fontSize: 12 }}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book. It has survived not
-            only five centuries, but also the leap into electronic typesetting,
-            remaining essentially unchanged. It was popularised in the 1960s
-            with the release of Letraset sheets containing Lorem Ipsum passages,
-            and more recently with desktop publishing software like Aldus
-            PageMaker including versions of versions of ve Lorem Ipsum.{" "}
+            {userData?.description}
             <Text style={{ fontWeight: "500", fontSize: 14 }}>
               Read more...
-            </Text>{" "}
+            </Text>
           </Text>
         </View>
         <View
@@ -163,7 +170,7 @@ const PeopleProfile = () => {
           <Text
             style={{ fontWeight: "500", fontSize: 16, paddingHorizontal: 20 }}
           >
-            Your posts
+            Posts
           </Text>
           <ScrollView
             horizontal
@@ -174,7 +181,6 @@ const PeopleProfile = () => {
                 padding: 7,
                 paddingHorizontal: 10,
                 borderWidth: 2,
-                // flex:1,
                 width: "auto",
                 marginRight: 10,
                 borderRadius: 50,
@@ -217,6 +223,25 @@ const PeopleProfile = () => {
               </Text>
             </View>
           </ScrollView>
+        </View>
+        <View>
+          {userPosts?.map((item, index) => {
+            // console.log(item.description.length);
+            return (
+              <PostCard
+                key={index}
+                user={userData?.name}
+                header={userData?.header}
+                description={item.description || ""}
+                image={item.image}
+                likes={item.likedBy}
+                comments={item.comments}
+                profilePicture={userData?.profilePicture}
+                // optionsContent={optionContents}
+                post={item}
+              />
+            );
+          })}
         </View>
       </ScrollView>
     </View>

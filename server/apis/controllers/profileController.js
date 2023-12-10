@@ -167,13 +167,13 @@ const getProfileController = async (req, res) => {
   try {
     const userData = await User.findOne({ email: email });
     const response = await axios.get(
-      `${process.env.STRAPI_API}/api/posts?email=${email}&populate=*`
+      `${process.env.STRAPI_API}/api/posts?filters[postedBy][$eq]=${email}&populate=*`
     );
     const posts = response.data.data.reverse().map((post) => {
       return {
         ...post.attributes,
         id: post.id,
-        image: `http://192.168.39.254:1337${post.attributes.image.data.attributes?.url}`
+        image: `${process.env.STRAPI_API}${post.attributes.image.data.attributes?.url}`
       };
     });
 
@@ -222,11 +222,65 @@ const getShortProfileInfoController = async (req, res) => {
   }
 };
 
+const handleFollowController = async (req, res) => {
+  const { email, followerEmail } = req.body;
+  try {
+    const users = await User.find({ email: { $in: [email, followerEmail] } });
+    if (users.length !== 2) {
+      return res.send({
+        status: 404,
+        message: "User or follower not found"
+      });
+    }
+    const [userData, followerData] = users;
+    // console.log(userData.followers, followerEmail);
+    try {
+      if (userData.following.includes(followerEmail)) {
+        // console.log("true");
+        await User.updateOne(
+          { email: followerEmail },
+          { $pull: { followers: email } },
+          { upsert: true, new: true }
+        );
+        await User.updateOne(
+          { email: email },
+          { $pull: { following: followerEmail } },
+          { upsert: true, new: true }
+        );
+      } else {
+        await User.updateOne(
+          { email: followerEmail },
+          { $addToSet: { followers: email } },
+          { upsert: true, new: true }
+        );
+        await User.updateOne(
+          { email: email },
+          { $addToSet: { following: followerEmail } },
+          { upsert: true, new: true }
+        );
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    res.send({
+      status: 200,
+      message: "Follower added or removed successfully"
+    });
+  } catch (error) {
+    console.log(error);
+    res.send({
+      status: 500,
+      message: "Server error"
+    });
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
   editProfilePictureController,
   editBackgroundPictureController,
   getProfileController,
-  getShortProfileInfoController
+  getShortProfileInfoController,
+  handleFollowController
 };

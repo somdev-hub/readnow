@@ -13,10 +13,7 @@ const searchHeadlines = async (query) => {
 };
 
 const getArticle = async (url) => {
-  const response = await axios.post(`${ADDRESS}/news/get-article-body`, {
-    url: url
-  });
-  // console.log(response.data);
+  const response = await axios.get(`${ADDRESS}/news/get-article-body/${url}`);
   return response.data;
 };
 
@@ -249,6 +246,18 @@ const getPeople = async () => {
   }
 };
 
+const handleFollow = async (email, followerEmail) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/profile/follow`, {
+      email,
+      followerEmail
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getHeadlines,
   searchHeadlines,
@@ -270,5 +279,6 @@ export {
   commentPost,
   deleteBookmark,
   deletePost,
-  getPeople
+  getPeople,
+  handleFollow
 };

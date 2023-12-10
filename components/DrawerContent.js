@@ -13,6 +13,10 @@ const DrawerContent = () => {
       icon: "user"
     },
     {
+      name: "Groups",
+      icon: "team"
+    },
+    {
       name: "Publishers",
       icon: "book"
     },

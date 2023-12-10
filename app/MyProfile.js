@@ -81,7 +81,7 @@ const MyProfile = () => {
       option: "Delete post",
       function: async (postId) => {
         deletePost(postId).then((response) => {
-          console.log(response);
+          // console.log(response);
           setSnackbarVisible(true);
           getProfileInfo();
         });
@@ -195,11 +195,11 @@ const MyProfile = () => {
                 }}
               >
                 <Text style={styles.textStyle}>
-                  {userData?.followers} followers
+                  {userData?.followers.length} followers
                 </Text>
                 <Text style={styles.textStyle}>|</Text>
                 <Text style={styles.textStyle}>
-                  {userData?.following} following
+                  {userData?.following.length} following
                 </Text>
                 <Text style={styles.textStyle}>|</Text>
                 <Text style={styles.textStyle}>{userData?.posts} posts</Text>

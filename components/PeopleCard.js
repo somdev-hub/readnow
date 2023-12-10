@@ -1,24 +1,45 @@
 import { View, Text, Image, TouchableOpacity, Pressable } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { handleFollow } from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
 
-const PeopleCard = ({ image, name, header, tags, background }) => {
+const PeopleCard = ({
+  image,
+  name,
+  header,
+  tags,
+  background,
+  userEmail,
+  followers
+}) => {
   const navigator = useNavigation();
   const [followed, setFollowed] = React.useState(false);
+  const handleFollowFunc = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await handleFollow(email, userEmail);
+    console.log(response);
+    response.status === 200 && setFollowed(!followed);
+  };
+  useEffect(() => {
+    SecureStorage.getItemAsync("email").then((response) => {
+      setFollowed(followers.includes(response));
+    });
+  }, []);
   return (
     <Pressable
       onPress={() => {
         navigator.navigate("PeopleProfile", {
-          item: { image, name, header, tags, background }
+          item: { image, name, header, tags, background, userEmail }
         });
       }}
       style={{
         backgroundColor: "white",
         elevation: 1,
-        // borderWidth: 2,
-        // borderColor: "#A9A9A9",
         borderRadius: 20,
-        marginTop: 20
+        // marginTop: 15,
+        // marginBottom: 5
+        marginVertical: 10
       }}
     >
       <View style={{ width: "100%", height: 100, position: "relative" }}>
@@ -70,7 +91,7 @@ const PeopleCard = ({ image, name, header, tags, background }) => {
         >
           <TouchableOpacity
             onPress={() => {
-              setFollowed(!followed);
+              handleFollowFunc();
             }}
             style={{
               borderColor: "#39A7FF",

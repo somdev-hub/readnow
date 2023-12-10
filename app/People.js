@@ -1,8 +1,9 @@
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 import PeopleCard from "../components/PeopleCard";
+import { getPeople } from "../api/apis";
 
 const People = () => {
   const [peopleList, setPeopleList] = useState([]);
@@ -35,6 +36,14 @@ const People = () => {
       header: "Social media influencer"
     }
   ];
+  useEffect(() => {
+    const getPeopleFunc = async () => {
+      const response = await getPeople();
+      // console.log(response.users[1].email);
+      setPeopleList(response.users);
+    };
+    getPeopleFunc();
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView
@@ -44,19 +53,21 @@ const People = () => {
           // backgroundColor: "white"
         }}
       >
-        <Text style={{ fontSize: 16, fontWeight: "500" }}>
+        <Text style={{ fontSize: 16, fontWeight: "500", marginBottom: 10 }}>
           People you might know
         </Text>
         <View>
-          {people_list.map((item, index) => {
+          {peopleList.map((item, index) => {
             return (
               <PeopleCard
                 key={index}
-                image={item.image}
-                background={item.background}
+                image={item.profilePicture}
+                background={item.backgroundPicture}
                 header={item.header}
                 name={item.name}
                 tags={item.tags}
+                userEmail={item.email}
+                followers={item.followers}
               />
             );
           })}

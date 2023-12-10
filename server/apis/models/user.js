@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema({
   profilePicture: String,
   backgroundPicture: String,
   tags: Array,
-  followers: Number,
-  following: Number,
+  followers: Array,
+  following: Array,
   posts: Number,
 });
 
