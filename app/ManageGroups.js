@@ -22,8 +22,6 @@ const ManageGroups = () => {
                 backgroundColor: "white",
                 elevation: 1,
                 borderRadius: 20,
-                // marginTop: 15,
-                // marginBottom: 5
                 marginVertical: 10
               }}
             >

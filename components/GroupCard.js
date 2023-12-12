@@ -1,10 +1,13 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const GroupCard = () => {
+  const navigator = useNavigation();
   return (
-    <View
+    <Pressable
+      onPress={() => navigator.navigate("ViewGroupInfo")}
       style={{
         flexDirection: "row",
         alignItems: "start",
@@ -59,7 +62,7 @@ const GroupCard = () => {
           />
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

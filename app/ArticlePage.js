@@ -14,11 +14,6 @@ const ArticlePage = () => {
   const addtoBookmark = useSelector(
     (state) => state.notify.addedToNewsBookmark
   );
-  const [visible, setVisible] = React.useState(false);
-
-  const onToggleSnackBar = () => setVisible(!visible);
-
-  const onDismissSnackBar = () => setVisible(false);
 
   useEffect(() => {
     dispatch({

@@ -25,6 +25,10 @@ import ArticlePage from "../../app/ArticlePage";
 import ViewPost from "../../app/ViewPost";
 import Web from "../../app/Web";
 import GroupTopNavigator from "./GroupTopNavigator";
+import ViewGroupInfo from "../../app/ViewGroupInfo";
+import GroupDetails from "../../app/GroupDetails";
+import CreateGroup from "../../app/CreateGroup";
+import GroupSettings from "../../app/GroupSettings";
 // import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
@@ -77,10 +81,68 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
+      initialRouteName="GroupsPage"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
+      <Stack.Screen
+        name="ViewGroupInfo"
+        component={ViewGroupInfo}
+        options={{
+          headerShown: true,
+          headerTitle: "Group info"
+        }}
+      />
+      <Stack.Screen
+        name="GroupSettings"
+        component={GroupSettings}
+        options={{
+          headerShown: true,
+          headerTitle: "Group Settings"
+        }}
+      />
+      <Stack.Screen
+        name="CreateGroup"
+        component={CreateGroup}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Create Group
+                </Text>
+                <TouchableOpacity>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#39A7FF"
+                    }}
+                  >
+                    Create
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+        }}
+      />
+      <Stack.Screen
+        name="GroupDetails"
+        component={GroupDetails}
+        options={{
+          headerShown: true,
+          headerTitle: "Group Details"
+        }}
+      />
       <Stack.Screen
         name="Post"
         component={ViewPost}
@@ -166,7 +228,11 @@ const StackNavigator = () => {
                 }}
               >
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>Groups</Text>
-                <TouchableOpacity onPress={() => {}}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("CreateGroup");
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 16,
