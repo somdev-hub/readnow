@@ -20,8 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchEmail } from "../redux/postSlice";
 import { FAB, Surface, ActivityIndicator, MD2Colors } from "react-native-paper";
 import { getAIResponse } from "../api/apis";
-// import Markeddown from "react-native-marked"
-import Markdown from 'react-native-easy-markdown';
 
 
 const screenHeights = Dimensions.get("window").height;

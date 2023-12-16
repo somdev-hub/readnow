@@ -13,7 +13,6 @@ export const postFormData = createAsyncThunk(
     formData.append("postedBy", postData.postedBy);
 
     const res = await fetch(postData.image);
-    // const blob=await res.blob();
     formData.append("image", postData.image);
     const response = await submitPost(postData);
     console.log(formData);

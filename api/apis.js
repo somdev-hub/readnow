@@ -264,6 +264,54 @@ const handleFollow = async (email, followerEmail) => {
   }
 };
 
+const createGroup = async (data) => {
+  const formData = new FormData();
+
+  formData.append("groupImage", {
+    uri: data.groupImage,
+    name: "groupImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("groupCoverImage", {
+    uri: data.groupCoverImage,
+    name: "groupCoverImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("groupName", data.groupName);
+  formData.append("groupDescription", data.groupDescription);
+  formData.append("groupAdmins", JSON.stringify(data.groupAdmins));
+  formData.append("groupRules", data.groupRules);
+  formData.append("groupTags", data.groupTags);
+  formData.append("groupDetails", JSON.stringify(data.groupDetails));
+  // console.log(data.groupDetails);
+  console.log("====================================");
+  console.log(formData);
+  console.log("====================================");
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/group/create-group`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const getGroups = async () => {
+  try {
+    const response = await axios.get(`${ADDRESS}/group/get-groups`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getHeadlines,
   searchHeadlines,
@@ -286,5 +334,7 @@ export {
   deleteBookmark,
   deletePost,
   getPeople,
-  handleFollow
+  handleFollow,
+  createGroup,
+  getGroups
 };

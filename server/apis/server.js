@@ -18,6 +18,7 @@
  * @requires ./routes/authRoute Route for handling authentication.
  * @requires ./routes/bookmarkRoute Route for handling bookmarks.
  * @requires ./routes/peopleRoute Route for handling people.
+ * @requires ./routes/groupRoute Route for handling groups.
  *
  * @function express Initializes and returns an instance of Express application.
  * @function dotenv.config Loads environment variables from a `.env` file into `process.env`.
@@ -38,6 +39,7 @@ const newsRouter = require("./routes/newsRoute");
 const authRouter = require("./routes/authRoute");
 const bookmarkRouter = require("./routes/bookmarkRoute");
 const peopleRouter = require("./routes/peopleRoute");
+const groupRouter = require("./routes/groupRoute");
 
 // initialize express
 const app = express();
@@ -67,6 +69,7 @@ app.use("/news", newsRouter);
 app.use("/auth", authRouter);
 app.use("/bookmark", bookmarkRouter);
 app.use("/people", peopleRouter);
+app.use("/group", groupRouter);
 
 // start the server
 const port = process.env.PORT || 3500;

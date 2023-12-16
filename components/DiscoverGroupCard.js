@@ -9,7 +9,13 @@ import {
 import React from "react";
 import { useNavigation } from "@react-navigation/native";
 
-const DiscoverGroupCard = () => {
+const DiscoverGroupCard = ({
+  groupName,
+  groupImage,
+  groupCoverImage,
+  groupMembers,
+  groupId
+}) => {
   const screenWidth = Dimensions.get("window").width;
   const navigator = useNavigation();
   return (
@@ -21,8 +27,6 @@ const DiscoverGroupCard = () => {
         marginBottom: 15,
         backgroundColor: "white",
         elevation: 1
-        // borderColor: "#39A7FF",
-        // borderWidth: 2
       }}
     >
       <View
@@ -39,7 +43,9 @@ const DiscoverGroupCard = () => {
       >
         <Image
           source={{
-            uri: "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
+            uri: groupCoverImage
+              ? groupCoverImage
+              : "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
           }}
           style={{
             width: "100%",
@@ -64,7 +70,9 @@ const DiscoverGroupCard = () => {
         >
           <Image
             source={{
-              uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+              uri: groupImage
+                ? groupImage
+                : "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
             }}
             style={{
               width: "100%",
@@ -90,7 +98,9 @@ const DiscoverGroupCard = () => {
             fontWeight: "500"
           }}
         >
-          Group Name
+          {groupName.length > 15
+            ? groupName.substring(0, 15) + "..."
+            : groupName}
         </Text>
         <Text
           style={{
@@ -99,7 +109,7 @@ const DiscoverGroupCard = () => {
             color: "#A9A9A9"
           }}
         >
-          100 Members
+          {groupMembers} Members
         </Text>
         <TouchableOpacity
           style={{

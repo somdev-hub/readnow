@@ -2,21 +2,80 @@ import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
   Image,
   TextInput,
   Pressable
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Entypo } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
-// import { Entypo } from '@expo/vector-icons';
 import { RadioButton } from "react-native-paper";
-import { width } from "deprecated-react-native-prop-types/DeprecatedImagePropType";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchEmail } from "../redux/groupSlice";
+import * as ImagePicker from "expo-image-picker";
+import { useNavigation } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 
 const CreateGroup = () => {
-  const [checked, setChecked] = React.useState("first");
+  const ref = React.useRef(true);
+  const dispatch = useDispatch();
+  const navigator = useNavigation();
+  const groupData = useSelector((state) => state.group.groupData);
+  const groupGenres = useSelector((state) => state.group.groupGenres);
+  // console.log(groupGenres);
+  const router = useRoute();
+  const [groupCreationData, setGroupCreationData] = React.useState({
+    groupName: "",
+    groupDescription: "",
+    groupAdmins: [],
+    groupRules: "",
+    groupTags: [],
+    groupDetails: {
+      groupLocation: "",
+      groupVisibility: "private",
+      groupGenre: groupGenres
+    },
+    groupImage: null,
+    groupCoverImage: null
+  });
+
+  const selectImage = async (type) => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
+    });
+
+    if (!result.canceled) {
+      if (type === "groupImage") {
+        setGroupCreationData({
+          ...groupCreationData,
+          groupImage: result.assets[0].uri
+        });
+      } else {
+        setGroupCreationData({
+          ...groupCreationData,
+          groupCoverImage: result.assets[0].uri
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    setGroupCreationData({
+      ...groupCreationData,
+      groupDetails: {
+        ...groupCreationData.groupDetails,
+        groupGenre: groupGenres
+      }
+    });
+  }, [groupGenres]);
+
+  useEffect(() => {
+    dispatch({
+      type: "group/updateGroupData",
+      payload: { ...groupCreationData }
+    });
+    dispatch(fetchEmail());
+  }, [groupCreationData]);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -32,7 +91,10 @@ const CreateGroup = () => {
                 backgroundColor: "gray"
               }}
             >
-              <View
+              <Pressable
+                onPress={() => {
+                  selectImage("groupCoverImage");
+                }}
                 style={{
                   position: "absolute",
                   backgroundColor: "#fff",
@@ -43,15 +105,16 @@ const CreateGroup = () => {
                   zIndex: 1,
                   bottom: 10,
                   right: 10,
-                  // justifyContent: "center",
                   alignItems: "center"
                 }}
               >
                 <EvilIcons name="pencil" size={28} color="black" />
-              </View>
+              </Pressable>
               <Image
                 source={{
-                  uri: "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
+                  uri: groupCreationData.groupCoverImage
+                    ? groupCreationData.groupCoverImage
+                    : "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
                 }}
                 style={{
                   width: "100%",
@@ -75,7 +138,10 @@ const CreateGroup = () => {
                   borderWidth: 1
                 }}
               >
-                <View
+                <Pressable
+                  onPress={() => {
+                    selectImage("groupImage");
+                  }}
                   style={{
                     position: "absolute",
                     backgroundColor: "#fff",
@@ -91,10 +157,12 @@ const CreateGroup = () => {
                   }}
                 >
                   <EvilIcons name="pencil" size={28} color="black" />
-                </View>
+                </Pressable>
                 <Image
                   source={{
-                    uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                    uri: groupCreationData.groupImage
+                      ? groupCreationData.groupImage
+                      : "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
                   }}
                   style={{
                     width: "100%",
@@ -132,11 +200,16 @@ const CreateGroup = () => {
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
-                //   fontSize: 18,
-                // fontWeight: "500",
                 marginBottom: 10
               }}
               placeholder="Group Name"
+              value={groupCreationData.groupName}
+              onChangeText={(text) => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupName: text
+                });
+              }}
             />
           </View>
           <View
@@ -160,11 +233,16 @@ const CreateGroup = () => {
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
-                //   fontSize: 18,
-                // fontWeight: "500",
                 marginBottom: 10
               }}
               placeholder="About this group"
+              value={groupCreationData.groupDescription}
+              onChangeText={(text) => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupDescription: text
+                });
+              }}
             />
           </View>
           <View
@@ -182,41 +260,84 @@ const CreateGroup = () => {
             >
               Group genre*
             </Text>
-            <Pressable
+            <View
               style={{
-                borderColor: "#A9A9A9",
-                borderWidth: 1,
-                borderRadius: 50,
-                // padding: 5,
-                paddingVertical: 5,
-                paddingHorizontal: 15,
-                width: 130,
-                flex: 1,
-
-                // width:"auto",
                 flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: 5
+                flexWrap: "wrap",
+                gap: 10
               }}
             >
-              <Text
+              {groupGenres.map((genre, index) => {
+                return (
+                  <View
+                    key={index}
+                    style={{
+                      // borderColor: "#A9A9A9",
+                      // borderWidth: 1,
+                      borderRadius: 50,
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      paddingVertical: 5,
+                      paddingHorizontal: 15,
+                      width: "auto",
+                      flexDirection: "row",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      // alignSelf: "flex-start",
+                      gap: 5,
+                      backgroundColor: "#39A7FF"
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontWeight: "500",
+                        fontSize: 14
+                        // margin:0
+                      }}
+                    >
+                      {genre}
+                    </Text>
+                    <Entypo
+                      name="cross"
+                      size={18}
+                      color="white"
+                      onPress={() => {
+                        dispatch({
+                          type: "group/updateGroupGenres",
+                          payload: groupGenres.filter((i) => i !== genre)
+                        });
+                      }}
+                    />
+                  </View>
+                );
+              })}
+              <Pressable
+                onPress={() => navigator.navigate("GenreSelection")}
                 style={{
-                  fontWeight: "500",
-                  fontSize: 14
+                  borderColor: "#A9A9A9",
+                  borderWidth: 1,
+                  borderRadius: 50,
+                  paddingVertical: 5,
+                  paddingHorizontal: 15,
+                  width: 130,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 5
                 }}
               >
-                Add genre
-              </Text>
-              <Entypo
-                name="plus"
-                size={18}
-                color="black"
-                style={{
-                  flex: 1
-                }}
-              />
-            </Pressable>
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    fontSize: 14
+                  }}
+                >
+                  Add genre
+                </Text>
+                <Entypo name="plus" size={18} color="black" />
+              </Pressable>
+            </View>
           </View>
           <View
             style={{
@@ -239,11 +360,19 @@ const CreateGroup = () => {
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
-                //   fontSize: 18,
-                // fontWeight: "500",
                 marginBottom: 10
               }}
               placeholder="location of your group"
+              value={groupData.groupDetails.groupLocation}
+              onChangeText={(text) => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupDetails: {
+                    ...groupCreationData.groupDetails,
+                    groupLocation: text
+                  }
+                });
+              }}
             />
           </View>
           <View
@@ -267,11 +396,49 @@ const CreateGroup = () => {
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
-                //   fontSize: 18,
-                // fontWeight: "500",
                 marginBottom: 10
               }}
               placeholder="rules of your group"
+              value={groupCreationData.groupRules}
+              onChangeText={(text) => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupRules: text
+                });
+              }}
+            />
+          </View>
+          <View
+            style={{
+              marginBottom: 10
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 14,
+                fontWeight: "500",
+                marginBottom: 10,
+                color: "#39A7FF"
+              }}
+            >
+              Enter tags
+            </Text>
+            <TextInput
+              multiline={true}
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: "#ccc",
+                paddingBottom: 5,
+                marginBottom: 10
+              }}
+              placeholder="#tags of your group separated by comma"
+              value={groupCreationData.groupTags.join(",")}
+              onChangeText={(text) => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupTags: text.split(",")
+                });
+              }}
             />
           </View>
           <View>
@@ -294,6 +461,15 @@ const CreateGroup = () => {
                 marginRight: 10,
                 width: "100%"
               }}
+              onPress={() => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupDetails: {
+                    ...groupCreationData.groupDetails,
+                    groupVisibility: "private"
+                  }
+                });
+              }}
             >
               <View style={{}}>
                 <Text style={{ fontWeight: "500" }}>Private</Text>
@@ -308,9 +484,22 @@ const CreateGroup = () => {
                 </Text>
               </View>
               <RadioButton
-                value="first"
-                status={checked === "first" ? "checked" : "unchecked"}
-                onPress={() => setChecked("first")}
+                value={groupCreationData.groupDetails.groupVisibility}
+                status={
+                  groupCreationData.groupDetails.groupVisibility === "private"
+                    ? "checked"
+                    : "unchecked"
+                }
+                onPress={() => {
+                  setGroupCreationData({
+                    ...groupCreationData,
+                    groupDetails: {
+                      ...groupCreationData.groupDetails,
+                      groupVisibility: "private"
+                    }
+                  });
+                  // setChecked("private")
+                }}
                 color="#39A7FF"
                 style={{ justifyContent: "center" }}
               />
@@ -321,7 +510,16 @@ const CreateGroup = () => {
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginVertical: 10
-                // width: "100%",
+              }}
+              onPress={() => {
+                setGroupCreationData({
+                  ...groupCreationData,
+                  groupDetails: {
+                    ...groupCreationData.groupDetails,
+                    groupVisibility: "public"
+                  }
+                });
+                // setChecked("private")
               }}
             >
               <View style={{}}>
@@ -337,9 +535,22 @@ const CreateGroup = () => {
                 </Text>
               </View>
               <RadioButton
-                value="second"
-                status={checked === "second" ? "checked" : "unchecked"}
-                onPress={() => setChecked("second")}
+                value={groupCreationData.groupDetails.groupVisibility}
+                status={
+                  groupCreationData.groupDetails.groupVisibility === "public"
+                    ? "checked"
+                    : "unchecked"
+                }
+                onPress={() => {
+                  setGroupCreationData({
+                    ...groupCreationData,
+                    groupDetails: {
+                      ...groupCreationData.groupDetails,
+                      groupVisibility: "public"
+                    }
+                  });
+                  // setChecked("private")
+                }}
                 color="#39A7FF"
                 style={{
                   justifyContent: "center"

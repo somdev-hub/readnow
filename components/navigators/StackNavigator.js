@@ -29,6 +29,8 @@ import ViewGroupInfo from "../../app/ViewGroupInfo";
 import GroupDetails from "../../app/GroupDetails";
 import CreateGroup from "../../app/CreateGroup";
 import GroupSettings from "../../app/GroupSettings";
+import { postGroupData } from "../../redux/groupSlice";
+import GroupGenreSelection from "../../app/GroupGenreSelection";
 // import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
@@ -39,6 +41,8 @@ const StackNavigator = () => {
   const dispatch = useDispatch();
   const postData = useSelector((state) => state.post.postData);
   const bookmarkSelector = useSelector((state) => state.bookmark);
+  const groupData = useSelector((state) => state.group.groupData);
+  const groupGenres = useSelector((state) => state.group.groupGenres);
   const [visible, setVisible] = useState(false);
 
   const openMenu = () => setVisible(true);
@@ -119,7 +123,11 @@ const StackNavigator = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
                   Create Group
                 </Text>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    dispatch(postGroupData(groupData));
+                  }}
+                >
                   <Text
                     style={{
                       fontSize: 16,
@@ -128,6 +136,43 @@ const StackNavigator = () => {
                     }}
                   >
                     Create
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+        }}
+      />
+      <Stack.Screen
+        name="GenreSelection"
+        component={GroupGenreSelection}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Genre</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.goBack();
+                    
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#39A7FF"
+                    }}
+                  >
+                    Done
                   </Text>
                 </TouchableOpacity>
               </View>
