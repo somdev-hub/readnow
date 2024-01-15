@@ -31,6 +31,9 @@ import CreateGroup from "../../app/CreateGroup";
 import GroupSettings from "../../app/GroupSettings";
 import { postGroupData } from "../../redux/groupSlice";
 import GroupGenreSelection from "../../app/GroupGenreSelection";
+import GroupNewView from "../../app/GroupNewView";
+import Events from "../../app/Events";
+import EventPage from "../../app/EventPage";
 // import TabNavigator from "./TabNavigator";
 
 const Stack = createStackNavigator();
@@ -85,7 +88,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="GroupsPage"
+      initialRouteName="HomeScreen"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -95,6 +98,22 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Group info"
+        }}
+      />
+      <Stack.Screen
+        name="GroupNewView"
+        component={GroupNewView}
+        options={{
+          headerShown: true,
+          headerTitle: "Group info"
+        }}
+      />
+      <Stack.Screen
+        name="EventPage"
+        component={EventPage}
+        options={{
+          headerShown: true,
+          headerTitle: "Event Page"
         }}
       />
       <Stack.Screen
@@ -132,7 +151,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#39A7FF"
+                      color: "#49755D"
                     }}
                   >
                     Create
@@ -162,14 +181,13 @@ const StackNavigator = () => {
                 <TouchableOpacity
                   onPress={() => {
                     navigator.goBack();
-                    
                   }}
                 >
                   <Text
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#39A7FF"
+                      color: "#49755D"
                     }}
                   >
                     Done
@@ -191,6 +209,13 @@ const StackNavigator = () => {
       <Stack.Screen
         name="Post"
         component={ViewPost}
+        options={{
+          headerShown: true
+        }}
+      />
+      <Stack.Screen
+        name="Events"
+        component={Events}
         options={{
           headerShown: true
         }}
@@ -282,7 +307,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#39A7FF"
+                      color: "#49755D"
                     }}
                   >
                     Create
@@ -321,7 +346,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#39A7FF"
+                      color: "#49755D"
                     }}
                   >
                     Post

@@ -126,7 +126,7 @@ const ViewPost = () => {
             />
             <Pressable onPress={handleComment}>
               <Text
-                style={{ fontWeight: "bold", fontSize: 16, color: "#39A7FF" }}
+                style={{ fontWeight: "bold", fontSize: 16, color: "#49755D" }}
               >
                 Post
               </Text>

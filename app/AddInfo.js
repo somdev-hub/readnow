@@ -194,7 +194,7 @@ const AddInfo = () => {
           <TouchableOpacity
             onPress={handleSubmit}
             style={{
-              backgroundColor: "#39A7FF",
+              backgroundColor: "#49755D",
               padding: 15,
               borderRadius: 30,
               marginHorizontal: 20,

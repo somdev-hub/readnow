@@ -67,12 +67,12 @@ const SignUp = () => {
             style={{
               fontWeight: "500",
               fontFamily: "Montserrat_600SemiBold",
-              color: "#39A7FF"
+              color: "#49755D"
             }}
           >
             Log in
           </Text>
-          <AntDesign name="arrowright" size={16} color="#39A7FF" />
+          <AntDesign name="arrowright" size={16} color="#49755D" />
         </TouchableOpacity>
         <View style={{ marginTop: 10, justifyContent: "center" }}>
           <View
@@ -173,7 +173,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={handleSubmit}
             style={{
-              backgroundColor: "#39A7FF",
+              backgroundColor: "#6C3428",
               padding: 15,
               borderRadius: 30,
               marginHorizontal: 20,

@@ -3,11 +3,15 @@ import React from "react";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 
-const GroupCard = () => {
+const GroupCard = ({ groupId, groupImg, groupName, groupFollowers }) => {
   const navigator = useNavigation();
   return (
     <Pressable
-      onPress={() => navigator.navigate("ViewGroupInfo")}
+      onPress={() =>
+        navigator.navigate("ViewGroupInfo", {
+          groupId: groupId
+        })
+      }
       style={{
         flexDirection: "row",
         alignItems: "start",
@@ -26,7 +30,9 @@ const GroupCard = () => {
       >
         <Image
           source={{
-            uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+            uri: groupImg
+              ? groupImg
+              : "https://nurserylive.com/cdn/shop/products/nurserylive-combo-packs-plants-top-5-plants-for-healthy-and-prosperous-new-year-16969394913420.jpg?v=1634230380"
           }}
           style={{
             width: "100%",
@@ -48,10 +54,8 @@ const GroupCard = () => {
         }}
       >
         <View style={{ paddingHorizontal: 5 }}>
-          <Text style={{ fontWeight: "500" }}>
-            React native developer group and react discussion center
-          </Text>
-          <Text style={{ marginTop: 5 }}>1200 members</Text>
+          <Text style={{ fontWeight: "500" }}>{groupName}</Text>
+          <Text style={{ marginTop: 5 }}>{groupFollowers} members</Text>
         </View>
         <View>
           <Entypo

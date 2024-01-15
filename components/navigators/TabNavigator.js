@@ -18,7 +18,7 @@ const TabNavigator = () => {
     activeButton: {
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#39A7FF",
+      backgroundColor: "#6C3428",
       flexDirection: "row",
       gap: 3,
       borderRadius: 50,
@@ -80,7 +80,7 @@ const TabNavigator = () => {
               options={{
                 headerShown: item.name === "Home" ? false : true,
                 headerStyle: {
-                  backgroundColor: "#39A7FF",
+                  backgroundColor: "#49755D",
                   elevation: 10
                 },
                 headerTintColor: "#fff",

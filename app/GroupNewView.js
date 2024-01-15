@@ -12,22 +12,38 @@ import { Chip } from "react-native-paper";
 import { Entypo, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import { getSpecificGroup } from "../api/apis";
+import {
+  exitThisGroup,
+  getShortProfileInfo,
+  getSpecificGroup,
+  joinThisGroup
+} from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 
-const ViewGroupInfo = () => {
+const GroupNewView = () => {
   const navigator = useNavigation();
   const route = useRoute();
   const { groupId } = route.params;
   const [groupInfo, setGroupInfo] = useState({});
+  const [groupAdmins, setGroupAdmins] = useState([]);
   const [groupJoin, setGroupJoin] = useState(false);
+
   useEffect(() => {
-    // console.log(groupId);
     const fetchGroupInfo = async () => {
-      const email = await SecureStorage.getItemAsync("email");
       const response = await getSpecificGroup(groupId);
-      // console.log(response);
       setGroupInfo(response);
+
+      const adminInfos = [];
+      for (const item of response?.groupAdmins) {
+        const adminInfo = await getShortProfileInfo(item.user);
+        adminInfos.push({
+          adminData: adminInfo.data,
+          role: item.role
+        });
+      }
+      setGroupAdmins(adminInfos);
+
+      const email = await SecureStorage.getItemAsync("email");
       if (response?.groupMembers?.find((item) => item.user === email)) {
         setGroupJoin(true);
         console.log("joined");
@@ -37,7 +53,35 @@ const ViewGroupInfo = () => {
     };
     fetchGroupInfo();
   }, []);
-  console.log(groupInfo.groupCoverImage);
+  const joinGroupMethod = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    joinThisGroup(email, groupId).then((response) => {
+      try {
+        if (response.status === 200) {
+          setGroupJoin(true);
+        }
+        console.log(response.data);
+      } catch (error) {
+        console.log(response.status);
+        console.log(response.data);
+      }
+    });
+  };
+  const exitGroupMethod = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    exitThisGroup(email, groupId).then((response) => {
+      try {
+        if (response.status === 200) {
+          console.log(response);
+          setGroupJoin(false);
+        }
+        console.log(response.data);
+      } catch (error) {
+        console.log(response.status);
+        console.log(response.data);
+      }
+    });
+  };
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -51,8 +95,6 @@ const ViewGroupInfo = () => {
               style={{
                 height: 110,
                 backgroundColor: "gray"
-
-                // zIndex: 1
               }}
             >
               <Image
@@ -143,6 +185,7 @@ const ViewGroupInfo = () => {
               }}
             >
               <TouchableOpacity
+                onPress={groupJoin ? exitGroupMethod : joinGroupMethod}
                 style={{
                   flex: 1,
                   padding: 8,
@@ -165,34 +208,13 @@ const ViewGroupInfo = () => {
                   {groupJoin ? "Exit" : "Join"}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  borderColor: "#49755D",
-                  borderWidth: 2,
-                  borderRadius: 50,
-                  padding: 8,
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    // marginTop: 5,
-                    fontWeight: "500",
-                    color: "#49755D"
-                  }}
-                >
-                  Invite
-                </Text>
-              </TouchableOpacity>
+
               <TouchableOpacity
                 style={{
                   borderColor: "#49755D",
                   borderWidth: 2,
                   borderRadius: 50,
-                  padding: 8,
+                  padding: 7,
                   justifyContent: "center",
                   alignItems: "center"
                 }}
@@ -230,7 +252,7 @@ const ViewGroupInfo = () => {
                 groupDetails: groupInfo?.groupDetails,
                 groupRules: groupInfo?.groupRules,
                 groupMembers: groupInfo?.groupMembers,
-                groupAdmins: groupInfo?.groupAdmins
+                groupAdmins: groupAdmins
               });
             }}
           >
@@ -251,50 +273,109 @@ const ViewGroupInfo = () => {
           style={{
             backgroundColor: "#fff",
             marginTop: 10,
-            paddingHorizontal: 10,
-            paddingVertical: 15,
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 10
+            paddingHorizontal: 10
           }}
         >
-          <View
+          <Text
             style={{
-              width: 45,
-              height: 45,
-              borderRadius: 50
+              fontWeight: "500",
+              fontSize: 16,
+              marginVertical: 10
             }}
           >
-            <Image
-              source={{
-                uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-              }}
-              style={{
-                width: "100%",
-                height: "100%",
-                resizeMode: "cover",
-                borderRadius: 50
-              }}
-            />
-          </View>
-          <View
-            style={{
-              flex: 1
-            }}
-          >
-            <TextInput
-              style={{
-                // width: "100%",
-                flex: 1,
-                height: 40,
-                backgroundColor: "#F5F5F5",
-                borderRadius: 50,
-                paddingHorizontal: 20
-              }}
-              placeholder="Post something here..."
-            />
+            Admins
+          </Text>
+          <View>
+            {groupAdmins?.map((item, index) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center",
+                    marginBottom: 10
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri: item?.adminData.profilePicture
+                    }}
+                    style={{
+                      width: 45,
+                      height: 45,
+                      borderRadius: 50,
+                      resizeMode: "cover",
+                      borderColor: "#49755D",
+                      borderWidth: 1
+                    }}
+                  />
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      flex: 1,
+                      alignItems: "center",
+                      borderBottomColor: "#A9A9A9",
+                      borderBottomWidth: 1,
+                      paddingBottom: 10
+                    }}
+                  >
+                    <View>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: 5,
+                          alignItems: "center"
+                        }}
+                      >
+                        <Text style={{ fontWeight: "500", fontSize: 16 }}>
+                          {item?.adminData.name}
+                        </Text>
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            //   fontSize: 16,
+                            backgroundColor: "#DDE6ED",
+                            borderRadius: 10,
+                            paddingHorizontal: 5,
+                            color: "#49755D"
+                          }}
+                        >
+                          {item?.role}
+                        </Text>
+                      </View>
+                      <Text
+                        style={{
+                          color: "#A9A9A9",
+                          fontWeight: "500",
+                          fontSize: 14,
+                          marginTop: 3
+                        }}
+                      >
+                        {item?.adminData.header}
+                      </Text>
+                    </View>
+                    <Pressable>
+                      <Text
+                        style={{
+                          color: "#49755D",
+                          fontWeight: "500",
+                          fontSize: 14,
+                          marginTop: 3,
+                          marginRight: 10
+                        }}
+                      >
+                        follow
+                      </Text>
+                    </Pressable>
+                  </View>
+                </View>
+              );
+            })}
           </View>
         </View>
+
         <View
           style={{
             backgroundColor: "#fff",
@@ -354,4 +435,4 @@ const ViewGroupInfo = () => {
   );
 };
 
-export default ViewGroupInfo;
+export default GroupNewView;

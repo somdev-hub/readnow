@@ -163,7 +163,7 @@ const editBackgroundPictureController = async (req, res) => {
 
 const getProfileController = async (req, res) => {
   const { email } = req.body;
-  // console.log(req.body);
+  console.log(req.body);
   try {
     const userData = await User.findOne({ email: email });
     const response = await axios.get(

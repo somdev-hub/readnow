@@ -1,9 +1,22 @@
 import { View, Text, ScrollView, Image } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import GroupCard from "../components/GroupCard";
+import * as SecureStorage from "expo-secure-store";
+import { getFollowedGroups } from "../api/apis";
 
 const Groups = () => {
+  const [followedGroups, setFollowedGroups] = useState([]);
+  useEffect(() => {
+    const getFollowedGroupsMethod = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      getFollowedGroups(email).then((data) => {
+        setFollowedGroups(data);
+      });
+    };
+    getFollowedGroupsMethod();
+  }, []);
+  console.log(followedGroups);
   return (
     <View>
       <ScrollView>
@@ -12,8 +25,16 @@ const Groups = () => {
             Groups you follow
           </Text>
           <View style={{ marginTop: 10 }}>
-            {Array.from(Array(5).keys()).map((item, index) => {
-              return <GroupCard key={index}/>;
+            {followedGroups.map((item, index) => {
+              return (
+                <GroupCard
+                  key={index}
+                  groupId={item._id}
+                  groupImg={item.groupImage}
+                  groupName={item.groupName}
+                  groupFollowers={item.groupMembers.length}
+                />
+              );
             })}
           </View>
         </View>

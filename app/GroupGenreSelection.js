@@ -14,6 +14,12 @@ const GroupGenreSelection = () => {
   const dispatch = useDispatch();
   const [search, setSearch] = useState("");
   const genres = [
+    "Farmers",
+    "Gardeners",
+    "Horticulturists",
+    "Botanists",
+    "Plant",
+    "Plant desease",
     "Action",
     "Adventure",
     "Comedy",

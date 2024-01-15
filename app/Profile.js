@@ -66,7 +66,7 @@ const Profile = () => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            backgroundColor: "#39A7FF",
+            backgroundColor: "#49755D",
             padding: 16,
             borderRadius: 20
           }}

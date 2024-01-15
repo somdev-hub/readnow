@@ -7,8 +7,8 @@ const Schema = mongoose.Schema;
 const GroupSchema = new Schema({
   groupName: { type: String, required: true },
   groupDescription: { type: String, required: true },
-  groupMembers: { type: Array },
-  groupAdmins: { type: Array, required: true },
+  groupMembers: { type: Array, },
+  groupAdmins: { type: Array, required: true, unique: true },
   groupPosts: { type: Array },
   groupImage: { type: String },
   groupCoverImage: { type: String },

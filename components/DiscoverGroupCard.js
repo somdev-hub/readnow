@@ -20,6 +20,7 @@ const DiscoverGroupCard = ({
   const navigator = useNavigation();
   return (
     <Pressable
+      onPress={() => navigator.navigate("GroupNewView", { groupId: groupId })}
       style={{
         width: screenWidth * 0.43,
         height: 230,

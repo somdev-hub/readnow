@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.33.67:3500";
+const ADDRESS = "http://192.168.53.254:3500";
 
-const getHeadlines = async () => {
+export const getHeadlines = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/news/get-headlines`);
     return response.data;
@@ -11,19 +11,19 @@ const getHeadlines = async () => {
   }
 };
 
-const searchHeadlines = async (query) => {
+export const searchHeadlines = async (query) => {
   const response = await axios.get(`${ADDRESS}/news/search-headlines/${query}`);
   return response.data;
 };
 
-const getArticle = async (url) => {
+export const getArticle = async (url) => {
   const response = await axios.post(`${ADDRESS}/news/get-article-body/`, {
     url
   });
   return response.data;
 };
 
-const signup = async (userCredentials) => {
+export const signup = async (userCredentials) => {
   try {
     const response = await axios.post(
       `${ADDRESS}/profile/add-user`,
@@ -35,7 +35,7 @@ const signup = async (userCredentials) => {
   }
 };
 
-const login = async (userCredentials) => {
+export const login = async (userCredentials) => {
   try {
     const response = await axios.post(
       `${ADDRESS}/auth/authenticate`,
@@ -47,7 +47,7 @@ const login = async (userCredentials) => {
   }
 };
 
-const editProfile = async (userCredentials) => {
+export const editProfile = async (userCredentials) => {
   try {
     const response = await axios.post(
       `${ADDRESS}/profile/edit-profile`,
@@ -59,7 +59,7 @@ const editProfile = async (userCredentials) => {
   }
 };
 
-const editProfilePicture = async (data) => {
+export const editProfilePicture = async (data) => {
   const formData = new FormData();
   console.log(data);
   formData.append("profilePicture", {
@@ -84,7 +84,7 @@ const editProfilePicture = async (data) => {
   }
 };
 
-const editBackgroundPicture = async (data) => {
+export const editBackgroundPicture = async (data) => {
   const formData = new FormData();
   formData.append("backgroundPicture", {
     uri: data.image,
@@ -104,19 +104,20 @@ const editBackgroundPicture = async (data) => {
   return response.data;
 };
 
-const decodeUser = async (token) => {
+export const decodeUser = async (token) => {
   const response = await axios.post(`${ADDRESS}/auth/decode`, { token: token });
   return response.data;
 };
 
-const getProfile = async (email) => {
+export const getProfile = async (email) => {
+  console.log(email);
   const response = await axios.post(`${ADDRESS}/profile/get-profile`, {
     email: email
   });
   return response.data;
 };
 
-const submitPost = async (data) => {
+export const submitPost = async (data) => {
   try {
     const formData = new FormData();
     formData.append("description", data.description);
@@ -137,7 +138,7 @@ const submitPost = async (data) => {
   }
 };
 
-const getFeeds = async () => {
+export const getFeeds = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/post/get-feeds`);
     // console.log(response.data);
@@ -147,7 +148,7 @@ const getFeeds = async () => {
   }
 };
 
-const deletePost = async (postId) => {
+export const deletePost = async (postId) => {
   try {
     const response = await axios.delete(
       `${ADDRESS}/post/delete-post/${postId}`
@@ -158,7 +159,7 @@ const deletePost = async (postId) => {
   }
 };
 
-const getShortProfileInfo = async (email) => {
+export const getShortProfileInfo = async (email) => {
   try {
     const response = await axios.post(
       `${ADDRESS}/profile/get-short-profile-info`,
@@ -172,7 +173,7 @@ const getShortProfileInfo = async (email) => {
   }
 };
 
-const getAIResponse = async (data) => {
+export const getAIResponse = async (data) => {
   try {
     const response = await axios.post(`${ADDRESS}/get-ai`, { text: data });
     return response;
@@ -181,7 +182,7 @@ const getAIResponse = async (data) => {
   }
 };
 
-const addBookmark = async (item, type, email) => {
+export const addBookmark = async (item, type, email) => {
   try {
     const response = await axios.post(`${ADDRESS}/bookmark/add-bookmark`, {
       item,
@@ -194,7 +195,7 @@ const addBookmark = async (item, type, email) => {
   }
 };
 
-const getBookmarks = async (email) => {
+export const getBookmarks = async (email) => {
   try {
     const response = await axios.get(
       `${ADDRESS}/bookmark/get-bookmarks/${email}`
@@ -206,7 +207,7 @@ const getBookmarks = async (email) => {
   }
 };
 
-const deleteBookmark = async (bookmarkIds, email, type) => {
+export const deleteBookmark = async (bookmarkIds, email, type) => {
   try {
     const response =
       await axios.delete(`${ADDRESS}/bookmark/delete-bookmark/${email}/${bookmarkIds}/${type}
@@ -218,7 +219,7 @@ const deleteBookmark = async (bookmarkIds, email, type) => {
   }
 };
 
-const likePost = async (postId, userId) => {
+export const likePost = async (postId, userId) => {
   try {
     const response = await axios.post(`${ADDRESS}/post/like-post`, {
       postId,
@@ -230,7 +231,7 @@ const likePost = async (postId, userId) => {
   }
 };
 
-const commentPost = async (postId, userId, comment) => {
+export const commentPost = async (postId, userId, comment) => {
   try {
     const response = await axios.post(`${ADDRESS}/post/comment-post`, {
       postId,
@@ -243,7 +244,7 @@ const commentPost = async (postId, userId, comment) => {
   }
 };
 
-const getPeople = async () => {
+export const getPeople = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/people/get-people`);
     return response.data;
@@ -252,7 +253,7 @@ const getPeople = async () => {
   }
 };
 
-const handleFollow = async (email, followerEmail) => {
+export const handleFollow = async (email, followerEmail) => {
   try {
     const response = await axios.post(`${ADDRESS}/profile/follow`, {
       email,
@@ -264,7 +265,7 @@ const handleFollow = async (email, followerEmail) => {
   }
 };
 
-const createGroup = async (data) => {
+export const createGroup = async (data) => {
   const formData = new FormData();
 
   formData.append("groupImage", {
@@ -303,7 +304,7 @@ const createGroup = async (data) => {
   }
 };
 
-const getGroups = async () => {
+export const getGroups = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/group/get-groups`);
     return response.data;
@@ -312,29 +313,86 @@ const getGroups = async () => {
   }
 };
 
-export {
-  getHeadlines,
-  searchHeadlines,
-  getArticle,
-  signup,
-  login,
-  editProfile,
-  editProfilePicture,
-  editBackgroundPicture,
-  decodeUser,
-  getProfile,
-  submitPost,
-  getFeeds,
-  getShortProfileInfo,
-  getAIResponse,
-  addBookmark,
-  getBookmarks,
-  likePost,
-  commentPost,
-  deleteBookmark,
-  deletePost,
-  getPeople,
-  handleFollow,
-  createGroup,
-  getGroups
+export const getSpecificGroup = async (groupId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/get-specific-group/${groupId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
+
+export const joinThisGroup = async (email, groupId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/join-group/${groupId}/${email}`
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const exitThisGroup = async (email, groupId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/exit-group/${groupId}/${email}`
+    );
+    // console.log(response.status);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getFollowedGroups = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/get-followed-groups/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getManagedGroups = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/get-managed-groups/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// export {
+//   getHeadlines,
+//   searchHeadlines,
+//   getArticle,
+//   signup,
+//   login,
+//   editProfile,
+//   editProfilePicture,
+//   editBackgroundPicture,
+//   decodeUser,
+//   getProfile,
+//   submitPost,
+//   getFeeds,
+//   getShortProfileInfo,
+//   getAIResponse,
+//   addBookmark,
+//   getBookmarks,
+//   likePost,
+//   commentPost,
+//   deleteBookmark,
+//   deletePost,
+//   getPeople,
+//   handleFollow,
+//   createGroup,
+//   getGroups,
+//   getSpecificGroup
+// };

@@ -119,21 +119,19 @@ const PeopleProfile = () => {
                 handleFollowFunc();
               }}
               style={{
-                borderColor: "#39A7FF",
-                //   borderWidth: followed ? 0 : 1,
+                borderColor: "#49755D",
                 borderWidth: 2,
                 marginHorizontal: 20,
                 padding: 10,
                 borderRadius: 30,
                 marginTop: 20,
-                //   width: 80,
-                backgroundColor: followed ? "#39A7FF" : "white"
+                backgroundColor: followed ? "#49755D" : "white"
               }}
             >
               <Text
                 style={{
                   fontSize: 14,
-                  color: followed ? "white" : "#39A7FF",
+                  color: followed ? "white" : "#49755D",
                   textAlign: "center",
                   fontWeight: "500"
                 }}
@@ -184,10 +182,10 @@ const PeopleProfile = () => {
                 width: "auto",
                 marginRight: 10,
                 borderRadius: 50,
-                borderColor: "#39A7FF"
+                borderColor: "#49755D"
               }}
             >
-              <Text style={{ color: "#39A7FF", textAlign: "center" }}>
+              <Text style={{ color: "#49755D", textAlign: "center" }}>
                 Posts
               </Text>
             </View>
@@ -200,10 +198,10 @@ const PeopleProfile = () => {
                 width: "auto",
                 borderRadius: 50,
                 marginRight: 10,
-                borderColor: "#39A7FF"
+                borderColor: "#49755D"
               }}
             >
-              <Text style={{ color: "#39A7FF", textAlign: "center" }}>
+              <Text style={{ color: "#49755D", textAlign: "center" }}>
                 Videos
               </Text>
             </View>
@@ -215,10 +213,10 @@ const PeopleProfile = () => {
                 // flex:1,
                 width: "auto",
                 borderRadius: 50,
-                borderColor: "#39A7FF"
+                borderColor: "#49755D"
               }}
             >
-              <Text style={{ color: "#39A7FF", textAlign: "center" }}>
+              <Text style={{ color: "#49755D", textAlign: "center" }}>
                 Videos
               </Text>
             </View>

@@ -5,6 +5,7 @@ import {
   TextInput,
   Dimensions,
   KeyboardAvoidingView,
+  
   Platform,
   Image,
   Pressable,
@@ -204,7 +205,7 @@ const AddPost = () => {
               position: "absolute",
               bottom: 100,
               borderRadius: 10
-              // borderColor:"#39A7FF",
+              // borderColor:"#49755D",
               // borderWidth:1
               // alignItems: "center",
             }}
@@ -226,7 +227,7 @@ const AddPost = () => {
               onPress={handleAI}
               style={{
                 padding: 10,
-                backgroundColor: "#39A7FF",
+                backgroundColor: "#6C3428",
                 borderRadius: 10
               }}
             >
@@ -253,7 +254,7 @@ const AddPost = () => {
             position: "absolute",
             bottom: 20,
             right: 20,
-            backgroundColor: "#39A7FF",
+            backgroundColor: "#49755D",
             color: "#fff"
           }}
           onPress={() => setSurfaceVisible(!surfaceVisible)}

@@ -217,13 +217,13 @@ const Feeds = () => {
                 height: 65,
                 borderRadius: 50,
                 borderStyle: "dashed",
-                borderColor: "#39A7FF",
+                borderColor: "#49755D",
                 borderWidth: 2,
                 alignItems: "center",
                 justifyContent: "center"
               }}
             >
-              <Entypo name="plus" size={24} color="#39A7FF" />
+              <Entypo name="plus" size={24} color="#49755D" />
             </View>
             <Text
               style={{
@@ -262,7 +262,7 @@ const Feeds = () => {
                       width: "100%",
                       height: "100%",
                       borderRadius: 50,
-                      borderColor: "#39A7FF",
+                      borderColor: "#49755D",
                       borderWidth: 2
                     }}
                     resizeMode="cover"

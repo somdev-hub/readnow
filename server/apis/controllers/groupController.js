@@ -101,9 +101,102 @@ const getMyGroupsController = async (req, res) => {
   }
 };
 
+const joinGroupController = async (req, res) => {
+  console.log(req.params);
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).send("No group found");
+    const isMember = group.groupMembers.find(
+      (member) => member.user === req.params.email
+    );
+    if (isMember) {
+      console.log("already a member");
+      return res.status(400).send("Already a member");
+    } else {
+      group.groupMembers.push({
+        user: req.params.email,
+        joinedOn: new Date().toISOString()
+      });
+      await group.save();
+      console.log("joined");
+      res.status(200).send("Joined group");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while joining the group");
+  }
+};
+
+const exitGroupController = async (req, res) => {
+  console.log(req.params);
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) {
+      console.log("no group");
+      return res.status(404).send("No group found");
+    } else {
+      const isMember = group.groupMembers.find(
+        (member) => member.user === req.params.email
+      );
+      if (!isMember) {
+        console.log("not a member");
+        return res.status(400).send("Not a member");
+      }
+    }
+    // Group.collection.dropIndex("groupMembers_1");
+    await Group.findByIdAndUpdate(
+      { _id: req.params.id },
+      { $pull: { groupMembers: { user: req.params.email } } }
+    );
+    console.log("exited");
+    res.status(200).send("Exited group");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while exiting the group");
+  }
+};
+
+const getFollowedGroupsController = async (req, res) => {
+  try {
+    const groups = await Group.find({
+      groupMembers: {
+        $elemMatch: {
+          user: req.params.email
+        }
+      }
+    }).select("groupImage groupName groupMembers ");
+    if (!groups) return res.status(404).send("No groups found");
+    res.status(200).json(groups);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while fetching the groups");
+  }
+};
+
+const getManagedGroupsController = async (req, res) => {
+  try {
+    const groups = await Group.find({
+      groupAdmins: {
+        $elemMatch: {
+          user: req.params.email
+        }
+      }
+    }).select("groupImage groupName groupMembers groupCoverImage groupTags");
+    if (!groups) return res.status(404).send("No groups found");
+    res.status(200).json(groups);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while fetching the groups"); 
+  }
+};
+
 module.exports = {
   createGroupController,
   getGroupController,
   getSpecificGroupController,
-  getMyGroupsController
+  getMyGroupsController,
+  joinGroupController,
+  exitGroupController,
+  getFollowedGroupsController,
+  getManagedGroupsController
 };

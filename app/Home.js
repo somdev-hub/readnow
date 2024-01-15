@@ -61,7 +61,6 @@ const Home = () => {
       // console.log(data);
     };
     fetchData();
-    
   }, []);
   return (
     <View>
@@ -174,6 +173,8 @@ const Home = () => {
                       <Image
                         source={{
                           uri: item.urlToImage
+                            ? item.urlToImage
+                            : "https://static.toiimg.com/thumb/imgsize-17912,msid-101495834,width-400,resizemode-4/101495834.jpg"
                         }}
                         height={sliderWidth * 0.3}
                         width={sliderWidth * 0.3}
@@ -249,7 +250,7 @@ const styles = StyleSheet.create({
     padding: 7
   },
   textBlue: {
-    color: "#39A7FF",
+    color: "#49755D",
     fontWeight: "500",
     fontSize: 16
   }

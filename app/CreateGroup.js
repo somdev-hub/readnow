@@ -134,7 +134,7 @@ const CreateGroup = () => {
                   height: 90,
                   zIndex: 5,
                   borderRadius: 20,
-                  borderColor: "#39A7FF",
+                  borderColor: "#49755D",
                   borderWidth: 1
                 }}
               >
@@ -190,7 +190,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Enter group name*
@@ -222,7 +222,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Enter group description*
@@ -255,7 +255,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Group genre*
@@ -285,7 +285,7 @@ const CreateGroup = () => {
                       alignItems: "center",
                       // alignSelf: "flex-start",
                       gap: 5,
-                      backgroundColor: "#39A7FF"
+                      backgroundColor: "#49755D"
                     }}
                   >
                     <Text
@@ -349,7 +349,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Enter location*
@@ -385,7 +385,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Enter rules*
@@ -418,7 +418,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Enter tags
@@ -447,7 +447,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#39A7FF"
+                color: "#49755D"
               }}
             >
               Group visibility*
@@ -500,7 +500,7 @@ const CreateGroup = () => {
                   });
                   // setChecked("private")
                 }}
-                color="#39A7FF"
+                color="#49755D"
                 style={{ justifyContent: "center" }}
               />
             </Pressable>
@@ -551,7 +551,7 @@ const CreateGroup = () => {
                   });
                   // setChecked("private")
                 }}
-                color="#39A7FF"
+                color="#49755D"
                 style={{
                   justifyContent: "center"
                 }}
