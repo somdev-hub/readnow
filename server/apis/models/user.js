@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   followers: Array,
   following: Array,
   posts: Number,
+  groups: Array
 });
 
 const User = mongoose.model("User", userSchema);

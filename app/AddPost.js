@@ -4,9 +4,6 @@ import {
   ScrollView,
   TextInput,
   Dimensions,
-  KeyboardAvoidingView,
-  
-  Platform,
   Image,
   Pressable,
   TouchableOpacity
@@ -19,12 +16,77 @@ import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmail } from "../redux/postSlice";
-import { FAB, Surface, ActivityIndicator, MD2Colors } from "react-native-paper";
-import { getAIResponse } from "../api/apis";
-
+import {
+  FAB,
+  Surface,
+  ActivityIndicator,
+  Modal,
+  Portal,
+  RadioButton
+} from "react-native-paper";
+import { getAIResponse, getFollowedGroups, getUserGroups } from "../api/apis";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const screenHeights = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
+
+const Option = ({
+  icon,
+  text,
+  subText,
+  checked,
+  onCheck,
+  groupSelection = false,
+  groupImage
+}) => (
+  <View
+    style={{
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center"
+    }}
+  >
+    <View
+      style={{ flexDirection: "row", alignItems: "center", gap: 10, flex: 1 }}
+    >
+      {!groupSelection && (
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#eeeeee",
+            width: 50,
+            height: 50,
+            borderRadius: 50
+          }}
+        >
+          {icon}
+        </View>
+      )}
+      {groupSelection && (
+        <Image
+          style={{
+            backgroundColor: "#eeeeee",
+            width: 50,
+            height: 50,
+            borderRadius: 50
+          }}
+          source={{
+            uri: groupImage
+          }}
+        />
+      )}
+      <View style={{ flex: 1 }}>
+        <Text style={{ fontWeight: "500", fontSize: 16 }}>{text}</Text>
+        {subText && <Text>{subText}</Text>}
+      </View>
+    </View>
+    <RadioButton status={checked ? "checked" : "unchecked"} onPress={onCheck} />
+  </View>
+);
+
 const AddPost = () => {
   const [postImage, setPostImage] = useState(null);
   const [userMail, setUserMail] = useState("");
@@ -36,8 +98,32 @@ const AddPost = () => {
   const [surfaceVisible, setSurfaceVisible] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isAILoading, setIsAILoading] = useState(false);
+  const postVisibilityModal = useSelector(
+    (state) => state.post.selectVisibility
+  );
+  const [groupSelectionModal, setGroupSelectionModal] = useState(false);
+  const [postVisibility, setPostVisibility] = useState({
+    anyone: false,
+    followersOnly: false,
+    groups: false
+  });
+  const [userGroups, setUserGroups] = useState([]); // ["React Native Developers", "Plant Lovers"
+  const [selectedGroup, setSelectedGroup] = useState("");
 
   const firstRender = useRef(true);
+
+  const fetchUserGroups = () => {
+    getFollowedGroups(userMail).then((res) => {
+      setUserGroups(res);
+    });
+  };
+
+  const hideModal = () => {
+    dispatch({
+      type: "post/updatePostVisibility",
+      payload: false
+    });
+  };
 
   const handleInputChanges = (text) => {
     dispatch({
@@ -58,7 +144,6 @@ const AddPost = () => {
   const handleAI = async () => {
     setIsAILoading(true);
     const response = await getAIResponse(aiPrompt);
-    
 
     dispatch({
       type: "post/updatePostData",
@@ -106,17 +191,16 @@ const AddPost = () => {
     }
 
     dispatch(fetchEmail());
+    fetchUserGroups();
   }, []);
 
   return (
     <View>
-      {/* <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}> */}
       <View
         style={{
           position: "relative",
           backgroundColor: "white",
           marginTop: 10,
-          //   elevation: 1,
           height: screenHeights * 0.8
         }}
       >
@@ -129,9 +213,6 @@ const AddPost = () => {
             onChangeText={(text) => handleInputChanges(text)}
             value={postData.description}
           />
-         {/* <Markdown>
-          {postData.description}
-         </Markdown> */}
         </ScrollView>
         {postImage && (
           <View
@@ -183,12 +264,7 @@ const AddPost = () => {
                   elevation: 3
                 }}
               >
-                <Entypo
-                  name="cross"
-                  size={18}
-                  color="black"
-                  // style={{ position: "absolute" }}
-                />
+                <Entypo name="cross" size={18} color="black" />
               </Pressable>
             </View>
           </View>
@@ -205,9 +281,6 @@ const AddPost = () => {
               position: "absolute",
               bottom: 100,
               borderRadius: 10
-              // borderColor:"#49755D",
-              // borderWidth:1
-              // alignItems: "center",
             }}
             elevation={1}
           >
@@ -278,8 +351,111 @@ const AddPost = () => {
         </Pressable>
         <MaterialCommunityIcons name="file-pdf-box" size={24} color="#a9a9a9" />
       </View>
-      {/* </ScrollView> */}
-      {/* </KeyboardAvoidingView> */}
+      <Portal>
+        <Modal
+          visible={postVisibilityModal}
+          onDismiss={hideModal}
+          contentContainerStyle={{
+            backgroundColor: "white",
+            padding: 20,
+            width: screenWidth * 0.9,
+            alignSelf: "center"
+          }}
+        >
+          <Text style={{ fontWeight: "600", marginBottom: 30 }}>
+            Who can see your post?
+          </Text>
+          <View style={{ flexDirection: "column", gap: 20 }}>
+            <Option
+              icon={<Entypo name="globe" size={24} color="black" />}
+              text="Anyone"
+              subText="Anyone on ReadNow"
+              checked={postVisibility.anyone}
+              onCheck={() => {
+                setPostVisibility({
+                  anyone: !postVisibility.anyone,
+                  followersOnly: false,
+                  groups: false
+                });
+                dispatch({
+                  type: "post/updatePostVisibility",
+                  payload: false
+                });
+              }}
+            />
+            <Option
+              icon={<MaterialIcons name="group" size={24} color="black" />}
+              text="Followers only"
+              checked={postVisibility.followersOnly}
+              onCheck={() => {
+                setPostVisibility({
+                  anyone: false,
+                  followersOnly: !postVisibility.followersOnly,
+                  groups: false
+                });
+                dispatch({
+                  type: "post/updatePostVisibility",
+                  payload: false
+                });
+              }}
+            />
+            <Option
+              icon={<MaterialIcons name="groups" size={24} color="black" />}
+              text="Groups"
+              checked={postVisibility.groups}
+              onCheck={() => {
+                setPostVisibility({
+                  anyone: false,
+                  followersOnly: false,
+                  groups: !postVisibility.groups
+                });
+                dispatch({
+                  type: "post/updatePostVisibility",
+                  payload: false
+                });
+                setGroupSelectionModal(true);
+              }}
+            />
+          </View>
+        </Modal>
+      </Portal>
+      <Portal>
+        <Modal
+          visible={groupSelectionModal}
+          onDismiss={() => setGroupSelectionModal(false)}
+          contentContainerStyle={{
+            backgroundColor: "white",
+            padding: 20,
+            width: screenWidth * 0.9,
+            alignSelf: "center"
+          }}
+        >
+          <Text style={{ fontWeight: "600", marginBottom: 30 }}>
+            Select the group
+          </Text>
+          <View style={{ flexDirection: "column", gap: 20 }}>
+            {userGroups?.map((group, index) => {
+              return (
+                <Option
+                  key={index}
+                  image={group.groupImage}
+                  text={group.groupName}
+                  checked={selectedGroup === group.groupName}
+                  onCheck={() => {
+                    setSelectedGroup(group._id);
+                    dispatch({
+                      type: "post/updatePostVisibility",
+                      payload: false
+                    });
+                    setGroupSelectionModal(false);
+                  }}
+                  groupSelection={true}
+                />
+              );
+            })}
+          </View>
+        </Modal>
+      </Portal>
     </View>
   );
 };

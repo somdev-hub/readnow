@@ -9,7 +9,9 @@ const {
   joinGroupController,
   exitGroupController,
   getFollowedGroupsController,
-  getManagedGroupsController
+  getManagedGroupsController,
+  addGroupPostController,
+  getGroupFeedsController
 } = require("../controllers/groupController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -41,5 +43,9 @@ router.get("/exit-group/:id/:email", exitGroupController);
 router.get("/get-followed-groups/:email", getFollowedGroupsController);
 
 router.get("/get-managed-groups/:email", getManagedGroupsController);
+
+router.post("/add-group-post", uploadMiddleware.single("image"), addGroupPostController);
+
+router.get("/get-group-feeds", getGroupFeedsController);
 
 module.exports = router;

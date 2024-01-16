@@ -18,16 +18,18 @@ import { useRoute } from "@react-navigation/native";
 
 const size = Dimensions.get("window");
 
-const PostCard = ({
+const GroupPostCard = ({
   user,
   header,
   profilePicture,
+  groupProfile,
   description,
   image,
   likes,
   comments,
   post,
   fetchData,
+  groupName,
   optionsContent
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -79,23 +81,36 @@ const PostCard = ({
             style={{
               width: 55,
               height: 55,
-              borderRadius: 50
+              borderRadius: 50,
+              position: "relative"
             }}
           >
+            <Image
+              source={{ uri: groupProfile }}
+              style={{
+                width: "75%",
+                height: "75%",
+                borderRadius: 10,
+                position: "absolute"
+              }}
+            />
             <Image
               source={{
                 uri: profilePicture
               }}
               style={{
-                width: "100%",
-                height: "100%",
-                borderRadius: 50
+                width: "65%",
+                height: "65%",
+                borderRadius: 50,
+                position: "absolute",
+                left: "30%",
+                bottom: "5%"
               }}
             />
           </View>
           <View>
-            <Text style={{ fontWeight: "500", fontSize: 16 }}>{user}</Text>
-            <Text style={{ color: "#A9A9A9", marginTop: 2 }}>{header}</Text>
+            <Text style={{ fontWeight: "500", fontSize: 16 }}>{groupName}</Text>
+            <Text style={{ color: "#A9A9A9", marginTop: 2 }}>{user} | {header}</Text>
           </View>
         </View>
 
@@ -160,10 +175,10 @@ const PostCard = ({
           }}
         >
           <View>
-            <Text>{likes.length} likes</Text>
+            <Text>{likes?.length} likes</Text>
           </View>
           <View>
-            <Text>{comments.length} comments</Text>
+            <Text>{comments?.length} comments</Text>
           </View>
         </View>
         <View
@@ -228,4 +243,4 @@ const PostCard = ({
   );
 };
 
-export default PostCard;
+export default GroupPostCard;

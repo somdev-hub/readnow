@@ -6,14 +6,49 @@ import {
   Image,
   Pressable
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { getShortProfileInfo } from "../api/apis";
 
 const GroupDetails = () => {
   const route = useRoute();
   const { groupDesc, groupDetails, groupRules, groupMembers, groupAdmins } =
     route.params;
+  const [groupAdminData, setGroupAdminData] = useState([]);
+  const [groupUsers, setGroupUsers] = useState([]);
+  const [groupDescLength, setGroupDescLength] = useState(
+    groupDesc.length > 500
+  );
+
+  const getUserData = async (admin) => {
+    const adminData = await getShortProfileInfo(admin.user);
+    return {
+      adminData: adminData.data,
+      role: admin.role
+    };
+  };
+
+  const getGroupUsers = async () => {
+    const users = await Promise.all(
+      groupMembers.slice(0, 5).map(async (member) => {
+        const userInfo = await getShortProfileInfo(member.user);
+        return userInfo?.data.profilePicture;
+      })
+    );
+    setGroupUsers(users);
+  };
+
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      const adminData = await Promise.all(groupAdmins.map(getUserData));
+      setGroupAdminData(adminData);
+    };
+    fetchAdminData();
+  }, [groupAdmins]);
+  useEffect(() => {
+    getGroupUsers();
+  }, [groupMembers]);
   return (
     <View>
       <ScrollView>
@@ -33,36 +68,36 @@ const GroupDetails = () => {
           >
             Description
           </Text>
-          <Text>
-            {groupDesc.length > 500
-              ? groupDesc.substring(0, 500) + "..."
-              : groupDesc}
+          <Text style={{marginBottom:5}}>
+            {groupDescLength ? groupDesc.substring(0, 500) + "..." : groupDesc}
           </Text>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 5
-            }}
-            onPress={() => {
-              navigator.navigate("GroupDetails");
-            }}
-          >
-            <Text
+          {groupDescLength && (
+            <TouchableOpacity
               style={{
-                textAlign: "center",
-                marginVertical: 10,
-                color: "#39A7FF",
-                fontWeight: "500",
-                fontSize: 16
-                // justifyContent: "center"
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 5
+              }}
+              onPress={() => {
+                setGroupDescLength(!groupDescLength);
               }}
             >
-              Show more
-            </Text>
-            <AntDesign name="down" size={16} color="#39A7FF" style={{}} />
-          </TouchableOpacity>
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginVertical: 10,
+                  color: "#39A7FF",
+                  fontWeight: "500",
+                  fontSize: 16
+                  // justifyContent: "center"
+                }}
+              >
+                Show more
+              </Text>
+              <AntDesign name="down" size={16} color="#39A7FF" style={{}} />
+            </TouchableOpacity>
+          )}
         </View>
         <View
           style={{
@@ -202,12 +237,12 @@ const GroupDetails = () => {
               marginBottom: 10
             }}
           >
-            {Array.from(Array(5).keys()).map((item, index) => {
+            {groupUsers?.map((item, index) => {
               return (
                 <Image
                   key={index}
                   source={{
-                    uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                    uri: item
                   }}
                   style={{
                     width: 40,
@@ -279,7 +314,7 @@ const GroupDetails = () => {
             Admins
           </Text>
           <View>
-            {groupAdmins?.map((item, index) => {
+            {groupAdminData?.map((item, index) => {
               return (
                 <View
                   key={index}
@@ -323,7 +358,7 @@ const GroupDetails = () => {
                         }}
                       >
                         <Text style={{ fontWeight: "500", fontSize: 16 }}>
-                          {item?.adminData.name}
+                          {item?.adminData?.name}
                         </Text>
                         <Text
                           style={{
@@ -346,7 +381,7 @@ const GroupDetails = () => {
                           marginTop: 3
                         }}
                       >
-                        {item?.adminData.header}
+                        {item?.adminData?.header}
                       </Text>
                     </View>
                     <Pressable>

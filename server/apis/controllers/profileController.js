@@ -275,6 +275,17 @@ const handleFollowController = async (req, res) => {
   }
 };
 
+const getProfileGroups = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const groups = await User.findOne({ email }).populate("groups");
+    res.status(200).json({ data: groups.groups });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
@@ -282,5 +293,6 @@ module.exports = {
   editBackgroundPictureController,
   getProfileController,
   getShortProfileInfoController,
-  handleFollowController
+  handleFollowController,
+  getProfileGroups
 };

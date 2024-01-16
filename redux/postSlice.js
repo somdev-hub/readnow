@@ -34,6 +34,7 @@ const postSlice = createSlice({
       postedBy: "",
       image: null
     },
+    selectVisibility: false,
     loading: false,
     error: "",
     switch: false
@@ -45,6 +46,9 @@ const postSlice = createSlice({
     },
     updateSwitch: (state, action) => {
       state.switch = action.payload;
+    },
+    updatePostVisibility: (state, action) => {
+      state.selectVisibility = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -55,7 +59,6 @@ const postSlice = createSlice({
       })
       .addCase(postFormData.fulfilled, (state, action) => {
         state.loading = false;
-
       })
       .addCase(postFormData.rejected, (state, action) => {
         state.loading = false;

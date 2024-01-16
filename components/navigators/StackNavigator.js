@@ -1,10 +1,10 @@
 import "react-native-gesture-handler";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import * as SecureStorage from "expo-secure-store";
 import { useNavigation, CommonActions } from "@react-navigation/native";
-import { addBookmark, decodeUser } from "../../api/apis";
+import { addBookmark, decodeUser, getShortProfileInfo } from "../../api/apis";
 import { useDispatch } from "react-redux";
 import { postFormData } from "../../redux/postSlice";
 import TabNavigator from "./TabNavigator";
@@ -35,6 +35,7 @@ import GroupNewView from "../../app/GroupNewView";
 import Events from "../../app/Events";
 import EventPage from "../../app/EventPage";
 // import TabNavigator from "./TabNavigator";
+import { AntDesign } from "@expo/vector-icons";
 
 const Stack = createStackNavigator();
 
@@ -46,7 +47,16 @@ const StackNavigator = () => {
   const bookmarkSelector = useSelector((state) => state.bookmark);
   const groupData = useSelector((state) => state.group.groupData);
   const groupGenres = useSelector((state) => state.group.groupGenres);
+  const postVisibilityModal = useSelector((state) => state.post.selectVisibility);
   const [visible, setVisible] = useState(false);
+  const [userData, setUserData] = useState({});
+
+  const getUser = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    getShortProfileInfo(email).then((data) => {
+      setUserData(data);
+    });
+  };
 
   const openMenu = () => setVisible(true);
 
@@ -84,11 +94,12 @@ const StackNavigator = () => {
       }
     };
     decodeToken();
+    getUser();
   }, [token]);
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
+      initialRouteName="Add Post"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -333,9 +344,44 @@ const StackNavigator = () => {
                   width: "100%"
                 }}
               >
-                <Text style={{ fontSize: 20, fontWeight: "500" }}>
-                  Add Post
-                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "center"
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri: userData?.data?.profilePicture
+                    }}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 20,
+                      borderColor: "#49755D",
+                      resizeMode: "cover"
+                    }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      dispatch({
+                        type: "post/updatePostVisibility",
+                        payload: !postVisibilityModal
+                      });
+                    }}
+                    style={{
+                      flexDirection: "row",
+                      gap: 5,
+                      alignItems: "center"
+                    }}
+                  >
+                    <Text style={{ fontWeight: "600", fontSize: 16 }}>
+                      Everyone
+                    </Text>
+                    <AntDesign name="caretdown" size={14} color="black" />
+                  </TouchableOpacity>
+                </View>
                 <TouchableOpacity
                   onPress={() => {
                     console.log(postData);

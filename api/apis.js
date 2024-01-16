@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.53.254:3500";
+const ADDRESS = "http://192.168.33.91:3500";
 
 export const getHeadlines = async () => {
   try {
@@ -368,6 +368,7 @@ export const getManagedGroups = async (email) => {
     console.log(error);
   }
 };
+
 
 // export {
 //   getHeadlines,

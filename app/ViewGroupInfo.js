@@ -14,6 +14,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import { getSpecificGroup } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
+import GroupPostCard from "../components/GroupPostCard";
 
 const ViewGroupInfo = () => {
   const navigator = useNavigation();
@@ -37,7 +38,22 @@ const ViewGroupInfo = () => {
     };
     fetchGroupInfo();
   }, []);
-  console.log(groupInfo.groupCoverImage);
+  const groupPosts = [
+    {
+      id: 1,
+      user: "John Doe",
+      header: "Group Post",
+      profilePicture:
+        "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      description: "This is a group post",
+      image:
+        "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      likes: ["John Doe", "Jane Doe"],
+      groupProfile: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+      comments:[],
+      groupName: "Group Name"
+    }
+  ];
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -348,6 +364,29 @@ const ViewGroupInfo = () => {
               Stories
             </Chip>
           </View>
+        </View>
+        <View
+          style={{
+            backgroundColor: "#fff",
+            marginTop: 10,
+            paddingHorizontal: 10
+          }}
+        >
+          {groupPosts.map((item) => {
+            return (
+              <GroupPostCard
+                key={item.id}
+                user={item.user}
+                header={item.header}
+                profilePicture={item.profilePicture}
+                description={item.description}
+                image={item.image}
+                likes={item.likes}
+                groupProfile={item.groupProfile}
+                groupName={item.groupName}
+              />
+            );
+          })}
         </View>
       </ScrollView>
     </View>

@@ -24,7 +24,8 @@ const {
   editBackgroundPictureController,
   getProfileController,
   getShortProfileInfoController,
-  handleFollowController
+  handleFollowController,
+  getProfileGroups
 } = require("../controllers/profileController");
 
 // multer is used for uploading files
@@ -56,5 +57,7 @@ router.post("/get-profile", getProfileController);
 router.post("/get-short-profile-info", getShortProfileInfoController);
 // hit this route to follow
 router.post("/follow", handleFollowController);
+
+router.get("/get-profile-groups/:email", getProfileGroups);
 
 module.exports = router;
