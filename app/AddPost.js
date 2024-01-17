@@ -27,6 +27,7 @@ import {
 import { getAIResponse, getFollowedGroups, getUserGroups } from "../api/apis";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 
 const screenHeights = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -88,13 +89,11 @@ const Option = ({
 );
 
 const AddPost = () => {
+  const route = useRoute();
+  const { visibility } = route.params;
   const [postImage, setPostImage] = useState(null);
-  const [userMail, setUserMail] = useState("");
-
-  SecureStorage.getItemAsync("email").then((res) => setUserMail(res));
   const dispatch = useDispatch();
   const postData = useSelector((state) => state.post.postData);
-  const switchValue = useSelector((state) => state.post.switch);
   const [surfaceVisible, setSurfaceVisible] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isAILoading, setIsAILoading] = useState(false);
@@ -102,21 +101,12 @@ const AddPost = () => {
     (state) => state.post.selectVisibility
   );
   const [groupSelectionModal, setGroupSelectionModal] = useState(false);
-  const [postVisibility, setPostVisibility] = useState({
-    anyone: false,
-    followersOnly: false,
-    groups: false
-  });
+  const postVisibility = useSelector((state) => state.post.postVisibility);
   const [userGroups, setUserGroups] = useState([]); // ["React Native Developers", "Plant Lovers"
-  const [selectedGroup, setSelectedGroup] = useState("");
+  // const [selectedGroup, setSelectedGroup] = useState("");
+  const selectedGroup = useSelector((state) => state.post.selectedGroup);
 
   const firstRender = useRef(true);
-
-  const fetchUserGroups = () => {
-    getFollowedGroups(userMail).then((res) => {
-      setUserGroups(res);
-    });
-  };
 
   const hideModal = () => {
     dispatch({
@@ -124,7 +114,6 @@ const AddPost = () => {
       payload: false
     });
   };
-
   const handleInputChanges = (text) => {
     dispatch({
       type: "post/updatePostData",
@@ -137,9 +126,6 @@ const AddPost = () => {
   };
   const aiPromptHandler = (text) => {
     setAiPrompt(text);
-  };
-  const handleSubmit = () => {
-    console.log(postData);
   };
   const handleAI = async () => {
     setIsAILoading(true);
@@ -190,8 +176,19 @@ const AddPost = () => {
       });
     }
 
+    const getEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      getFollowedGroups(email).then((res) => {
+        setUserGroups(res);
+      });
+    };
+    getEmail();
     dispatch(fetchEmail());
-    fetchUserGroups();
+
+    dispatch({
+      type: "post/updatePostVisibilityOption",
+      payload: visibility ? visibility : "anyone"
+    });
   }, []);
 
   return (
@@ -372,10 +369,9 @@ const AddPost = () => {
               subText="Anyone on ReadNow"
               checked={postVisibility.anyone}
               onCheck={() => {
-                setPostVisibility({
-                  anyone: !postVisibility.anyone,
-                  followersOnly: false,
-                  groups: false
+                dispatch({
+                  tyoe: "post/updatePostVisibilityOption",
+                  payload: "anyone"
                 });
                 dispatch({
                   type: "post/updatePostVisibility",
@@ -388,10 +384,9 @@ const AddPost = () => {
               text="Followers only"
               checked={postVisibility.followersOnly}
               onCheck={() => {
-                setPostVisibility({
-                  anyone: false,
-                  followersOnly: !postVisibility.followersOnly,
-                  groups: false
+                dispatch({
+                  type: "post/updatePostVisibilityOption",
+                  payload: "followersOnly"
                 });
                 dispatch({
                   type: "post/updatePostVisibility",
@@ -404,10 +399,9 @@ const AddPost = () => {
               text="Groups"
               checked={postVisibility.groups}
               onCheck={() => {
-                setPostVisibility({
-                  anyone: false,
-                  followersOnly: false,
-                  groups: !postVisibility.groups
+                dispatch({
+                  type: "post/updatePostVisibilityOption",
+                  payload: "groups"
                 });
                 dispatch({
                   type: "post/updatePostVisibility",
@@ -442,7 +436,10 @@ const AddPost = () => {
                   text={group.groupName}
                   checked={selectedGroup === group.groupName}
                   onCheck={() => {
-                    setSelectedGroup(group._id);
+                    dispatch({
+                      type: "post/updateSelectedGroup",
+                      payload: group._id
+                    });
                     dispatch({
                       type: "post/updatePostVisibility",
                       payload: false

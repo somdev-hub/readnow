@@ -369,31 +369,29 @@ export const getManagedGroups = async (email) => {
   }
 };
 
-
-// export {
-//   getHeadlines,
-//   searchHeadlines,
-//   getArticle,
-//   signup,
-//   login,
-//   editProfile,
-//   editProfilePicture,
-//   editBackgroundPicture,
-//   decodeUser,
-//   getProfile,
-//   submitPost,
-//   getFeeds,
-//   getShortProfileInfo,
-//   getAIResponse,
-//   addBookmark,
-//   getBookmarks,
-//   likePost,
-//   commentPost,
-//   deleteBookmark,
-//   deletePost,
-//   getPeople,
-//   handleFollow,
-//   createGroup,
-//   getGroups,
-//   getSpecificGroup
-// };
+export const addGroupPost = async (data) => {
+  const formData = new FormData();
+  formData.append("description", data.description);
+  formData.append("postedBy", data.postedBy);
+  formData.append("group", data.group);
+  formData.append("image", {
+    uri: data.image,
+    name: "postImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("group", data.group);
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/group/add-group-post`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

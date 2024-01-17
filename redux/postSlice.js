@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
-import { getHeadlines, submitPost } from "../api/apis";
+import { addGroupPost, getHeadlines, submitPost } from "../api/apis";
 import axios from "axios";
 
 const ADDRESS = "http://192.168.33.115:3500";
@@ -21,6 +21,16 @@ export const postFormData = createAsyncThunk(
   }
 );
 
+export const postGroupFormData = createAsyncThunk(
+  "post/postGroupFormData",
+  async (postData) => {
+    // const response = await addGroupPost(postData);
+    // console.log(response);
+    // return response;
+    // console.log(postData);
+  }
+);
+
 export const fetchEmail = createAsyncThunk("post/fetchEmail", async () => {
   const email = await SecureStorage.getItemAsync("email");
   return email;
@@ -35,6 +45,12 @@ const postSlice = createSlice({
       image: null
     },
     selectVisibility: false,
+    postVisibility: {
+      anyone: false,
+      followersOnly: false,
+      groups: false
+    },
+    selectedGroup: "",
     loading: false,
     error: "",
     switch: false
@@ -49,6 +65,15 @@ const postSlice = createSlice({
     },
     updatePostVisibility: (state, action) => {
       state.selectVisibility = action.payload;
+    },
+    updatePostVisibilityOption: (state, action) => {
+      for (let key in state.postVisibility) {
+        state.postVisibility[key] = false;
+      }
+      state.postVisibility[action.payload] = true;
+    },
+    updateSelectedGroup: (state, action) => {
+      state.selectedGroup = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -66,6 +91,17 @@ const postSlice = createSlice({
       })
       .addCase(fetchEmail.fulfilled, (state, action) => {
         state.postData.postedBy = action.payload;
+      })
+      .addCase(postGroupFormData.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(postGroupFormData.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(postGroupFormData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   }
 });

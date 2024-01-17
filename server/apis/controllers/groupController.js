@@ -132,7 +132,6 @@ const joinGroupController = async (req, res) => {
 };
 
 const exitGroupController = async (req, res) => {
-  console.log(req.params);
   try {
     const group = await Group.findById(req.params.id);
     const user = await User.findOne({ email: req.params.email });

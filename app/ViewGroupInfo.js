@@ -49,8 +49,9 @@ const ViewGroupInfo = () => {
       image:
         "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
       likes: ["John Doe", "Jane Doe"],
-      groupProfile: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-      comments:[],
+      groupProfile:
+        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
+      comments: [],
       groupName: "Group Name"
     }
   ];
@@ -293,12 +294,15 @@ const ViewGroupInfo = () => {
               }}
             />
           </View>
-          <View
+          <TouchableOpacity
+            onPress={() =>
+              navigator.navigate("Add Post", { visibility: "group" })
+            }
             style={{
               flex: 1
             }}
           >
-            <TextInput
+            {/* <TextInput
               style={{
                 // width: "100%",
                 flex: 1,
@@ -308,8 +312,20 @@ const ViewGroupInfo = () => {
                 paddingHorizontal: 20
               }}
               placeholder="Post something here..."
-            />
-          </View>
+            /> */}
+            <View
+              style={{
+                flex: 1,
+                height: 40,
+                backgroundColor: "#F5F5F5",
+                borderRadius: 50,
+                paddingHorizontal: 20,
+                justifyContent: "center"
+              }}
+            >
+              <Text style={{}}>Post something here...</Text>
+            </View>
+          </TouchableOpacity>
         </View>
         <View
           style={{

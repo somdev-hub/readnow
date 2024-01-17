@@ -6,7 +6,7 @@ import * as SecureStorage from "expo-secure-store";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import { addBookmark, decodeUser, getShortProfileInfo } from "../../api/apis";
 import { useDispatch } from "react-redux";
-import { postFormData } from "../../redux/postSlice";
+import { postFormData, postGroupFormData } from "../../redux/postSlice";
 import TabNavigator from "./TabNavigator";
 import { Menu } from "react-native-paper";
 import { useSelector } from "react-redux";
@@ -47,9 +47,13 @@ const StackNavigator = () => {
   const bookmarkSelector = useSelector((state) => state.bookmark);
   const groupData = useSelector((state) => state.group.groupData);
   const groupGenres = useSelector((state) => state.group.groupGenres);
-  const postVisibilityModal = useSelector((state) => state.post.selectVisibility);
+  const postVisibilityModal = useSelector(
+    (state) => state.post.selectVisibility
+  );
   const [visible, setVisible] = useState(false);
   const [userData, setUserData] = useState({});
+  const postVisibility = useSelector((state) => state.post.postVisibility);
+  const selectedGroupId = useSelector((state) => state.post.selectedGroup);
 
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
@@ -99,7 +103,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Add Post"
+      initialRouteName="HomeScreen"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -377,15 +381,29 @@ const StackNavigator = () => {
                     }}
                   >
                     <Text style={{ fontWeight: "600", fontSize: 16 }}>
-                      Everyone
+                      {postVisibility.anyone
+                        ? "Anyone"
+                        : postVisibility.followersOnly
+                        ? "Followers only"
+                        : "Groups"}
                     </Text>
                     <AntDesign name="caretdown" size={14} color="black" />
                   </TouchableOpacity>
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    console.log(postData);
-                    dispatch(postFormData(postData));
+                    // console.log(postData);
+                    console.log(selectedGroupId);
+                    {
+                      postVisibility.anyone
+                        ? dispatch(postFormData(postData))
+                        : dispatch(
+                            postGroupFormData({
+                              ...postData,
+                              group: selectedGroupId
+                            })
+                          );
+                    }
                   }}
                 >
                   <Text

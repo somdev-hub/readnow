@@ -82,7 +82,9 @@ const DrawerContent = () => {
           </View>
           <View style={{ marginTop: 30, gap: 30, marginHorizontal: 10 }}>
             <Pressable
-              onPress={() => navigator.navigate("Add Post")}
+              onPress={() =>
+                navigator.navigate("Add Post", { visibility: "anyone" })
+              }
               style={{ flexDirection: "row", gap: 10 }}
             >
               <AntDesign name="pluscircle" size={24} color="#49755D" />
