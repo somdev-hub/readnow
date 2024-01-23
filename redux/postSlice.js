@@ -24,10 +24,10 @@ export const postFormData = createAsyncThunk(
 export const postGroupFormData = createAsyncThunk(
   "post/postGroupFormData",
   async (postData) => {
-    // const response = await addGroupPost(postData);
-    // console.log(response);
-    // return response;
-    // console.log(postData);
+    const response = await addGroupPost(postData);
+    console.log(response);
+    console.log(postData);
+    return response;
   }
 );
 

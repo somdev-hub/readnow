@@ -12,7 +12,7 @@ import { Entypo } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Menu } from "react-native-paper";
 import * as SecureStorage from "expo-secure-store";
-import { addBookmark, likePost } from "../api/apis";
+import { addBookmark, likeGroupPost, likePost } from "../api/apis";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 
@@ -27,14 +27,13 @@ const GroupPostCard = ({
   image,
   likes,
   comments,
-  post,
+  postId,
   fetchData,
   groupName,
-  optionsContent
+  // optionsContent
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const route = useRoute();
-  // console.log(route.name);
   const [visible, setVisible] = useState(false);
   const [liked, setLiked] = useState(false);
   const email = SecureStorage.getItemAsync("email").then((res) => res);
@@ -42,7 +41,7 @@ const GroupPostCard = ({
 
   const handleLike = async () => {
     const userId = await SecureStorage.getItemAsync("email");
-    const response = await likePost(post.id, userId);
+    const response = await likeGroupPost(postId, userId);
     // console.log(response);
     setLiked(!liked);
   };
@@ -57,6 +56,38 @@ const GroupPostCard = ({
       setLiked(true);
     }
   }, []);
+  const optionsContent = [
+    {
+      option: "Add to Bookmark",
+      function: (feedId) => {
+        addToBookmark(feedId);
+      }
+    },
+    {
+      option: "Add to Story",
+      function: () => {
+        console.log("Add to Story");
+      }
+    },
+    {
+      option: "Share",
+      function: () => {
+        console.log("Share");
+      }
+    },
+    {
+      option: "Send",
+      function: () => {
+        console.log("Send");
+      }
+    },
+    {
+      option: "Report",
+      function: () => {
+        console.log("Report");
+      }
+    }
+  ];
   return (
     <View
       style={{ backgroundColor: "#ffffff", marginVertical: 10, elevation: 1 }}
@@ -74,7 +105,8 @@ const GroupPostCard = ({
           style={{
             flexDirection: "row",
             gap: 10,
-            alignItems: "center"
+            alignItems: "center",
+            flex: 1
           }}
         >
           <View
@@ -108,9 +140,15 @@ const GroupPostCard = ({
               }}
             />
           </View>
-          <View>
-            <Text style={{ fontWeight: "500", fontSize: 16 }}>{groupName}</Text>
-            <Text style={{ color: "#A9A9A9", marginTop: 2 }}>{user} | {header}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontWeight: "500", fontSize: 16, flex: 1 }}>
+              {groupName.length > 50
+                ? `${groupName.substring(0, 50)}...`
+                : groupName}
+            </Text>
+            <Text style={{ color: "#A9A9A9", marginTop: 2 }}>
+              {user} | {header}
+            </Text>
           </View>
         </View>
 
@@ -130,7 +168,7 @@ const GroupPostCard = ({
             return (
               <Menu.Item
                 onPress={() => {
-                  option.function(post.id);
+                  option.function(postId);
                   closeMenu();
                 }}
                 title={option.option}
@@ -140,7 +178,7 @@ const GroupPostCard = ({
           })}
         </Menu>
       </View>
-      <View>
+      <View style={{flex:1}}>
         <Text style={{ marginHorizontal: 15 }}>
           {isExpanded ? description : `${description?.substring(0, 100)}...`}
         </Text>
@@ -158,9 +196,9 @@ const GroupPostCard = ({
           style={{
             width: size.width,
             height: size.height * 0.35,
-            marginVertical: 10
+            marginVertical: 10,
+            resizeMode: "contain"
           }}
-          resizeMode="contain"
         />
 
         <View
@@ -210,18 +248,20 @@ const GroupPostCard = ({
           </Pressable>
           <Pressable
             onPress={() => {
-              route.name === "Feed" &&
+              // route.name === "Feed" &&
                 navigator.navigate("Post", {
                   item: {
                     user,
                     header,
                     profilePicture,
+                    groupProfile,
                     description,
                     image,
                     likes,
                     comments,
-                    // fetchData,
-                    id: post.id,
+                    id: postId,
+                    type:"group-post",
+                    groupName,
                     optionsContent
                   }
                 });

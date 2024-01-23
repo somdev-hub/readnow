@@ -12,7 +12,12 @@ import { Chip } from "react-native-paper";
 import { Entypo, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import { getSpecificGroup } from "../api/apis";
+import {
+  getGroupFeed,
+  getShortGroupInfo,
+  getShortProfileInfo,
+  getSpecificGroup
+} from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import GroupPostCard from "../components/GroupPostCard";
 
@@ -22,12 +27,23 @@ const ViewGroupInfo = () => {
   const { groupId } = route.params;
   const [groupInfo, setGroupInfo] = useState({});
   const [groupJoin, setGroupJoin] = useState(false);
+  const [groupPosts, setGroupPosts] = useState([]);
+  const fetchGroupPosts = async () => {
+    const response = await getGroupFeed(groupId);
+    const postsWithUserAndGroup = await Promise.all(
+      response.posts.map(async (post) => {
+        const userProfile = await getShortProfileInfo(post.postedBy);
+        const groupDetails = await getShortGroupInfo(post.group);
+        return { ...post, userProfile: userProfile.data, groupDetails };
+      })
+    );
+    setGroupPosts(postsWithUserAndGroup);
+  };
   useEffect(() => {
-    // console.log(groupId);
     const fetchGroupInfo = async () => {
       const email = await SecureStorage.getItemAsync("email");
       const response = await getSpecificGroup(groupId);
-      // console.log(response);
+
       setGroupInfo(response);
       if (response?.groupMembers?.find((item) => item.user === email)) {
         setGroupJoin(true);
@@ -37,24 +53,9 @@ const ViewGroupInfo = () => {
       }
     };
     fetchGroupInfo();
+    fetchGroupPosts();
   }, []);
-  const groupPosts = [
-    {
-      id: 1,
-      user: "John Doe",
-      header: "Group Post",
-      profilePicture:
-        "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-      description: "This is a group post",
-      image:
-        "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-      likes: ["John Doe", "Jane Doe"],
-      groupProfile:
-        "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885_1280.jpg",
-      comments: [],
-      groupName: "Group Name"
-    }
-  ];
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -381,25 +382,21 @@ const ViewGroupInfo = () => {
             </Chip>
           </View>
         </View>
-        <View
-          style={{
-            backgroundColor: "#fff",
-            marginTop: 10,
-            paddingHorizontal: 10
-          }}
-        >
-          {groupPosts.map((item) => {
+        <View>
+          {groupPosts?.map((item) => {
             return (
               <GroupPostCard
-                key={item.id}
-                user={item.user}
-                header={item.header}
-                profilePicture={item.profilePicture}
-                description={item.description}
-                image={item.image}
-                likes={item.likes}
-                groupProfile={item.groupProfile}
-                groupName={item.groupName}
+                key={item?.id}
+                user={item?.userProfile?.name}
+                header={item?.userProfile?.header}
+                profilePicture={item?.userProfile?.profilePicture}
+                description={item?.description}
+                image={item?.image}
+                likes={item?.likedBy}
+                postId={item?.id}
+                comments={item?.comments}
+                groupProfile={item?.groupDetails?.groupImage}
+                groupName={item?.groupDetails?.groupName}
               />
             );
           })}

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.33.91:3500";
+const ADDRESS = "http://192.168.222.254:3500";
 
 export const getHeadlines = async () => {
   try {
@@ -371,6 +371,7 @@ export const getManagedGroups = async (email) => {
 
 export const addGroupPost = async (data) => {
   const formData = new FormData();
+
   formData.append("description", data.description);
   formData.append("postedBy", data.postedBy);
   formData.append("group", data.group);
@@ -379,7 +380,6 @@ export const addGroupPost = async (data) => {
     name: "postImage.jpg",
     type: "image/jpg"
   });
-  formData.append("group", data.group);
   try {
     const response = await axios.post(
       `${ADDRESS}/group/add-group-post`,
@@ -395,3 +395,50 @@ export const addGroupPost = async (data) => {
     console.log(error);
   }
 };
+
+export const getGroupFeed = async (groupId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/get-group-feeds/${groupId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getShortGroupInfo = async (id) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/group/get-short-group-info/${id}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const likeGroupPost = async (postId, userId) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/group/like-group-post`, {
+      postId,
+      userId
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const commentGroupPost = async (postId, userId, comment) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/group/comment-group-post`, {
+      postId,
+      userId,
+      comment
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+}

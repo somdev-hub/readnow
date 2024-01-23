@@ -76,14 +76,12 @@ const getFeedsController = async (req, res) => {
 
 const likePostController = async (req, res) => {
   const { postId, userId } = req.body;
-  // console.log(req.body);
   try {
     const response = await axios.get(
       `${process.env.STRAPI_API}/api/posts/${postId}`
     );
 
     const post = response.data.data;
-    // console.log(post);
     const likedBy = post.attributes.likedBy;
     let newLikedBy;
 

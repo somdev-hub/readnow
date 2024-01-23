@@ -182,6 +182,7 @@ const AddPost = () => {
         setUserGroups(res);
       });
     };
+
     getEmail();
     dispatch(fetchEmail());
 
@@ -370,7 +371,7 @@ const AddPost = () => {
               checked={postVisibility.anyone}
               onCheck={() => {
                 dispatch({
-                  tyoe: "post/updatePostVisibilityOption",
+                  type: "post/updatePostVisibilityOption",
                   payload: "anyone"
                 });
                 dispatch({
@@ -432,7 +433,7 @@ const AddPost = () => {
               return (
                 <Option
                   key={index}
-                  image={group.groupImage}
+                  groupImage={group.groupImage}
                   text={group.groupName}
                   checked={selectedGroup === group.groupName}
                   onCheck={() => {

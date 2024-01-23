@@ -36,6 +36,7 @@ import Events from "../../app/Events";
 import EventPage from "../../app/EventPage";
 // import TabNavigator from "./TabNavigator";
 import { AntDesign } from "@expo/vector-icons";
+import CreateEvent from "../../app/CreateEvent";
 
 const Stack = createStackNavigator();
 
@@ -232,7 +233,36 @@ const StackNavigator = () => {
         name="Events"
         component={Events}
         options={{
-          headerShown: true
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Events</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("CreateEvent");
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#49755D"
+                    }}
+                  >
+                    Create
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
         }}
       />
       <Stack.Screen
@@ -287,6 +317,45 @@ const StackNavigator = () => {
                   <Menu.Item onPress={() => {}} title="Share" />
                   <Menu.Item onPress={() => {}} title="Send" />
                 </Menu>
+              </View>
+            );
+          }
+        }}
+      />
+
+      <Stack.Screen
+        name="CreateEvent"
+        component={CreateEvent}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Create Event
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.goBack();
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: "#49755D"
+                    }}
+                  >
+                    Done
+                  </Text>
+                </TouchableOpacity>
               </View>
             );
           }

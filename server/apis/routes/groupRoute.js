@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const storage = multer.memoryStorage();
+const uploadMiddleware = multer({ storage });
 const {
   createGroupController,
   getGroupController,
@@ -11,10 +13,11 @@ const {
   getFollowedGroupsController,
   getManagedGroupsController,
   addGroupPostController,
-  getGroupFeedsController
+  getGroupFeedsController,
+  getShortGroupInfoController,
+  likeGroupPostController,
+  commentGroupPostController
 } = require("../controllers/groupController");
-const storage = multer.memoryStorage();
-const uploadMiddleware = multer({ storage });
 
 router.post(
   "/create-group",
@@ -44,8 +47,18 @@ router.get("/get-followed-groups/:email", getFollowedGroupsController);
 
 router.get("/get-managed-groups/:email", getManagedGroupsController);
 
-router.post("/add-group-post", uploadMiddleware.single("image"), addGroupPostController);
+router.post(
+  "/add-group-post",
+  uploadMiddleware.single("image"),
+  addGroupPostController
+);
 
-router.get("/get-group-feeds", getGroupFeedsController);
+router.get("/get-group-feeds/:groupId", getGroupFeedsController);
+
+router.get("/get-short-group-info/:id", getShortGroupInfoController);
+
+router.post("/like-group-post", likeGroupPostController);
+
+router.post("/comment-group-post", commentGroupPostController);
 
 module.exports = router;

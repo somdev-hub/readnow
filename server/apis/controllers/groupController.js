@@ -176,7 +176,8 @@ const getFollowedGroupsController = async (req, res) => {
       }
     }).select("groupImage groupName groupMembers");
 
-    if (!groups || groups.length === 0) return res.status(404).send("No groups found");
+    if (!groups || groups.length === 0)
+      return res.status(404).send("No groups found");
     res.status(200).json(groups);
   } catch (error) {
     console.log(error);
@@ -201,8 +202,24 @@ const getManagedGroupsController = async (req, res) => {
   }
 };
 
+const getShortGroupInfoController = async (req, res) => {
+  try {
+    const groups = await Group.findById(req.params.id).select(
+      "groupImage groupName groupMembers"
+    );
+    if (!groups) return res.status(404).send("No groups found");
+    res.status(200).json(groups);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while fetching the groups");
+  }
+};
+
 const addGroupPostController = async (req, res) => {
   const { description, postedBy, group } = req.body;
+  console.log("====================================");
+  console.log(req.body);
+  console.log("====================================");
   const image = req.file;
 
   const formData = new FormData();
@@ -221,7 +238,7 @@ const addGroupPostController = async (req, res) => {
         }
       }
     );
-
+    console.log(imageResponse.data[0].id);
     const data = {
       data: {
         description,
@@ -235,7 +252,7 @@ const addGroupPostController = async (req, res) => {
     };
 
     const response = await axios.post(
-      `${process.env.STRAPI_API}/api/group-post`,
+      `${process.env.STRAPI_API}/api/group-posts`,
       JSON.stringify(data),
       {
         headers: {
@@ -253,9 +270,17 @@ const addGroupPostController = async (req, res) => {
 
 const getGroupFeedsController = async (req, res) => {
   try {
+    const groupId = req.params.groupId;
+    console.log(groupId);
     const response = await axios.get(
-      `${process.env.STRAPI_API}/api/group-post?populate=*`
+      `${process.env.STRAPI_API}/api/group-posts?populate=*&filters[group][$eq]=${groupId}`,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
     );
+    console.log(response.data);
 
     const posts = response.data.data.reverse().map((post) => {
       return {
@@ -275,6 +300,89 @@ const getGroupFeedsController = async (req, res) => {
   }
 };
 
+const likeGroupPostController = async (req, res) => {
+  const { postId, userId } = req.body;
+  try {
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/group-posts/${postId}`
+    );
+
+    const post = response.data.data;
+    const likedBy = post.attributes.likedBy;
+    let newLikedBy;
+
+    if (likedBy.includes(userId)) {
+      newLikedBy = likedBy.filter((id) => id !== userId);
+    } else {
+      newLikedBy = [...likedBy, userId];
+    }
+
+    const data = {
+      data: {
+        likedBy: newLikedBy
+      }
+    };
+
+    const likeResponse = await axios.put(
+      `${process.env.STRAPI_API}/api/group-posts/${postId}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    res.status(200).send("post liked/disliked");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while liking/disliking the post");
+  }
+};
+
+const commentGroupPostController = async (req, res) => {
+  const { postId, userId, comment } = req.body;
+  console.log(req.body);
+  try {
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/group-posts/${postId}`
+    );
+
+    const post = response.data.data;
+    // console.log(post);
+    const comments = post.attributes.comments;
+    let newComments = [
+      ...comments,
+      {
+        comment,
+        commentedBy: userId,
+        commentedOn: new Date().toISOString()
+      }
+    ];
+
+    const data = {
+      data: {
+        comments: newComments
+      }
+    };
+
+    const commentResponse = await axios.put(
+      `${process.env.STRAPI_API}/api/group-posts/${postId}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    res.status(200).send("post commented");
+  } catch (error) {
+    // console.error(error);
+    res.status(500).send("An error occurred while commenting the post");
+  }
+};
+
 module.exports = {
   createGroupController,
   getGroupController,
@@ -285,5 +393,8 @@ module.exports = {
   getFollowedGroupsController,
   getManagedGroupsController,
   addGroupPostController,
-  getGroupFeedsController
+  getGroupFeedsController,
+  getShortGroupInfoController,
+  likeGroupPostController,
+  commentGroupPostController
 };

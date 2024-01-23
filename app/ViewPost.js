@@ -12,7 +12,12 @@ import { useRoute } from "@react-navigation/native";
 import PostCard from "../components/PostCard";
 import CommentCard from "../components/CommentCard";
 import * as SecureStore from "expo-secure-store";
-import { commentPost, getShortProfileInfo } from "../api/apis";
+import {
+  commentGroupPost,
+  commentPost,
+  getShortProfileInfo
+} from "../api/apis";
+import GroupPostCard from "../components/GroupPostCard";
 
 const ViewPost = () => {
   const route = useRoute();
@@ -29,9 +34,14 @@ const ViewPost = () => {
     if (userComment === "") return;
     setRefreshing(true);
     const email = await SecureStore.getItemAsync("email");
-    const res = await commentPost(item.id, email, userComment);
+    if (item.type === "group-post") {
+      const res = await commentGroupPost(item.id, email, userComment);
+      console.log(res);
+    } else {
+      const res = await commentPost(item.id, email, userComment);
+      console.log(res);
+    }
     setUserComment("");
-    console.log(res);
     item.fetchData();
     setRefreshing(false);
     // console.log(item.id);
@@ -53,7 +63,11 @@ const ViewPost = () => {
         }
       >
         <View>
-          <PostCard {...item} />
+          {item.type === "group-post" ? (
+            <GroupPostCard {...item} />
+          ) : (
+            <PostCard {...item} />
+          )}
         </View>
         <View style={{ marginHorizontal: 10, marginBottom: 5, gap: 10 }}>
           {item.comments?.reverse().map((comment, index) => {

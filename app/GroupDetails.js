@@ -15,14 +15,19 @@ const GroupDetails = () => {
   const route = useRoute();
   const { groupDesc, groupDetails, groupRules, groupMembers, groupAdmins } =
     route.params;
+  // console.log(groupAdmins);
   const [groupAdminData, setGroupAdminData] = useState([]);
   const [groupUsers, setGroupUsers] = useState([]);
   const [groupDescLength, setGroupDescLength] = useState(
     groupDesc.length > 500
   );
+  const [groupRulesLength, setGroupRulesLength] = useState(
+    groupRules.length > 500
+  );
 
   const getUserData = async (admin) => {
-    const adminData = await getShortProfileInfo(admin.user);
+    console.log(admin);
+    const adminData = await getShortProfileInfo(admin.adminData.email);
     return {
       adminData: adminData.data,
       role: admin.role
@@ -68,10 +73,10 @@ const GroupDetails = () => {
           >
             Description
           </Text>
-          <Text style={{marginBottom:5}}>
+          <Text style={{ marginBottom: 5 }}>
             {groupDescLength ? groupDesc.substring(0, 500) + "..." : groupDesc}
           </Text>
-          {groupDescLength && (
+          {groupDescLength ? (
             <TouchableOpacity
               style={{
                 flexDirection: "row",
@@ -96,6 +101,32 @@ const GroupDetails = () => {
                 Show more
               </Text>
               <AntDesign name="down" size={16} color="#39A7FF" style={{}} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 5
+              }}
+              onPress={() => {
+                setGroupDescLength(!groupDescLength);
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginVertical: 10,
+                  color: "#39A7FF",
+                  fontWeight: "500",
+                  fontSize: 16
+                  // justifyContent: "center"
+                }}
+              >
+                Show less
+              </Text>
+              <AntDesign name="up" size={16} color="#39A7FF" style={{}} />
             </TouchableOpacity>
           )}
         </View>
@@ -187,32 +218,63 @@ const GroupDetails = () => {
             Rules
           </Text>
           <Text style={{}}>
-            {groupRules.length > 500
+            {groupRulesLength
               ? groupRules.substring(0, 500) + "..."
               : groupRules}
           </Text>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 5
-            }}
-          >
-            <Text
+          {groupRulesLength ? (
+            <TouchableOpacity
+              onPress={() => {
+                setGroupRulesLength(!groupDescLength);
+              }}
               style={{
-                textAlign: "center",
-                marginVertical: 10,
-                color: "#39A7FF",
-                fontWeight: "500",
-                fontSize: 16
-                // justifyContent: "center"
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 5
               }}
             >
-              Show more
-            </Text>
-            <AntDesign name="down" size={16} color="#39A7FF" style={{}} />
-          </TouchableOpacity>
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginVertical: 10,
+                  color: "#39A7FF",
+                  fontWeight: "500",
+                  fontSize: 16
+                  // justifyContent: "center"
+                }}
+              >
+                Show more
+              </Text>
+              <AntDesign name="down" size={16} color="#39A7FF" style={{}} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => {
+                setGroupRulesLength(groupDescLength);
+              }}
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 5
+              }}
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  marginVertical: 10,
+                  color: "#39A7FF",
+                  fontWeight: "500",
+                  fontSize: 16
+                  // justifyContent: "center"
+                }}
+              >
+                Show less
+              </Text>
+              <AntDesign name="up" size={16} color="#39A7FF" style={{}} />
+            </TouchableOpacity>
+          )}
         </View>
         <View
           style={{
