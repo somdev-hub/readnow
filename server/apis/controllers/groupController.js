@@ -4,26 +4,12 @@ const FormData = require("form-data");
 const axios = require("axios");
 
 const createGroupController = async (req, res) => {
-  // const {
-  //   groupName,
-  //   groupDescription,
-  //   groupAdmins,
-  //   groupRules,
-  //   groupTags,
-  //   groupGenre,
-  //   groupLocation,
-  //   groupVisibility
-  // } = req.body;
 
   console.log(req.body);
-  // console.log(req.files);
   const groupImage = req.files.groupImage ? req.files.groupImage[0] : undefined;
   const groupCoverImage = req.files.groupCoverImage
     ? req.files.groupCoverImage[0]
     : undefined;
-  // console.log(Buffer.from(groupCoverImage.buffer));
-
-  // const [groupImage, groupCoverImage] = req.files;
 
   const formData = new FormData();
   formData.append("files", Buffer.from(groupImage.buffer), {

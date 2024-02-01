@@ -15,6 +15,8 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
+import { ActivityIndicator } from "react-native-paper";
+
 
 const SignUp = () => {
   const [userCredentials, setUserCredentials] = useState({
@@ -46,7 +48,7 @@ const SignUp = () => {
     Montserrat_600SemiBold
   });
   if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
+    return <ActivityIndicator animating={true} color={"#1640D6"} />;
   }
 
   return (
@@ -67,12 +69,12 @@ const SignUp = () => {
             style={{
               fontWeight: "500",
               fontFamily: "Montserrat_600SemiBold",
-              color: "#49755D"
+              color: "#00A9FF"
             }}
           >
             Log in
           </Text>
-          <AntDesign name="arrowright" size={16} color="#49755D" />
+          <AntDesign name="arrowright" size={16} color="#00A9FF" />
         </TouchableOpacity>
         <View style={{ marginTop: 10, justifyContent: "center" }}>
           <View
@@ -173,7 +175,7 @@ const SignUp = () => {
           <TouchableOpacity
             onPress={handleSubmit}
             style={{
-              backgroundColor: "#6C3428",
+              backgroundColor: "#1640D6",
               padding: 15,
               borderRadius: 30,
               marginHorizontal: 20,
@@ -191,7 +193,6 @@ const SignUp = () => {
               borderTopColor: "#eeeeee",
               borderWidth: 1,
               marginHorizontal: 50,
-              // width: "80%",
               marginTop: 40,
               position: "relative"
             }}

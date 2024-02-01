@@ -4,15 +4,15 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Dimensions
+  Dimensions,
+  Pressable,
+  TextInput
 } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import PeopleCard from "../components/PeopleCard";
-
-const TopTab = createMaterialTopTabNavigator();
+import BottomSheet, { useBottomSheet } from "@gorhom/bottom-sheet";
 
 const EventDetails = () => {
   return (
@@ -33,6 +33,18 @@ const EventDetails = () => {
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;
+  // const { open, close, snapTo } = useBottomSheet();
+  const bottomSheetRef = React.useRef(null);
+  const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
+  const close = React.useCallback(() => bottomSheetRef.current?.close(), []);
+  const snapTo = React.useCallback(
+    (index) => bottomSheetRef.current?.snapTo(index),
+    []
+  );
+  const handleSheetChanges = React.useCallback((index) => {
+    console.log("handleSheetChanges", index);
+  }, []);
+
   return (
     <View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -73,7 +85,8 @@ const EventPage = () => {
           style={{
             paddingTop: 10,
             paddingHorizontal: 10,
-            backgroundColor: "#fff"
+            backgroundColor: "#fff",
+            elevation: 1
           }}
         >
           <Text
@@ -158,7 +171,7 @@ const EventPage = () => {
           >
             <TouchableOpacity
               style={{
-                backgroundColor: "#6C3428",
+                backgroundColor: "#00A9FF",
                 padding: 7,
                 borderRadius: 50,
                 flex: 1
@@ -169,8 +182,8 @@ const EventPage = () => {
             </TouchableOpacity>
             <TouchableOpacity
               style={{
-                // backgroundColor: "#6C3428",
-                borderColor: "#6C3428",
+                // backgroundColor: "#00A9FF",
+                borderColor: "#00A9FF",
                 borderWidth: 1,
                 padding: 7,
                 borderRadius: 50,
@@ -178,22 +191,34 @@ const EventPage = () => {
                 // elevation: 3
               }}
             >
-              <Text style={{ color: "#6C3428", textAlign: "center" }}>
+              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
                 Share
               </Text>
             </TouchableOpacity>
           </View>
-          {/* <EventDetails/> */}
         </View>
-        {/* <View style={{ marginTop: 10 }}> */}
-        {/* <TopTab.Navigator>
-            <TopTab.Screen name="Details">
-              {() => ( */}
+        <Pressable
+          onPress={() => open()}
+          style={{
+            marginVertical: 10,
+            flexDirection: "row",
+            backgroundColor: "#fff",
+            paddingVertical: 15,
+            paddingHorizontal: 10,
+            // marginHorizontal: 10,
+            elevation: 1,
+            justifyContent: "space-between"
+          }}
+        >
+          <Text style={{ fontSize: 14, fontWeight: 500 }}>Comments</Text>
+          <Entypo name="chevron-down" size={22} color="black" />
+        </Pressable>
+
         <View
           style={{
             flex: 1,
             paddingHorizontal: 10,
-            marginTop: 10,
+            // marginTop: ,
             paddingVertical: 10,
             backgroundColor: "#fff"
           }}
@@ -221,7 +246,7 @@ const EventPage = () => {
             <Text
               style={{
                 marginTop: 10,
-                color: "#49755D",
+                color: "#00A9FF",
                 fontWeight: "500",
                 fontSize: 16,
                 textAlign: "center"
@@ -271,6 +296,91 @@ const EventPage = () => {
         </View>
         {/* </View> */}
       </ScrollView>
+      <BottomSheet
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={[height * 0.5, height * 0.9]}
+        enablePanDownToClose={true}
+        onChange={handleSheetChanges}
+        style={{
+          backgroundColor: "#fff",
+          borderTopLeftRadius: 50,
+          borderTopRightRadius: 50,
+          elevation: 15
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "#fff",
+            marginTop: 10
+            // paddingHorizontal: 10,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: "500",
+              paddingHorizontal: 10,
+              paddingVertical: 10
+            }}
+          >
+            Comments
+          </Text>
+          <View
+            style={{
+              backgroundColor: "#eeeeee",
+              paddingVertical: 10,
+              paddingHorizontal: 10
+            }}
+          >
+            <Text>
+              Please keep the comment section respectful and clean to adhere to
+              our community guidelines.
+            </Text>
+          </View>
+          <View
+            style={{
+              // position: "absolute",
+              // bottom: 0,
+              borderTopColor: "#eeeeee",
+              borderTopWidth: 1
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginHorizontal: 10,
+                marginVertical: 10
+              }}
+            >
+              <Image
+                source={{
+                  uri: "https://picsum.photos/200/300"
+                }}
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 50,
+                  resizeMode: "cover"
+                }}
+              />
+              <TextInput
+                placeholder="Write a comment"
+                style={{
+                  flex: 1,
+                  marginLeft: 10,
+                  borderRadius: 50,
+                  padding: 10,
+                  paddingHorizontal: 20,
+                  borderWidth: 2,
+                  borderColor: "#eeeeee"
+                }}
+              />
+            </View>
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 };

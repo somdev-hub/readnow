@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ADDRESS = "http://192.168.222.254:3500";
+const ADDRESS = "http://192.168.33.118:3500";
 
 export const getHeadlines = async () => {
   try {

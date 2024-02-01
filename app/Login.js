@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { login } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
-// import { useNavigation } from "@react-navigation/native";
+import { ActivityIndicator } from "react-native-paper";
 import { CommonActions } from "@react-navigation/native";
 
 const Login = () => {
@@ -25,45 +25,44 @@ const Login = () => {
     email: "",
     password: ""
   });
+  const [loading, setLoading] = useState(false); // [1
   const setFormData = (key, value) => {
     setUserCredentials({ ...userCredentials, [key]: value });
   };
   const navigator = useNavigation();
   const handleSubmit = () => {
     console.log(userCredentials);
-    login(userCredentials)
-      .then((Response) => {
-        console.log(Response);
-        if (Response.status === 200) {
+    setLoading(true);
+    login(userCredentials).then((Response) => {
+      console.log(Response);
+      if (Response.status === 200) {
+        console.log("token saved");
+        SecureStorage.deleteItemAsync("email");
+        SecureStorage.setItemAsync(
+          "email",
+          userCredentials.email.toLowerCase()
+        );
+        setLoading(false);
+        SecureStorage.setItemAsync("token", Response.token).then(() => {
           console.log("token saved");
-          SecureStorage.deleteItemAsync("email");
-          SecureStorage.setItemAsync(
-            "email",
-            userCredentials.email.toLowerCase()
+          navigator.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "HomeScreen" }]
+            })
           );
-          SecureStorage.setItemAsync("token", Response.token).then(() => {
-            console.log("token saved");
-            navigator.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "HomeScreen" }]
-              })
-            );
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+        });
+      }
+    });
   };
   const [fontsLoaded] = useFonts({
     Montserrat_500Medium,
     Montserrat_600SemiBold
   });
-  // const navigator = useNavigation();
   if (!fontsLoaded) {
-    return <Text>Loading...</Text>;
+    return <ActivityIndicator animating={true} color={"#1640D6"} />;
   }
+
   return (
     <SafeAreaView>
       <ScrollView>
@@ -82,12 +81,12 @@ const Login = () => {
             style={{
               fontWeight: "500",
               fontFamily: "Montserrat_600SemiBold",
-              color: "#49755D"
+              color: "#00A9FF"
             }}
           >
             SignUp
           </Text>
-          <AntDesign name="arrowright" size={16} color="#49755D" />
+          <AntDesign name="arrowright" size={16} color="#00A9FF" />
         </TouchableOpacity>
         <View style={{ marginTop: 10, justifyContent: "center" }}>
           <View
@@ -169,18 +168,26 @@ const Login = () => {
           <TouchableOpacity
             onPress={handleSubmit}
             style={{
-              backgroundColor: "#6C3428",
+              backgroundColor: "#1640D6",
               padding: 15,
               borderRadius: 30,
               marginHorizontal: 20,
               marginTop: 20
             }}
           >
-            <Text
-              style={{ textAlign: "center", color: "white", fontWeight: "500" }}
-            >
-              Continue
-            </Text>
+            {loading ? (
+              <ActivityIndicator animating={true} color={"white"} />
+            ) : (
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "white",
+                  fontWeight: "500"
+                }}
+              >
+                Continue
+              </Text>
+            )}
           </TouchableOpacity>
           <View
             style={{

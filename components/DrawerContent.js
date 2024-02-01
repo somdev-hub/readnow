@@ -45,7 +45,7 @@ const DrawerContent = () => {
         <View>
           <View
             style={{
-              backgroundColor: "#49755D",
+              backgroundColor: "#00A9FF",
               padding: 15,
               borderRadius: 20,
               flexDirection: "row",
@@ -87,8 +87,8 @@ const DrawerContent = () => {
               }
               style={{ flexDirection: "row", gap: 10 }}
             >
-              <AntDesign name="pluscircle" size={24} color="#49755D" />
-              <Text style={{ color: "#49755D", fontWeight: "bold" }}>
+              <AntDesign name="pluscircle" size={24} color="#00A9FF" />
+              <Text style={{ color: "#00A9FF", fontWeight: "bold" }}>
                 Create
               </Text>
             </Pressable>

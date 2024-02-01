@@ -157,7 +157,7 @@ const MyProfile = () => {
                 onPress={() => selectImage(setProfilePicture, "profile")}
                 style={{ position: "absolute", bottom: 10, left: 75 }}
               >
-                <AntDesign name="pluscircle" size={24} color="#49755D" />
+                <AntDesign name="pluscircle" size={24} color="#00A9FF" />
               </Pressable>
             </View>
           </View>
@@ -208,7 +208,7 @@ const MyProfile = () => {
             <TouchableOpacity
               onPress={() => navigator.navigate("Add Post")}
               style={{
-                backgroundColor: "#49755D",
+                backgroundColor: "#00A9FF",
                 marginHorizontal: 20,
                 padding: 10,
                 borderRadius: 30,
@@ -263,10 +263,10 @@ const MyProfile = () => {
                 width: "auto",
                 marginRight: 10,
                 borderRadius: 50,
-                borderColor: "#49755D"
+                borderColor: "#00A9FF"
               }}
             >
-              <Text style={{ color: "#49755D", textAlign: "center" }}>
+              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
                 Posts
               </Text>
             </View>
@@ -279,10 +279,10 @@ const MyProfile = () => {
                 width: "auto",
                 borderRadius: 50,
                 marginRight: 10,
-                borderColor: "#49755D"
+                borderColor: "#00A9FF"
               }}
             >
-              <Text style={{ color: "#49755D", textAlign: "center" }}>
+              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
                 Videos
               </Text>
             </View>
@@ -294,10 +294,10 @@ const MyProfile = () => {
                 // flex:1,
                 width: "auto",
                 borderRadius: 50,
-                borderColor: "#49755D"
+                borderColor: "#00A9FF"
               }}
             >
-              <Text style={{ color: "#49755D", textAlign: "center" }}>
+              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
                 Videos
               </Text>
             </View>

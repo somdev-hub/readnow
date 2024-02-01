@@ -104,7 +104,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
+      initialRouteName="EventPage"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -167,7 +167,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#49755D"
+                      color: "#00A9FF"
                     }}
                   >
                     Create
@@ -203,7 +203,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#49755D"
+                      color: "#00A9FF"
                     }}
                   >
                     Done
@@ -254,7 +254,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#49755D"
+                      color: "#00A9FF"
                     }}
                   >
                     Create
@@ -350,7 +350,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#49755D"
+                      color: "#00A9FF"
                     }}
                   >
                     Done
@@ -391,7 +391,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#49755D"
+                      color: "#00A9FF"
                     }}
                   >
                     Create
@@ -432,7 +432,7 @@ const StackNavigator = () => {
                       width: 40,
                       height: 40,
                       borderRadius: 20,
-                      borderColor: "#49755D",
+                      borderColor: "#00A9FF",
                       resizeMode: "cover"
                     }}
                   />
@@ -479,7 +479,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#49755D"
+                      color: "#00A9FF"
                     }}
                   >
                     Post

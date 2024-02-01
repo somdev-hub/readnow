@@ -1,6 +1,4 @@
-const {
-  value
-} = require("deprecated-react-native-prop-types/DeprecatedTextInputPropTypes");
+
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 

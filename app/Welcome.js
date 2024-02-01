@@ -11,7 +11,7 @@ const Welcome = () => {
     <SafeAreaView>
       <View
         style={{
-          backgroundColor: "#49755D",
+          backgroundColor: "#1640D6",
           height: height * 0.5,
           borderBottomRightRadius: 100,
           borderBottomLeftRadius: 100,
@@ -69,7 +69,7 @@ const Welcome = () => {
         <TouchableOpacity
           onPress={() => navigator.navigate("Signup")}
           style={{
-            backgroundColor: "#6C3428",
+            backgroundColor: "#1640D6",
             padding: 20,
             borderRadius: 50,
             shadowColor: "#000",

@@ -4,13 +4,75 @@ import {
   ScrollView,
   Pressable,
   Image,
-  TextInput
+  TextInput,
+  TouchableOpacity
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
+import { RadioButton } from "react-native-paper";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import * as ImagePicker from "expo-image-picker";
+import * as SecureStorage from "expo-secure-store";
+import { useDispatch } from "react-redux";
+
+const RadioButtonOption = ({ value, currentMode, setMode }) => (
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 10
+    }}
+  >
+    <RadioButton
+      value={value}
+      status={currentMode === value ? "checked" : "unchecked"}
+      onPress={() => setMode(value)}
+    />
+    <Text>{value.charAt(0).toUpperCase() + value.slice(1)}</Text>
+  </View>
+);
 
 const CreateEvent = () => {
+  const [open, setOpen] = React.useState(false);
+  const [speaker, setSpeaker] = useState("");
+  const dispatch = useDispatch();
+  const [eventCreationData, setEventCreationData] = useState({
+    eventOrganizer: "",
+    eventName: "",
+    eventMode: "video",
+    eventDateAndTime: new Date(),
+    eventSpeakers: [],
+    eventDescription: "",
+    eventCover: null
+  });
+
+  const selectImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
+    });
+
+    if (!result.canceled) {
+      setEventCreationData({
+        ...eventCreationData,
+        eventCover: result.assets[0].uri
+      });
+    }
+  };
+  useEffect(() => {
+    const getEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      setEventCreationData({ ...eventCreationData, eventOrganizer: email });
+    };
+    getEmail();
+  }, []);
+  useEffect(() => {
+    dispatch({
+      type: "event/updateEventData",
+      payload: {...eventCreationData}
+    });
+  }, [eventCreationData]);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -27,9 +89,7 @@ const CreateEvent = () => {
               }}
             >
               <Pressable
-                onPress={() => {
-                  selectImage("groupCoverImage");
-                }}
+                onPress={() => selectImage()}
                 style={{
                   position: "absolute",
                   backgroundColor: "#fff",
@@ -47,7 +107,9 @@ const CreateEvent = () => {
               </Pressable>
               <Image
                 source={{
-                  uri: "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
+                  uri: eventCreationData.eventCover
+                    ? eventCreationData.eventCover
+                    : "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
                 }}
                 style={{
                   width: "100%",
@@ -61,10 +123,14 @@ const CreateEvent = () => {
           </View>
         </View>
         <View style={{ marginHorizontal: 20 }}>
-          <View>
+          <View
+            style={{
+              marginBottom: 20
+            }}
+          >
             <Text
               style={{
-                // fontSize: 14,
+                fontSize: 16,
                 fontWeight: "500",
                 marginBottom: 10
                 // color: "#49755D"
@@ -73,6 +139,42 @@ const CreateEvent = () => {
               Organizer*
             </Text>
             <TextInput
+              value={eventCreationData.eventOrganizer}
+              onChangeText={(text) =>
+                setEventCreationData({
+                  ...eventCreationData,
+                  eventOrganizer: text
+                })
+              }
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: "#ccc",
+                paddingBottom: 5,
+                marginBottom: 10
+              }}
+              placeholder="Organizer email"
+            />
+          </View>
+          <View
+            style={{
+              marginBottom: 10
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                marginBottom: 10
+                // color: "#49755D"
+              }}
+            >
+              Event name*
+            </Text>
+            <TextInput
+              value={eventCreationData.eventName}
+              onChangeText={(text) =>
+                setEventCreationData({ ...eventCreationData, eventName: text })
+              }
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
@@ -82,25 +184,216 @@ const CreateEvent = () => {
               placeholder="Organizer name"
             />
           </View>
-          <View>
+          <View
+            style={{
+              marginBottom: 20
+            }}
+          >
             <Text
               style={{
-                // fontSize: 14,
+                fontSize: 16,
                 fontWeight: "500",
                 marginBottom: 10
                 // color: "#49755D"
               }}
             >
-              Event name*
+              Event mode*
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "space-between"
+              }}
+            >
+              <RadioButtonOption
+                value="video"
+                currentMode={eventCreationData.eventMode}
+                setMode={(mode) =>
+                  setEventCreationData({
+                    ...eventCreationData,
+                    eventMode: mode
+                  })
+                }
+              />
+              <RadioButtonOption
+                value="audio"
+                currentMode={eventCreationData.eventMode}
+                setMode={(mode) =>
+                  setEventCreationData({
+                    ...eventCreationData,
+                    eventMode: mode
+                  })
+                }
+              />
+              <RadioButtonOption
+                value="hybrid"
+                currentMode={eventCreationData.eventMode}
+                setMode={(mode) =>
+                  setEventCreationData({
+                    ...eventCreationData,
+                    eventMode: mode
+                  })
+                }
+              />
+            </View>
+          </View>
+          <View
+            style={{
+              marginBottom: 20
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                marginBottom: 10
+                // color: "#49755D"
+              }}
+            >
+              Event date and time*
+            </Text>
+            <TouchableOpacity onPress={() => setOpen(true)}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#ccc",
+                  paddingBottom: 5,
+                  marginBottom: 10
+                }}
+              >
+                <Text>
+                  {eventCreationData.eventDateAndTime.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: true
+                  }) +
+                    " " +
+                    eventCreationData.eventDateAndTime.toDateString()}
+                </Text>
+                <Entypo name="calendar" size={24} color="black" />
+              </View>
+            </TouchableOpacity>
+            <DateTimePickerModal
+              date={eventCreationData.eventDateAndTime}
+              isVisible={open}
+              mode="datetime"
+              onConfirm={(dateTime) => {
+                setEventCreationData({
+                  ...eventCreationData,
+                  eventDateAndTime: dateTime
+                });
+                setOpen(false);
+              }}
+              onCancel={() => {
+                setOpen(false);
+              }}
+            />
+          </View>
+          <View
+            style={{
+              marginBottom: 20
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                marginBottom: 10
+                // color: "#49755D"
+              }}
+            >
+              Event speakers
             </Text>
             <TextInput
+              value={speaker}
+              onChangeText={(text) => setSpeaker(text)}
+              onSubmitEditing={() => {
+                console.log(speaker);
+                setEventCreationData({
+                  ...eventCreationData,
+                  eventSpeakers: [...eventCreationData.eventSpeakers, speaker]
+                });
+                setSpeaker(""); // Clear the input field
+              }}
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="Organizer name"
+              placeholder="speakers email"
+            />
+            {eventCreationData.eventSpeakers.map((speaker, index) => {
+              return (
+                <View
+                  key={index}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    borderWidth: 1,
+                    borderColor: "#ccc",
+                    padding: 5,
+                    marginBottom: 10,
+                    borderRadius: 5
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: "500",
+                      color: "#49755D"
+                    }}
+                  >
+                    {speaker}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      setEventCreationData({
+                        ...eventCreationData,
+                        eventSpeakers: eventCreationData.eventSpeakers.filter(
+                          (item) => item !== speaker
+                        )
+                      });
+                    }}
+                  >
+                    <Entypo name="cross" size={24} color="black" />
+                  </Pressable>
+                </View>
+              );
+            })}
+          </View>
+          <View>
+            <Text
+              style={{
+                fontSize: 16,
+                fontWeight: "500",
+                marginBottom: 10
+                // color: "#49755D"
+              }}
+            >
+              Event description
+            </Text>
+            <TextInput
+              value={eventCreationData.eventDescription}
+              onChangeText={(text) => {
+                setEventCreationData({
+                  ...eventCreationData,
+                  eventDescription: text
+                });
+              }}
+              multiline={true}
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: "#ccc",
+                paddingBottom: 5,
+                marginBottom: 10
+              }}
+              placeholder="about this event..."
             />
           </View>
         </View>

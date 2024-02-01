@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     padding: 7
   },
   textBlue: {
-    color: "#49755D",
+    color: "#00A9FF",
     fontWeight: "500",
     fontSize: 16
   }

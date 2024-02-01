@@ -50,7 +50,7 @@ const Events = () => {
             style={{
               fontSize: 15,
               fontWeight: "500",
-              color: "#49755D"
+              color: "#00A9FF"
               //   }}>View all</Text>
             }}
           >
@@ -79,7 +79,7 @@ const Events = () => {
             style={{
               fontSize: 15,
               fontWeight: "500",
-              color: "#49755D"
+              color: "#00A9FF"
               //   }}>View all</Text>
             }}
           >
