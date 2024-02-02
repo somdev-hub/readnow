@@ -14,7 +14,9 @@ import { RadioButton } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { Snackbar } from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
 
 const RadioButtonOption = ({ value, currentMode, setMode }) => (
   <View
@@ -35,7 +37,10 @@ const RadioButtonOption = ({ value, currentMode, setMode }) => (
 );
 
 const CreateEvent = () => {
-  const [open, setOpen] = React.useState(false);
+  // const [visibleSnackbar, setVisibleSnackbar] = useState(false);
+  const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
+  console.log(visibleSnackbar);
+  const [open, setOpen] = useState(false);
   const [speaker, setSpeaker] = useState("");
   const dispatch = useDispatch();
   const [eventCreationData, setEventCreationData] = useState({
@@ -47,6 +52,7 @@ const CreateEvent = () => {
     eventDescription: "",
     eventCover: null
   });
+  const navigator = useNavigation();
 
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -70,7 +76,7 @@ const CreateEvent = () => {
   useEffect(() => {
     dispatch({
       type: "event/updateEventData",
-      payload: {...eventCreationData}
+      payload: { ...eventCreationData }
     });
   }, [eventCreationData]);
   return (
@@ -398,6 +404,29 @@ const CreateEvent = () => {
           </View>
         </View>
       </ScrollView>
+      <Snackbar
+        visible={visibleSnackbar}
+        onDismiss={() => {}}
+        // onDismiss={() => {
+        //   dispatch({
+        //     type: "event/eventSnackbar",
+        //     payload: false
+        //   });
+        // }}
+        // style={{ position: "absolute", bottom: 60 }}
+        action={{
+          label: "Done",
+          onPress: () => {
+            dispatch({
+              type: "event/updateSnackbarVisibility",
+              payload: false
+            });
+            navigator.navigate("AdminEventPage");
+          }
+        }}
+      >
+        Event successfully created
+      </Snackbar>
     </View>
   );
 };

@@ -12,5 +12,10 @@ export const store = configureStore({
     notify: notifyReducer,
     group: groupReducer,
     event: eventReducer
+  },
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware({
+      serializableCheck: false
+    });
   }
 });

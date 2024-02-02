@@ -13,31 +13,87 @@ import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import PeopleCard from "../components/PeopleCard";
 import BottomSheet from "@gorhom/bottom-sheet";
+import * as DocumentPicker from "expo-document-picker";
+import { Video, ResizeMode } from "expo-av";
+// import { Audio } from 'expo-av';
+import { useDispatch, useSelector } from "react-redux";
 
-const EventPage = () => {
+const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
+  const width = Dimensions.get("window").width;
   const bottomSheetRef = React.useRef(null);
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
+  const [eventMedia, setEventMedia] = React.useState(null);
+  const dispatch = useDispatch();
 
   const handleSheetChanges = React.useCallback((index) => {
     console.log("handleSheetChanges", index);
   }, []);
 
+  const pickFile = async () => {
+    let result = await DocumentPicker.getDocumentAsync({
+      type: "video/*", // All files
+      copyToCacheDirectory: true // For easier access to file
+    });
+
+    if (!result.canceled) {
+      console.log(result.assets[0].uri); // This is the local file URI
+      setEventMedia(result.assets[0].uri);
+      dispatch({
+        type: "event/updateEventMedia",
+        payload: result.assets[0].uri
+      });
+    }
+  };
+
   return (
     <View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ position: "relative" }}>
-          <Image
-            source={{
-              uri: "https://picsum.photos/200/300"
-            }}
+        <View style={{ position: "relative", alignItems: "center" }}>
+          {!eventMedia ? (
+            <Image
+              source={require("../assets/upload-image-bg.jpg")}
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "cover"
+              }}
+            />
+          ) : (
+            <Video
+              source={{ uri: eventMedia }}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode={ResizeMode.CONTAIN}
+              shouldPlay
+              isLooping
+              style={{ width: 300, height: 300 }}
+            />
+          )}
+          <Pressable
+            onPress={() => pickFile()}
             style={{
-              width: "100%",
-              height: 200,
-              resizeMode: "cover"
+              position: "absolute",
+              bottom: "35%",
+              right: "35%",
+              backgroundColor: "#eeeeee",
+              opacity: 0.7,
+              padding: 10,
+              borderRadius: 50
             }}
-          />
-          <View
+          >
+            <Text
+              style={{
+                color: "#000",
+                fontSize: 16,
+                fontWeight: "500"
+              }}
+            >
+              Upload media
+            </Text>
+          </Pressable>
+          {/* <View
             style={{
               flexDirection: "row",
               gap: 1,
@@ -57,7 +113,7 @@ const EventPage = () => {
             >
               Live tomorrow
             </Text>
-          </View>
+          </View> */}
         </View>
         <View
           style={{
@@ -71,7 +127,6 @@ const EventPage = () => {
             style={{
               fontSize: 20,
               fontWeight: "500"
-              //   }}>Workshop on plant healthcare and nutrition</Text>
             }}
           >
             Workshop on plant healthcare and nutrition, acheiving the best
@@ -153,24 +208,21 @@ const EventPage = () => {
                 padding: 7,
                 borderRadius: 50,
                 flex: 1
-                // elevation: 3
               }}
             >
-              <Text style={{ color: "#fff", textAlign: "center" }}>Attend</Text>
+              <Text style={{ color: "#fff", textAlign: "center" }}>Invite</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
-                // backgroundColor: "#00A9FF",
                 borderColor: "#00A9FF",
                 borderWidth: 1,
                 padding: 7,
                 borderRadius: 50,
                 flex: 1
-                // elevation: 3
               }}
             >
               <Text style={{ color: "#00A9FF", textAlign: "center" }}>
-                Share
+                Options
               </Text>
             </TouchableOpacity>
           </View>
@@ -188,7 +240,7 @@ const EventPage = () => {
             justifyContent: "space-between"
           }}
         >
-          <Text style={{ fontSize: 14, fontWeight: 500 }}>Comments</Text>
+          <Text style={{ fontSize: 14, fontWeight: 500 }}>Live Comments</Text>
           <Entypo name="chevron-down" size={22} color="black" />
         </Pressable>
 
@@ -196,7 +248,6 @@ const EventPage = () => {
           style={{
             flex: 1,
             paddingHorizontal: 10,
-            // marginTop: ,
             paddingVertical: 10,
             backgroundColor: "#fff"
           }}
@@ -205,7 +256,6 @@ const EventPage = () => {
             style={{
               fontSize: 18,
               fontWeight: "500"
-              //   }}>Workshop on plant healthcare and nutrition</Text>
             }}
           >
             About
@@ -363,4 +413,4 @@ const EventPage = () => {
   );
 };
 
-export default EventPage;
+export default AdminEventPage;

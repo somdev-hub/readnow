@@ -1,6 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
 
+export const postEventData = createAsyncThunk(
+  "event/postEventData",
+  async (eventData) => {
+    // const response = await createEvent(eventData);
+    // return response;
+    console.log(eventData);
+  }
+);
+
 const eventSlice = createSlice({
   name: "event",
   initialState: {
@@ -11,8 +20,10 @@ const eventSlice = createSlice({
       eventDateAndTime: new Date(),
       eventSpeakers: [],
       eventDescription: "",
-      eventCover: null
-    }
+      eventCover: null,
+      eventMedia: null
+    },
+    eventSnackbar: false
   },
   reducers: {
     updateEventData: (state, action) => {
@@ -23,6 +34,12 @@ const eventSlice = createSlice({
       state.eventdata.eventSpeakers = action.payload.eventSpeakers;
       state.eventdata.eventDescription = action.payload.eventDescription;
       state.eventdata.eventCover = action.payload.eventCover;
+    },
+    updateEventMedia: (state, action) => {
+      state.eventdata.eventMedia = action.payload;
+    },
+    updateSnackbarVisibility: (state, action) => {
+      state.eventSnackbar = action.payload;
     }
   }
 });

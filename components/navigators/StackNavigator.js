@@ -34,9 +34,10 @@ import GroupGenreSelection from "../../app/GroupGenreSelection";
 import GroupNewView from "../../app/GroupNewView";
 import Events from "../../app/Events";
 import EventPage from "../../app/EventPage";
-// import TabNavigator from "./TabNavigator";
 import { AntDesign } from "@expo/vector-icons";
 import CreateEvent from "../../app/CreateEvent";
+import AdminEventPage from "../../app/AdminEventPage";
+import { postEventData } from "../../redux/eventSlice";
 
 const Stack = createStackNavigator();
 
@@ -55,6 +56,8 @@ const StackNavigator = () => {
   const [userData, setUserData] = useState({});
   const postVisibility = useSelector((state) => state.post.postVisibility);
   const selectedGroupId = useSelector((state) => state.post.selectedGroup);
+  const eventData = useSelector((state) => state.event.eventdata);
+  const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
 
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
@@ -104,7 +107,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="EventPage"
+      initialRouteName="HomeScreen"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -138,6 +141,14 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Group Settings"
+        }}
+      />
+      <Stack.Screen
+        name="AdminEventPage"
+        component={AdminEventPage}
+        options={{
+          headerShown: true,
+          headerTitle: "Your Event"
         }}
       />
       <Stack.Screen
@@ -343,7 +354,12 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigator.goBack();
+                    dispatch(postEventData(eventData));
+                    dispatch({
+                      type: "event/updateSnackbarVisibility",
+                      payload: true
+                    });
+                    console.log(visibleSnackbar);
                   }}
                 >
                   <Text
