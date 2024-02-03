@@ -8,7 +8,7 @@ import {
   Pressable,
   TextInput
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import PeopleCard from "../components/PeopleCard";
@@ -17,6 +17,8 @@ import * as DocumentPicker from "expo-document-picker";
 import { Video, ResizeMode } from "expo-av";
 // import { Audio } from 'expo-av';
 import { useDispatch, useSelector } from "react-redux";
+import { useRoute } from "@react-navigation/native";
+import { getCardProfile, getShortProfileInfo } from "../api/apis";
 
 const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
@@ -25,6 +27,10 @@ const AdminEventPage = () => {
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const [eventMedia, setEventMedia] = React.useState(null);
   const dispatch = useDispatch();
+  const route = useRoute();
+  const eventData = route.params.eventData;
+  const [eventSpeakersData, setEventSpeakersData] = useState([]);
+  const [eventOrganizerData, setEventOrganizerData] = useState({});
 
   const handleSheetChanges = React.useCallback((index) => {
     console.log("handleSheetChanges", index);
@@ -45,6 +51,29 @@ const AdminEventPage = () => {
       });
     }
   };
+
+  useEffect(() => {
+    const fetchOrganizerData = async () => {
+      const organizerData = await getShortProfileInfo(
+        eventData.eventOrganizer.toLowerCase()
+      );
+      setEventOrganizerData(organizerData);
+    };
+    const fetchSpeakersData = async () => {
+      const speakerData = await Promise.all(
+        eventData.eventSpeakers.map(async (speaker) => {
+          const speakerInfo = await getCardProfile(speaker.toLowerCase());
+          return speakerInfo;
+        })
+      );
+      setEventSpeakersData(speakerData);
+    };
+    fetchOrganizerData();
+    fetchSpeakersData();
+  }, []);
+
+  console.log(eventData.eventSpeakers);
+  console.log(eventSpeakersData);
 
   return (
     <View>
@@ -129,7 +158,7 @@ const AdminEventPage = () => {
               fontWeight: "500"
             }}
           >
-            Workshop on plant healthcare and nutrition, acheiving the best
+            {eventData.eventName}
           </Text>
           <Text
             style={{
@@ -138,7 +167,7 @@ const AdminEventPage = () => {
               marginTop: 5
             }}
           >
-            Event organized by Dr. Pradeep Singh
+            Event organized by {eventData.eventOrganizer}
           </Text>
           <View
             style={{
@@ -155,7 +184,13 @@ const AdminEventPage = () => {
                 marginLeft: 5
               }}
             >
-              21 Dec, 2020, Thursday, 4:00pm - 5:00pm
+              {eventData.eventDateAndTime.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+              }) +
+                " " +
+                eventData.eventDateAndTime.toDateString()}
             </Text>
           </View>
           <View
@@ -191,7 +226,7 @@ const AdminEventPage = () => {
                 marginLeft: 5
               }}
             >
-              Event mode - Video
+              Event mode - {eventData.eventMode}
             </Text>
           </View>
           <View
@@ -260,16 +295,7 @@ const AdminEventPage = () => {
           >
             About
           </Text>
-          <Text style={{ marginTop: 10 }}>
-            Adipisicing reprehenderit esse consectetur quis nulla magna ipsum
-            veniam. Qui quis reprehenderit deserunt laboris ipsum. Incididunt
-            dolore in consectetur consequat incididunt veniam mollit ipsum
-            proident commodo eu deserunt sit ex. Tempor ad magna dolor et
-            laborum laboris reprehenderit. Dolore magna aliquip aute non non
-            proident anim. Sit est exercitation ea proident laboris ipsum. Id
-            nostrud cupidatat cupidatat adipisicing. Anim sint veniam in sint
-            anim officia.
-          </Text>
+          <Text style={{ marginTop: 10 }}>{eventData.eventDescription}</Text>
           <TouchableOpacity>
             <Text
               style={{
@@ -302,16 +328,21 @@ const AdminEventPage = () => {
             Speakers
           </Text>
           <View>
-            <PeopleCard
-              name="Dr. Pradeep Singh"
-              header="Professor, IIT Kanpur"
-              tags="#Plant Healthcare, #Nutrition, #Agriculture, #Plant Science"
-              followed={false}
-              image="https://edtech4beginnerscom.files.wordpress.com/2021/05/1.png"
-              background="https://hips.hearstapps.com/hmg-prod/images/indoor-plants-1-64f051a37d451.jpg"
-              userEmail="stevewings@gmail.com"
-            />
-            <PeopleCard
+            {eventSpeakersData?.map((speaker, index) => {
+              return (
+                <PeopleCard
+                  key={index}
+                  image={speaker?.profilePicture}
+                  background={speaker?.backgroundPicture}
+                  header={speaker?.header}
+                  name={speaker?.name}
+                  tags={speaker?.tags}
+                  userEmail={speaker?.email}
+                  followers={speaker?.followers}
+                />
+              );
+            })}
+            {/* <PeopleCard
               name="Dr. Sikha Sharma"
               header="Biochemist, IISER, Pune"
               tags="#Plant Healthcare, #Nutrition, #Agriculture, #Plant Science"
@@ -319,7 +350,7 @@ const AdminEventPage = () => {
               image="https://c.superprof.com/i/a/20975136/10127100/600/20220613124840/assistant-professor-lady-shri-ram-college-for-women-trained-teach-all-aspects-english-language.jpg"
               background="https://i.cbc.ca/1.4839023.1537972363!/fileImage/httpImage/image.png_gen/derivatives/16x9_780/plants-ft.png"
               userEmail="stevewings@gmail.com"
-            />
+            /> */}
           </View>
         </View>
         {/* </View> */}

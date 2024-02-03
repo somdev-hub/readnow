@@ -94,7 +94,7 @@ const PeopleCard = ({
               handleFollowFunc();
             }}
             style={{
-              borderColor: "#6C3428",
+              borderColor: "#00A9FF",
               //   borderWidth: followed ? 0 : 1,
               borderWidth: 1,
               marginHorizontal: 5,
@@ -102,13 +102,13 @@ const PeopleCard = ({
               borderRadius: 30,
               marginTop: 10,
               width: 80,
-              backgroundColor: followed ? "#6C3428" : "white"
+              backgroundColor: followed ? "#00A9FF" : "white"
             }}
           >
             <Text
               style={{
                 fontSize: 12,
-                color: followed ? "white" : "#6C3428",
+                color: followed ? "white" : "#00A9FF",
                 textAlign: "center"
               }}
             >
@@ -128,7 +128,7 @@ const PeopleCard = ({
           >
             {header}
           </Text>
-          <Text style={{ color: "#49755D" }}>{tags}</Text>
+          <Text style={{ color: "#00A9FF" }}>{tags}</Text>
         </View>
       </View>
     </Pressable>

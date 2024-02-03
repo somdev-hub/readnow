@@ -222,6 +222,28 @@ const getShortProfileInfoController = async (req, res) => {
   }
 };
 
+const getCardProfileInfoController = async (req, res) => {
+  try {
+    const { email } = req.params;
+    console.log(email);
+    const users = await User.findOne({ email });
+    const shortData = {
+      name: users.name,
+      email: users.email,
+      profilePicture: users.profilePicture,
+      header: users.header,
+      backgroundPicture: users.backgroundPicture,
+      tags: users.tags,
+      followers: users.followers
+    };
+
+    res.status(200).json({ data: shortData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 const handleFollowController = async (req, res) => {
   const { email, followerEmail } = req.body;
   try {
@@ -294,5 +316,6 @@ module.exports = {
   getProfileController,
   getShortProfileInfoController,
   handleFollowController,
-  getProfileGroups
+  getProfileGroups,
+  getCardProfileInfoController
 };

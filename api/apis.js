@@ -253,6 +253,17 @@ export const getPeople = async () => {
   }
 };
 
+export const getCardProfile = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/profile/get-card-profile-info/${email}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const handleFollow = async (email, followerEmail) => {
   try {
     const response = await axios.post(`${ADDRESS}/profile/follow`, {
@@ -441,4 +452,37 @@ export const commentGroupPost = async (postId, userId, comment) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
+
+export const createEvent = async (data) => {
+  const formData = new FormData();
+  formData.append("eventCover", {
+    uri: data.eventCover,
+    name: "eventCover.jpg",
+    type: "image/jpg"
+  });
+  formData.append("eventOrganizer", data.eventOrganizer);
+  formData.append("eventName", data.eventName);
+  formData.append("eventMode", data.eventMode);
+  formData.append("eventDateAndTime", data.eventDateAndTime.toISOString());
+  formData.append("eventSpeakers", data.eventSpeakers);
+  formData.append("eventDescription", data.eventDescription);
+  console.log("====================================");
+  console.log(formData);
+  console.log("====================================");
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/event/create-event`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    console.log(response.data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

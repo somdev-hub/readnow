@@ -39,7 +39,7 @@ const RadioButtonOption = ({ value, currentMode, setMode }) => (
 const CreateEvent = () => {
   // const [visibleSnackbar, setVisibleSnackbar] = useState(false);
   const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
-  console.log(visibleSnackbar);
+  // console.log(visibleSnackbar);
   const [open, setOpen] = useState(false);
   const [speaker, setSpeaker] = useState("");
   const dispatch = useDispatch();
@@ -318,7 +318,7 @@ const CreateEvent = () => {
               value={speaker}
               onChangeText={(text) => setSpeaker(text)}
               onSubmitEditing={() => {
-                console.log(speaker);
+                // console.log(speaker);
                 setEventCreationData({
                   ...eventCreationData,
                   eventSpeakers: [...eventCreationData.eventSpeakers, speaker]
@@ -407,13 +407,6 @@ const CreateEvent = () => {
       <Snackbar
         visible={visibleSnackbar}
         onDismiss={() => {}}
-        // onDismiss={() => {
-        //   dispatch({
-        //     type: "event/eventSnackbar",
-        //     payload: false
-        //   });
-        // }}
-        // style={{ position: "absolute", bottom: 60 }}
         action={{
           label: "Done",
           onPress: () => {
@@ -421,7 +414,9 @@ const CreateEvent = () => {
               type: "event/updateSnackbarVisibility",
               payload: false
             });
-            navigator.navigate("AdminEventPage");
+            navigator.navigate("AdminEventPage", {
+              eventData: eventCreationData
+            });
           }
         }}
       >

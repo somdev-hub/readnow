@@ -40,6 +40,7 @@ const authRouter = require("./routes/authRoute");
 const bookmarkRouter = require("./routes/bookmarkRoute");
 const peopleRouter = require("./routes/peopleRoute");
 const groupRouter = require("./routes/groupRoute");
+const eventRouter = require("./routes/eventRoute");
 
 // initialize express
 const app = express();
@@ -70,6 +71,7 @@ app.use("/auth", authRouter);
 app.use("/bookmark", bookmarkRouter);
 app.use("/people", peopleRouter);
 app.use("/group", groupRouter);
+app.use("/event", eventRouter);
 
 // start the server
 const port = process.env.PORT || 3500;

@@ -48,7 +48,6 @@ const StackNavigator = () => {
   const postData = useSelector((state) => state.post.postData);
   const bookmarkSelector = useSelector((state) => state.bookmark);
   const groupData = useSelector((state) => state.group.groupData);
-  const groupGenres = useSelector((state) => state.group.groupGenres);
   const postVisibilityModal = useSelector(
     (state) => state.post.selectVisibility
   );
@@ -107,7 +106,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
+      initialRouteName="AdminEventPage"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -354,12 +353,13 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    dispatch(postEventData(eventData));
-                    dispatch({
-                      type: "event/updateSnackbarVisibility",
-                      payload: true
-                    });
-                    console.log(visibleSnackbar);
+                    const res=dispatch(postEventData(eventData));
+                    console.log(res);
+                    // dispatch({
+                    //   type: "event/updateSnackbarVisibility",
+                    //   payload: true
+                    // });
+                    // console.log(visibleSnackbar);
                   }}
                 >
                   <Text

@@ -25,7 +25,8 @@ const {
   getProfileController,
   getShortProfileInfoController,
   handleFollowController,
-  getProfileGroups
+  getProfileGroups,
+  getCardProfileInfoController
 } = require("../controllers/profileController");
 
 // multer is used for uploading files
@@ -59,5 +60,7 @@ router.post("/get-short-profile-info", getShortProfileInfoController);
 router.post("/follow", handleFollowController);
 
 router.get("/get-profile-groups/:email", getProfileGroups);
+
+router.get("/get-card-profile-info/:email", getCardProfileInfoController);
 
 module.exports = router;

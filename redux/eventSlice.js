@@ -1,12 +1,15 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
+import { createEvent } from "../api/apis";
 
 export const postEventData = createAsyncThunk(
   "event/postEventData",
   async (eventData) => {
-    // const response = await createEvent(eventData);
-    // return response;
-    console.log(eventData);
+    const response = await createEvent(eventData);
+    // console.log(response.status);
+
+    return response.status;
+    // console.log(eventData);
   }
 );
 
@@ -41,6 +44,14 @@ const eventSlice = createSlice({
     updateSnackbarVisibility: (state, action) => {
       state.eventSnackbar = action.payload;
     }
+  },
+  extraReducers: (builder) => {
+    builder.addCase(postEventData.fulfilled, (state, action) => {
+      if (action.payload === 200) {
+        // console.log("extra reducers fulfilled");
+        state.eventSnackbar = true;
+      }
+    });
   }
 });
 
