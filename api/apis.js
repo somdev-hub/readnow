@@ -465,7 +465,7 @@ export const createEvent = async (data) => {
   formData.append("eventName", data.eventName);
   formData.append("eventMode", data.eventMode);
   formData.append("eventDateAndTime", data.eventDateAndTime.toISOString());
-  formData.append("eventSpeakers", data.eventSpeakers);
+  formData.append("eventSpeakers", JSON.stringify(data.eventSpeakers));
   formData.append("eventDescription", data.eventDescription);
   console.log("====================================");
   console.log(formData);
@@ -482,6 +482,41 @@ export const createEvent = async (data) => {
     );
     console.log(response.data);
     return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addEventMedia = async (eventMedia, eventId) => {
+  const formData = new FormData();
+  formData.append("eventMedia", {
+    uri: eventMedia,
+    name: "eventMedia.mp4",
+    type: "video/mp4"
+  });
+  formData.append("eventId", eventId);
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/event/upload-media`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getSpecificEvent = async (eventId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/event/get-specific-event/${eventId}`
+    );
+    return response.data;
   } catch (error) {
     console.log(error);
   }

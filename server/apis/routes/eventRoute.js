@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
-const { createEventController } = require("../controllers/eventController");
+const {
+  createEventController,
+  uploadEventMediaController,
+  getSpecificEventController,
+  getAllEventsShortInfoController
+} = require("../controllers/eventController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
 
@@ -10,5 +15,15 @@ router.post(
   uploadMiddleware.single("eventCover"),
   createEventController
 );
+
+router.post(
+  "/upload-media",
+  uploadMiddleware.single("eventMedia"),
+  uploadEventMediaController
+);
+
+router.get("/get-specific-event/:eventId", getSpecificEventController);
+
+router.get("/get-all-short-event-info", getAllEventsShortInfoController);
 
 module.exports = router;

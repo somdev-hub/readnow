@@ -106,7 +106,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="AdminEventPage"
+      initialRouteName="HomeScreen"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />

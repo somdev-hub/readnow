@@ -18,7 +18,12 @@ import { Video, ResizeMode } from "expo-av";
 // import { Audio } from 'expo-av';
 import { useDispatch, useSelector } from "react-redux";
 import { useRoute } from "@react-navigation/native";
-import { getCardProfile, getShortProfileInfo } from "../api/apis";
+import {
+  addEventMedia,
+  getCardProfile,
+  getShortProfileInfo,
+  getSpecificEvent
+} from "../api/apis";
 
 const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
@@ -28,9 +33,11 @@ const AdminEventPage = () => {
   const [eventMedia, setEventMedia] = React.useState(null);
   const dispatch = useDispatch();
   const route = useRoute();
-  const eventData = route.params.eventData;
+  // const eventData = route.params.eventData;
   const [eventSpeakersData, setEventSpeakersData] = useState([]);
   const [eventOrganizerData, setEventOrganizerData] = useState({});
+  const currentEventId = useSelector((state) => state.event.currentEventId);
+  const [eventData, setEventData] = useState({});
 
   const handleSheetChanges = React.useCallback((index) => {
     console.log("handleSheetChanges", index);
@@ -49,10 +56,22 @@ const AdminEventPage = () => {
         type: "event/updateEventMedia",
         payload: result.assets[0].uri
       });
+      const response = await addEventMedia(
+        result.assets[0].uri,
+        currentEventId
+      );
+      console.log(response);
     }
   };
 
   useEffect(() => {
+    const fetchEventData = async () => {
+      const eventInfo = await getSpecificEvent(currentEventId);
+      setEventData({
+        ...eventInfo.data.attributes,
+        eventDateAndTime: new Date(eventInfo.data.attributes.eventDateAndTime)
+      });
+    };
     const fetchOrganizerData = async () => {
       const organizerData = await getShortProfileInfo(
         eventData.eventOrganizer.toLowerCase()
@@ -61,19 +80,21 @@ const AdminEventPage = () => {
     };
     const fetchSpeakersData = async () => {
       const speakerData = await Promise.all(
-        eventData.eventSpeakers.map(async (speaker) => {
+        eventData?.eventSpeakers?.map(async (speaker) => {
           const speakerInfo = await getCardProfile(speaker.toLowerCase());
           return speakerInfo;
         })
       );
       setEventSpeakersData(speakerData);
     };
+    fetchEventData();
     fetchOrganizerData();
     fetchSpeakersData();
   }, []);
 
   console.log(eventData.eventSpeakers);
   console.log(eventSpeakersData);
+  console.log(eventData.eventDateAndTime);
 
   return (
     <View>
@@ -158,7 +179,7 @@ const AdminEventPage = () => {
               fontWeight: "500"
             }}
           >
-            {eventData.eventName}
+            {eventData?.eventName}
           </Text>
           <Text
             style={{
@@ -167,7 +188,7 @@ const AdminEventPage = () => {
               marginTop: 5
             }}
           >
-            Event organized by {eventData.eventOrganizer}
+            Event organized by {eventData?.eventOrganizer}
           </Text>
           <View
             style={{
@@ -184,13 +205,13 @@ const AdminEventPage = () => {
                 marginLeft: 5
               }}
             >
-              {eventData.eventDateAndTime.toLocaleTimeString([], {
+              {eventData?.eventDateAndTime.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true
               }) +
                 " " +
-                eventData.eventDateAndTime.toDateString()}
+                eventData?.eventDateAndTime.toDateString()}
             </Text>
           </View>
           <View
@@ -226,7 +247,7 @@ const AdminEventPage = () => {
                 marginLeft: 5
               }}
             >
-              Event mode - {eventData.eventMode}
+              Event mode - {eventData?.eventMode}
             </Text>
           </View>
           <View
@@ -295,7 +316,7 @@ const AdminEventPage = () => {
           >
             About
           </Text>
-          <Text style={{ marginTop: 10 }}>{eventData.eventDescription}</Text>
+          <Text style={{ marginTop: 10 }}>{eventData?.eventDescription}</Text>
           <TouchableOpacity>
             <Text
               style={{

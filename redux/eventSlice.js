@@ -8,7 +8,7 @@ export const postEventData = createAsyncThunk(
     const response = await createEvent(eventData);
     // console.log(response.status);
 
-    return response.status;
+    return response;
     // console.log(eventData);
   }
 );
@@ -26,7 +26,8 @@ const eventSlice = createSlice({
       eventCover: null,
       eventMedia: null
     },
-    eventSnackbar: false
+    eventSnackbar: false,
+    currentEventId: null
   },
   reducers: {
     updateEventData: (state, action) => {
@@ -47,9 +48,10 @@ const eventSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(postEventData.fulfilled, (state, action) => {
-      if (action.payload === 200) {
+      if (action.payload.status === 200) {
         // console.log("extra reducers fulfilled");
         state.eventSnackbar = true;
+        state.currentEventId = action.payload.data.id;
       }
     });
   }

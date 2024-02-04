@@ -39,14 +39,14 @@ const createEventController = async (req, res) => {
         eventOrganizer,
         eventName,
         eventMode,
-        eventDataAndTime: new Date(eventDateAndTime).toISOString(),
-        eventSpeakers,
+        eventDateAndTime: new Date(eventDateAndTime).toISOString(),
+        eventSpeakers: JSON.parse(eventSpeakers),
         eventDescription,
         eventCover: imageResponse.data[0].id
       }
     };
 
-    await axios.post(
+    const response = await axios.post(
       `${process.env.STRAPI_API}/api/events`,
       JSON.stringify(data),
       {
@@ -55,13 +55,105 @@ const createEventController = async (req, res) => {
         }
       }
     );
-    return res.status(200).send("event added");
+
+    console.log(response.data.data.id);
+
+    // Check if the response includes the created entry's details
+    if (response.data && response.data.data.id) {
+      return res
+        .status(200)
+        .send({ message: "event added", id: response.data.data.id });
+    } else {
+      return res.status(400).send("Error: event not added");
+    }
   } catch (error) {
     console.log(error);
     res.status(500).send("An error occurred while adding the post");
   }
 };
 
+const uploadEventMediaController = async (req, res) => {
+  const { eventId } = req.body;
+  const media = req.file;
+  console.log(eventId);
+  const formData = new FormData();
+  formData.append("files", Buffer.from(media.buffer), {
+    filename: media.originalname,
+    contentType: media.mimetype
+  });
+
+  try {
+    // const data=await axios.get(`${process.env.STRAPI_API}/api/events/${eventId}`)
+    // console.log(data.data);
+    const mediaResponse = await axios.post(
+      `${process.env.STRAPI_API}/api/upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    const data = {
+      data: {
+        eventMedia: mediaResponse.data[0].id
+      }
+    };
+
+    await axios.put(
+      `${process.env.STRAPI_API}/api/events/${eventId}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return res.status(200).send("media added");
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while adding the media");
+  }
+};
+
+const getSpecificEventController = async (req, res) => {
+  const { eventId } = req.params;
+  try {
+    const data = await axios.get(
+      `${process.env.STRAPI_API}/api/events/${eventId}`
+    );
+    console.log(data.data);
+    return res.status(200).send(data.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("internal server error");
+  }
+};
+
+const getAllEventsShortInfoController = async (req, res) => {
+  try {
+    const data = await axios.get(`${process.env.STRAPI_API}/api/events`);
+    console.log(data.data.data);
+    // const eventInfo = {
+    //   id: data.data.data.id,
+    //   eventOrganizer: data.data.data.attributes.eventOrganizer,
+    //   eventName: data.data.data.attributes.eventName,
+    //   // eventMode: data.data.eventMode,
+    //   eventDateAndTime: data.data.data.attributes.eventDateAndTime,
+    //   // eventDescription: data.data.eventDescription,
+    //   eventCover: data.data.data.attributes.eventCover
+    // };
+    return res.status(200).send(data.data);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("internal server error");
+  }
+};
+
 module.exports = {
-  createEventController
+  createEventController,
+  uploadEventMediaController,
+  getSpecificEventController,
+  getAllEventsShortInfoController
 };
