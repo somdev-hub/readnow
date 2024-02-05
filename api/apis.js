@@ -521,3 +521,29 @@ export const getSpecificEvent = async (eventId) => {
     console.log(error);
   }
 };
+
+export const getAllEventShortInfo = async () => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/event/get-all-short-event-info`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const toggleEventAttendence = async (eventId, email) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/event/toggle-event-attendence`,
+      {
+        eventId,
+        email
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

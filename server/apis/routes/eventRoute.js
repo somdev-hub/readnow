@@ -5,7 +5,8 @@ const {
   createEventController,
   uploadEventMediaController,
   getSpecificEventController,
-  getAllEventsShortInfoController
+  getAllEventsShortInfoController,
+  toggleEventAttendenceController
 } = require("../controllers/eventController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -25,5 +26,7 @@ router.post(
 router.get("/get-specific-event/:eventId", getSpecificEventController);
 
 router.get("/get-all-short-event-info", getAllEventsShortInfoController);
+
+router.post("/toggle-event-attendence", toggleEventAttendenceController);
 
 module.exports = router;

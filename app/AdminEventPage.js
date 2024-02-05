@@ -69,7 +69,7 @@ const AdminEventPage = () => {
       const eventInfo = await getSpecificEvent(currentEventId);
       setEventData({
         ...eventInfo.data.attributes,
-        eventDateAndTime: new Date(eventInfo.data.attributes.eventDateAndTime)
+        eventDateAndTime: new Date(eventInfo?.data?.attributes?.eventDateAndTime)
       });
     };
     const fetchOrganizerData = async () => {
@@ -118,7 +118,8 @@ const AdminEventPage = () => {
               resizeMode={ResizeMode.CONTAIN}
               shouldPlay
               isLooping
-              style={{ width: 300, height: 300 }}
+              style={{  width: "100%",
+              height: 200, }}
             />
           )}
           <Pressable
@@ -205,13 +206,13 @@ const AdminEventPage = () => {
                 marginLeft: 5
               }}
             >
-              {eventData?.eventDateAndTime.toLocaleTimeString([], {
+              {eventData?.eventDateAndTime?.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
                 hour12: true
               }) +
                 " " +
-                eventData?.eventDateAndTime.toDateString()}
+                eventData?.eventDateAndTime?.toDateString()}
             </Text>
           </View>
           <View

@@ -42,7 +42,8 @@ const createEventController = async (req, res) => {
         eventDateAndTime: new Date(eventDateAndTime).toISOString(),
         eventSpeakers: JSON.parse(eventSpeakers),
         eventDescription,
-        eventCover: imageResponse.data[0].id
+        eventCover: imageResponse.data[0].id,
+        eventAttendees: []
       }
     };
 
@@ -121,10 +122,18 @@ const getSpecificEventController = async (req, res) => {
   const { eventId } = req.params;
   try {
     const data = await axios.get(
-      `${process.env.STRAPI_API}/api/events/${eventId}`
+      `${process.env.STRAPI_API}/api/events/${eventId}?populate=*`
     );
-    console.log(data.data);
-    return res.status(200).send(data.data);
+    // console.log(data.data);
+    const eventData = {
+      id: data.data.data.id,
+      ...data.data.data.attributes,
+      eventCover: `${process.env.STRAPI_API}${data.data.data.attributes.eventCover.data.attributes?.url}`,
+      eventMedia:
+        data.data.data.attributes.eventMedia?.data &&
+        `${process.env.STRAPI_API}${data.data.data.attributes.eventMedia?.data?.attributes?.url}`
+    };
+    return res.status(200).send(eventData);
   } catch (error) {
     console.log(error);
     return res.status(500).send("internal server error");
@@ -133,18 +142,65 @@ const getSpecificEventController = async (req, res) => {
 
 const getAllEventsShortInfoController = async (req, res) => {
   try {
-    const data = await axios.get(`${process.env.STRAPI_API}/api/events`);
-    console.log(data.data.data);
-    // const eventInfo = {
-    //   id: data.data.data.id,
-    //   eventOrganizer: data.data.data.attributes.eventOrganizer,
-    //   eventName: data.data.data.attributes.eventName,
-    //   // eventMode: data.data.eventMode,
-    //   eventDateAndTime: data.data.data.attributes.eventDateAndTime,
-    //   // eventDescription: data.data.eventDescription,
-    //   eventCover: data.data.data.attributes.eventCover
-    // };
-    return res.status(200).send(data.data);
+    const data = await axios.get(
+      `${process.env.STRAPI_API}/api/events?populate=*`
+    );
+    const eventInfoPromises = data.data.data.map(async (event) => {
+      return {
+        id: event.id,
+        eventOrganizer: event.attributes.eventOrganizer,
+        eventName: event.attributes.eventName,
+        eventDateAndTime: event.attributes.eventDateAndTime,
+        eventCover: `${process.env.STRAPI_API}${event.attributes.eventCover.data.attributes?.url}`
+      };
+    });
+
+    const eventInfo = await Promise.all(eventInfoPromises);
+
+    return res.status(200).send(eventInfo);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("internal server error");
+  }
+};
+
+const toggleEventAttendenceController = async (req, res) => {
+  const { eventId, email } = req.body;
+  try {
+    const getEventResponse = await axios.get(
+      `${process.env.STRAPI_API}/api/events/${eventId}`
+    );
+    const currentAttendees =
+      getEventResponse.data.data.attributes.eventAttendees || [];
+
+    let updatedAttendees;
+    if (currentAttendees.includes(email)) {
+      updatedAttendees = currentAttendees.filter(
+        (attendee) => attendee !== email
+      );
+      await axios.put(
+        `${process.env.STRAPI_API}/api/events/${eventId}`,
+        JSON.stringify({ data: { eventAttendees: updatedAttendees } }),
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      return res.status(200).send("attendee removed");
+    } else {
+      updatedAttendees = [...currentAttendees, email];
+      await axios.put(
+        `${process.env.STRAPI_API}/api/events/${eventId}`,
+        JSON.stringify({ data: { eventAttendees: updatedAttendees } }),
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      return res.status(200).send("attendee added");
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).send("internal server error");
@@ -155,5 +211,6 @@ module.exports = {
   createEventController,
   uploadEventMediaController,
   getSpecificEventController,
-  getAllEventsShortInfoController
+  getAllEventsShortInfoController,
+  toggleEventAttendenceController
 };

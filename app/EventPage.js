@@ -8,28 +8,82 @@ import {
   Pressable,
   TextInput
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import PeopleCard from "../components/PeopleCard";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useRoute } from "@react-navigation/native";
+import {
+  getCardProfile,
+  getShortProfileInfo,
+  getSpecificEvent,
+  toggleEventAttendence
+} from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;
   const bottomSheetRef = React.useRef(null);
+  const route = useRoute();
+  const { eventId } = route.params;
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
+  const [eventData, setEventData] = useState({});
+  const [attendingEvent, setAttendingEvent] = useState(false);
 
   const handleSheetChanges = React.useCallback((index) => {
     console.log("handleSheetChanges", index);
   }, []);
 
+  const handleEventAttendence = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await toggleEventAttendence(eventId, email);
+    if (response.data === "attendee added") {
+      setAttendingEvent(true);
+    } else if (response.data === "attendee removed") {
+      setAttendingEvent(false);
+    }
+    console.log(response.data);
+  };
+
+  useEffect(() => {
+    const getEventDetails = async () => {
+      const response = await getSpecificEvent(eventId);
+      console.log(response);
+      const eventOrganizer = await getShortProfileInfo(
+        response?.eventOrganizer.toLowerCase()
+      );
+
+      const speakerData = await Promise.all(
+        response?.eventSpeakers?.map(async (speaker) => {
+          const speakerInfo = await getCardProfile(speaker.toLowerCase());
+          return speakerInfo;
+        })
+      );
+
+      const email = await SecureStorage.getItemAsync("email");
+      const attending = response?.eventAttendees?.includes(email);
+      setAttendingEvent(attending);
+
+      const eventDataWithOrganizerAndSpeakers = {
+        ...response,
+        eventOrganizerName: eventOrganizer.data.name,
+        eventSpeakers: speakerData
+      };
+      console.log(response);
+      setEventData(eventDataWithOrganizerAndSpeakers);
+      // setEventData(response);
+    };
+    getEventDetails();
+  }, []);
+  // console.log(response);
   return (
     <View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ position: "relative" }}>
           <Image
             source={{
-              uri: "https://picsum.photos/200/300"
+              uri: eventData?.eventCover
             }}
             style={{
               width: "100%",
@@ -74,7 +128,7 @@ const EventPage = () => {
               //   }}>Workshop on plant healthcare and nutrition</Text>
             }}
           >
-            Workshop on plant healthcare and nutrition, acheiving the best
+            {eventData?.eventName}
           </Text>
           <Text
             style={{
@@ -83,7 +137,7 @@ const EventPage = () => {
               marginTop: 5
             }}
           >
-            Event organized by Dr. Pradeep Singh
+            Event organized by {eventData?.eventOrganizerName}
           </Text>
           <View
             style={{
@@ -100,7 +154,13 @@ const EventPage = () => {
                 marginLeft: 5
               }}
             >
-              21 Dec, 2020, Thursday, 4:00pm - 5:00pm
+              {new Date(eventData?.eventDateAndTime).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+              }) +
+                " " +
+                new Date(eventData?.eventDateAndTime).toDateString()}
             </Text>
           </View>
           <View
@@ -118,7 +178,7 @@ const EventPage = () => {
                 marginLeft: 5
               }}
             >
-              200 attendees
+              {eventData?.eventAttendees?.length} attendees
             </Text>
           </View>
           <View
@@ -136,7 +196,7 @@ const EventPage = () => {
                 marginLeft: 5
               }}
             >
-              Event mode - Video
+              Event mode - {eventData?.eventMode}
             </Text>
           </View>
           <View
@@ -148,6 +208,7 @@ const EventPage = () => {
             }}
           >
             <TouchableOpacity
+              onPress={handleEventAttendence}
               style={{
                 backgroundColor: "#00A9FF",
                 padding: 7,
@@ -156,7 +217,9 @@ const EventPage = () => {
                 // elevation: 3
               }}
             >
-              <Text style={{ color: "#fff", textAlign: "center" }}>Attend</Text>
+              <Text style={{ color: "#fff", textAlign: "center" }}>
+                {attendingEvent ? "Attending" : "Attend"}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
@@ -210,16 +273,7 @@ const EventPage = () => {
           >
             About
           </Text>
-          <Text style={{ marginTop: 10 }}>
-            Adipisicing reprehenderit esse consectetur quis nulla magna ipsum
-            veniam. Qui quis reprehenderit deserunt laboris ipsum. Incididunt
-            dolore in consectetur consequat incididunt veniam mollit ipsum
-            proident commodo eu deserunt sit ex. Tempor ad magna dolor et
-            laborum laboris reprehenderit. Dolore magna aliquip aute non non
-            proident anim. Sit est exercitation ea proident laboris ipsum. Id
-            nostrud cupidatat cupidatat adipisicing. Anim sint veniam in sint
-            anim officia.
-          </Text>
+          <Text style={{ marginTop: 10 }}>{eventData?.eventDescription}</Text>
           <TouchableOpacity>
             <Text
               style={{
@@ -252,24 +306,20 @@ const EventPage = () => {
             Speakers
           </Text>
           <View>
-            <PeopleCard
-              name="Dr. Pradeep Singh"
-              header="Professor, IIT Kanpur"
-              tags="#Plant Healthcare, #Nutrition, #Agriculture, #Plant Science"
-              followed={false}
-              image="https://edtech4beginnerscom.files.wordpress.com/2021/05/1.png"
-              background="https://hips.hearstapps.com/hmg-prod/images/indoor-plants-1-64f051a37d451.jpg"
-              userEmail="stevewings@gmail.com"
-            />
-            <PeopleCard
-              name="Dr. Sikha Sharma"
-              header="Biochemist, IISER, Pune"
-              tags="#Plant Healthcare, #Nutrition, #Agriculture, #Plant Science"
-              followed={false}
-              image="https://c.superprof.com/i/a/20975136/10127100/600/20220613124840/assistant-professor-lady-shri-ram-college-for-women-trained-teach-all-aspects-english-language.jpg"
-              background="https://i.cbc.ca/1.4839023.1537972363!/fileImage/httpImage/image.png_gen/derivatives/16x9_780/plants-ft.png"
-              userEmail="stevewings@gmail.com"
-            />
+            {eventData?.eventSpeakers?.map((speaker, index) => {
+              return (
+                <PeopleCard
+                  key={index}
+                  image={speaker?.profilePicture}
+                  background={speaker?.backgroundPicture}
+                  header={speaker?.header}
+                  name={speaker?.name}
+                  tags={speaker?.tags}
+                  userEmail={speaker?.email}
+                  followers={speaker?.followers}
+                />
+              );
+            })}
           </View>
         </View>
         {/* </View> */}

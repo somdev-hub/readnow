@@ -6,21 +6,59 @@ import {
   Image,
   Pressable
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { getAllEventShortInfo, getShortProfileInfo } from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
 
 const Events = () => {
   const navigator = useNavigation();
+  const [allEventsData, setAllEventsData] = useState([]);
+  const [yourEventsData, setYourEventsData] = useState([]);
+
+  const getAllEventsDetails = async () => {
+    const response = await getAllEventShortInfo();
+    console.log(response);
+
+    const eventsWithOrganizerNames = await Promise.all(
+      response.map(async (event) => {
+        const organizerProfile = await getShortProfileInfo(
+          event.eventOrganizer
+        );
+        return {
+          ...event,
+          eventOrganizerName: organizerProfile?.data?.name // assuming the name is stored under the 'name' property
+        };
+      })
+    );
+
+    setAllEventsData(eventsWithOrganizerNames);
+  };
+
+  const getEmail = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const yourEvents =
+      allEventsData?.filter((event) => event.eventOrganizer === email) || [];
+    setYourEventsData(yourEvents);
+  };
+
+  useEffect(() => {
+    getAllEventsDetails();
+  }, []);
+
+  useEffect(() => {
+    if (allEventsData) {
+      getEmail();
+    }
+  }, [allEventsData]);
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
         <TextInput
           style={{
             height: 40,
-            // borderColor: "gray",
             backgroundColor: "#E5E5E5",
-            // borderWidth: 1
-            // paddingHorizontal: 10,
             marginHorizontal: 10,
             marginVertical: 10,
             paddingHorizontal: 10,
@@ -57,6 +95,60 @@ const Events = () => {
             View all
           </Text>
         </View>
+        {yourEventsData?.map((event, i) => {
+          return (
+            <Pressable
+              onPress={() => navigator.navigate("EventPage")}
+              key={i}
+              style={{
+                marginHorizontal: 10,
+                gap: 10,
+                marginVertical: 8
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10
+                }}
+              >
+                <Image
+                  source={{
+                    uri: event?.eventCover
+                  }}
+                  style={{
+                    width: 100,
+                    height: 80,
+                    borderRadius: 10,
+                    resizeMode: "cover"
+                  }}
+                />
+
+                <View style={{ flex: 1 }}>
+                  <Text>
+                    {new Date(event?.eventDateAndTime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true
+                    }) +
+                      " " +
+                      new Date(event?.eventDateAndTime).toDateString()}
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 16,
+                      marginVertical: 3
+                    }}
+                  >
+                    {event?.eventName}
+                  </Text>
+                  <Text>{event?.eventOrganizerName}</Text>
+                </View>
+              </View>
+            </Pressable>
+          );
+        })}
         <View
           style={{
             flexDirection: "row",
@@ -86,10 +178,12 @@ const Events = () => {
             View all
           </Text>
         </View>
-        {Array.from({ length: 3 }).map((_, i) => {
+        {allEventsData?.map((event, i) => {
           return (
             <Pressable
-              onPress={() => navigator.navigate("EventPage")}
+              onPress={() =>
+                navigator.navigate("EventPage", { eventId: event.id })
+              }
               key={i}
               style={{
                 marginHorizontal: 10,
@@ -105,7 +199,7 @@ const Events = () => {
               >
                 <Image
                   source={{
-                    uri: "https://picsum.photos/200/300"
+                    uri: event?.eventCover
                   }}
                   style={{
                     width: 100,
@@ -116,7 +210,15 @@ const Events = () => {
                 />
 
                 <View style={{ flex: 1 }}>
-                  <Text>Thu, 21 Dec, 23, 4:00pm</Text>
+                  <Text>
+                    {new Date(event?.eventDateAndTime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true
+                    }) +
+                      " " +
+                      new Date(event?.eventDateAndTime).toDateString()}
+                  </Text>
                   <Text
                     style={{
                       fontWeight: "bold",
@@ -124,9 +226,9 @@ const Events = () => {
                       marginVertical: 3
                     }}
                   >
-                    Workshop on plant healthcare and nutrition
+                    {event?.eventName}
                   </Text>
-                  <Text>Dr. Pradeep Singh</Text>
+                  <Text>{event?.eventOrganizerName}</Text>
                 </View>
               </View>
             </Pressable>
