@@ -21,15 +21,20 @@ import {
   toggleEventAttendence
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
+import { Video, ResizeMode } from "expo-av";
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;
+  const width = Dimensions.get("window").width;
   const bottomSheetRef = React.useRef(null);
   const route = useRoute();
   const { eventId } = route.params;
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const [eventData, setEventData] = useState({});
   const [attendingEvent, setAttendingEvent] = useState(false);
+  const [numberofDaysLeft, setNumberofDaysLeft] = useState(0);
+  const [playEventMedia, setPlayEventMedia] = useState(false);
+  const videoControl = React.useRef(null);
 
   const handleSheetChanges = React.useCallback((index) => {
     console.log("handleSheetChanges", index);
@@ -65,6 +70,14 @@ const EventPage = () => {
       const attending = response?.eventAttendees?.includes(email);
       setAttendingEvent(attending);
 
+      setNumberofDaysLeft(
+        Math.floor(
+          (new Date(response?.eventDateAndTime).getTime() -
+            new Date().getTime()) /
+            (1000 * 60 * 60 * 24)
+        )
+      );
+
       const eventDataWithOrganizerAndSpeakers = {
         ...response,
         eventOrganizerName: eventOrganizer.data.name,
@@ -81,37 +94,92 @@ const EventPage = () => {
     <View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ position: "relative" }}>
-          <Image
-            source={{
-              uri: eventData?.eventCover
-            }}
-            style={{
-              width: "100%",
-              height: 200,
-              resizeMode: "cover"
-            }}
-          />
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 1,
-              position: "absolute",
-              top: 10,
-              left: 10,
-              alignItems: "center"
-            }}
-          >
-            <Entypo name="dot-single" size={30} color="red" />
-            <Text
+          {eventData?.eventMedia && playEventMedia ? (
+            <Video
+              ref={videoControl}
+              source={{ uri: eventData?.eventMedia }}
+              rate={1.0}
+              volume={1.0}
+              isMuted={false}
+              resizeMode={ResizeMode.CONTAIN}
+              shouldPlay={playEventMedia}
+              // shouldPlay
+              useNativeControls
               style={{
-                color: "#fff",
-                fontSize: 16,
-                fontWeight: "bold"
+                width: "100%",
+                height: 200
+                // resizeMode: "cover"
               }}
-            >
-              Live tomorrow
-            </Text>
-          </View>
+              onError={(e) => console.log(e)}
+            />
+          ) : (
+            <>
+              <Image
+                source={{
+                  uri: eventData?.eventCover
+                }}
+                style={{
+                  width: "100%",
+                  height: 200,
+                  resizeMode: "cover"
+                }}
+              />
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 1,
+                  position: "absolute",
+                  top: 10,
+                  left: 10,
+                  alignItems: "center"
+                }}
+              >
+                <Entypo name="dot-single" size={30} color="red" />
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontSize: 16,
+                    fontWeight: "bold"
+                  }}
+                >
+                  Live{" "}
+                  {numberofDaysLeft > 0
+                    ? numberofDaysLeft === 1
+                      ? "tomorrow"
+                      : `in ${numberofDaysLeft} days`
+                    : "now"}
+                </Text>
+              </View>
+              <Pressable
+                onPress={() => {
+                  setPlayEventMedia(true);
+                  // videoControl.current.playAsync();
+                }}
+                style={{
+                  position: "absolute",
+                  top: "40%",
+                  left: "40%",
+                  // marginHorizontal:"auto",
+                  // transform: [{ translateX: -50 }, { translateY: -50 }],
+                  backgroundColor: "#eeeeee",
+                  opacity: 0.7,
+                  padding: 10,
+                  borderRadius: 50,
+                  paddingHorizontal: 20
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#000",
+                    fontSize: 16,
+                    fontWeight: "bold"
+                  }}
+                >
+                  Play
+                </Text>
+              </Pressable>
+            </>
+          )}
         </View>
         <View
           style={{
