@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "group_posts",
+  "info": {
+    "singularName": "group-post",
+    "pluralName": "group-posts",
+    "displayName": "GroupPost"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "description": {
+      "type": "text"
+    },
+    "postedOn": {
+      "type": "datetime"
+    },
+    "image": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "likedBy": {
+      "type": "json"
+    },
+    "comments": {
+      "type": "json"
+    },
+    "postedBy": {
+      "type": "email"
+    },
+    "group": {
+      "type": "string"
+    }
+  }
+}
