@@ -794,11 +794,20 @@ export interface ApiEventEvent extends Schema.CollectionType {
     singularName: 'event';
     pluralName: 'events';
     displayName: 'Events';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
+    eventOrganizer: Attribute.Email;
+    eventName: Attribute.String;
+    eventMode: Attribute.Enumeration<['video', 'audio', 'hybrid']>;
+    eventDateAndTime: Attribute.DateTime;
+    eventSpeakers: Attribute.JSON;
+    eventDescription: Attribute.Text;
+    eventCover: Attribute.Media;
+    eventAttendees: Attribute.JSON;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

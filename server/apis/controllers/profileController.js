@@ -169,7 +169,7 @@ const getProfileController = async (req, res) => {
     const response = await axios.get(
       `${process.env.STRAPI_API}/api/posts?filters[postedBy][$eq]=${email}&populate=*`
     );
-    const posts = response.data.data.reverse().map((post) => {
+    const posts = response?.data?.data?.reverse().map((post) => {
       return {
         ...post.attributes,
         id: post.id,

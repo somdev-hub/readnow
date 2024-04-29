@@ -4,11 +4,49 @@
   "info": {
     "singularName": "event",
     "pluralName": "events",
-    "displayName": "Events"
+    "displayName": "Events",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
   "pluginOptions": {},
-  "attributes": {}
+  "attributes": {
+    "eventOrganizer": {
+      "type": "email"
+    },
+    "eventName": {
+      "type": "string"
+    },
+    "eventMode": {
+      "type": "enumeration",
+      "enum": [
+        "video",
+        "audio",
+        "hybrid"
+      ]
+    },
+    "eventDateAndTime": {
+      "type": "datetime"
+    },
+    "eventSpeakers": {
+      "type": "json"
+    },
+    "eventDescription": {
+      "type": "text"
+    },
+    "eventCover": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "eventAttendees": {
+      "type": "json"
+    }
+  }
 }
