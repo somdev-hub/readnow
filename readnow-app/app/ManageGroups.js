@@ -9,6 +9,7 @@ import {
 import React, { useEffect, useState } from "react";
 import * as SecureStorage from "expo-secure-store";
 import { getManagedGroups } from "../api/apis";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const ManageGroups = () => {
   const [managedGroups, setManagedGroups] = useState([]);
@@ -112,7 +113,7 @@ const ManageGroups = () => {
                       </Text>
                       {item.groupTags.map((item, index) => {
                         return (
-                          <Text style={{ color: "#00A9FF" }} key={index}>
+                          <Text style={{ color: PRIMARY_COLOR }} key={index}>
                             {item}
                           </Text>
                         );

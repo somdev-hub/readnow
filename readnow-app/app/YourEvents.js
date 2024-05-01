@@ -12,9 +12,10 @@ import { getAllEventShortInfo, getShortProfileInfo } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { PRIMARY_COLOR } from "../styles/colors";
 
-const Events = () => {
+const YourEvents = () => {
   const navigator = useNavigation();
   const [allEventsData, setAllEventsData] = useState([]);
+  const [yourEventsData, setYourEventsData] = useState([]);
 
   const getAllEventsDetails = async () => {
     const response = await getAllEventShortInfo();
@@ -35,23 +36,22 @@ const Events = () => {
     setAllEventsData(eventsWithOrganizerNames);
   };
 
-  // const getEmail = async () => {
-  //   const email = await SecureStorage.getItemAsync("email");
-  //   const yourEvents =
-  //     allEventsData?.filter((event) => event.eventOrganizer === email) || [];
-  //   setYourEventsData(yourEvents);
-  // };
+  const getEmail = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const yourEvents =
+      allEventsData?.filter((event) => event.eventOrganizer === email) || [];
+    setYourEventsData(yourEvents);
+  };
 
   useEffect(() => {
     getAllEventsDetails();
   }, []);
 
-  // useEffect(() => {
-  //   if (allEventsData) {
-  //     getEmail();
-  //   }
-  // }, [allEventsData]);
-
+  useEffect(() => {
+    if (allEventsData) {
+      getEmail();
+    }
+  }, [allEventsData]);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -66,14 +66,13 @@ const Events = () => {
           }}
           placeholder="Search Events"
         />
-
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             marginHorizontal: 10,
-            marginVertical: 20
+            marginVertical: 10
           }}
         >
           <Text
@@ -83,7 +82,7 @@ const Events = () => {
               // }}>Upcoming events</Text>
             }}
           >
-            Top events
+            Your events
           </Text>
           <Text
             style={{
@@ -96,12 +95,10 @@ const Events = () => {
             View all
           </Text>
         </View>
-        {allEventsData?.map((event, i) => {
+        {yourEventsData?.map((event, i) => {
           return (
             <Pressable
-              onPress={() =>
-                navigator.navigate("EventPage", { eventId: event.id })
-              }
+              onPress={() => navigator.navigate("EventPage")}
               key={i}
               style={{
                 marginHorizontal: 10,
@@ -157,4 +154,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default YourEvents;

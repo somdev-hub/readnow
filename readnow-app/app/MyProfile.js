@@ -23,6 +23,7 @@ import {
 import * as SecureStorage from "expo-secure-store";
 import PostCard from "../components/PostCard";
 import { Snackbar } from "react-native-paper";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const MyProfile = () => {
   const navigator = useNavigation();
@@ -157,7 +158,7 @@ const MyProfile = () => {
                 onPress={() => selectImage(setProfilePicture, "profile")}
                 style={{ position: "absolute", bottom: 10, left: 75 }}
               >
-                <AntDesign name="pluscircle" size={24} color="#00A9FF" />
+                <AntDesign name="pluscircle" size={24} color={PRIMARY_COLOR} />
               </Pressable>
             </View>
           </View>
@@ -179,7 +180,7 @@ const MyProfile = () => {
                 {/* {userData?.tags.map((item, index) => {
                   return (
                     <Text
-                      style={{ marginTop: 10, color: "#00A9FF" }}
+                      style={{ marginTop: 10, color: PRIMARY_COLOR }}
                       key={index}
                     >
                       {item + " "}
@@ -208,7 +209,7 @@ const MyProfile = () => {
             <TouchableOpacity
               onPress={() => navigator.navigate("Add Post")}
               style={{
-                backgroundColor: "#00A9FF",
+                backgroundColor: PRIMARY_COLOR,
                 marginHorizontal: 20,
                 padding: 10,
                 borderRadius: 30,
@@ -263,10 +264,10 @@ const MyProfile = () => {
                 width: "auto",
                 marginRight: 10,
                 borderRadius: 50,
-                borderColor: "#00A9FF"
+                borderColor: PRIMARY_COLOR
               }}
             >
-              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
+              <Text style={{ color: PRIMARY_COLOR, textAlign: "center" }}>
                 Posts
               </Text>
             </View>
@@ -279,10 +280,10 @@ const MyProfile = () => {
                 width: "auto",
                 borderRadius: 50,
                 marginRight: 10,
-                borderColor: "#00A9FF"
+                borderColor: PRIMARY_COLOR
               }}
             >
-              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
+              <Text style={{ color: PRIMARY_COLOR, textAlign: "center" }}>
                 Videos
               </Text>
             </View>
@@ -294,10 +295,10 @@ const MyProfile = () => {
                 // flex:1,
                 width: "auto",
                 borderRadius: 50,
-                borderColor: "#00A9FF"
+                borderColor: PRIMARY_COLOR
               }}
             >
-              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
+              <Text style={{ color: PRIMARY_COLOR, textAlign: "center" }}>
                 Videos
               </Text>
             </View>

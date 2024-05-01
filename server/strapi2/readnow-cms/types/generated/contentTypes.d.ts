@@ -808,6 +808,7 @@ export interface ApiEventEvent extends Schema.CollectionType {
     eventDescription: Attribute.Text;
     eventCover: Attribute.Media;
     eventAttendees: Attribute.JSON;
+    eventMedia: Attribute.Media;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

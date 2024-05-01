@@ -187,7 +187,7 @@ const CreateEvent = () => {
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="Organizer name"
+              placeholder="Your event name"
             />
           </View>
           <View
@@ -331,7 +331,7 @@ const CreateEvent = () => {
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="speakers email"
+              placeholder="Enter email then press done"
             />
             {eventCreationData.eventSpeakers.map((speaker, index) => {
               return (

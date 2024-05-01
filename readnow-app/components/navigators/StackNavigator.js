@@ -38,6 +38,8 @@ import { AntDesign } from "@expo/vector-icons";
 import CreateEvent from "../../app/CreateEvent";
 import AdminEventPage from "../../app/AdminEventPage";
 import { postEventData } from "../../redux/eventSlice";
+import { PRIMARY_COLOR } from "../../styles/colors";
+import EventTopNavigator from "./EventTopNavigator";
 
 const Stack = createStackNavigator();
 
@@ -106,7 +108,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
+      initialRouteName="Events"
     >
       <Stack.Screen name="HomeScreen" component={TabNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -177,7 +179,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#00A9FF"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     Create
@@ -213,7 +215,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#00A9FF"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     Done
@@ -241,7 +243,7 @@ const StackNavigator = () => {
       />
       <Stack.Screen
         name="Events"
-        component={Events}
+        component={EventTopNavigator}
         options={{
           headerShown: true,
           headerTitle: () => {
@@ -264,7 +266,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#00A9FF"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     Create
@@ -354,7 +356,7 @@ const StackNavigator = () => {
                 <TouchableOpacity
                   onPress={() => {
                     const res=dispatch(postEventData(eventData));
-                    console.log(res);
+                    // console.log(res);
                     // dispatch({
                     //   type: "event/updateSnackbarVisibility",
                     //   payload: true
@@ -366,7 +368,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#00A9FF"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     Done
@@ -407,7 +409,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#00A9FF"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     Create
@@ -448,7 +450,7 @@ const StackNavigator = () => {
                       width: 40,
                       height: 40,
                       borderRadius: 20,
-                      borderColor: "#00A9FF",
+                      borderColor: PRIMARY_COLOR,
                       resizeMode: "cover"
                     }}
                   />
@@ -495,7 +497,7 @@ const StackNavigator = () => {
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: "#00A9FF"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     Post

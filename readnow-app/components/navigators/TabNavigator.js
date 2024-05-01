@@ -10,6 +10,7 @@ import DrawerNavigator from "./DrawerNavigator";
 import People from "../../app/People";
 import Bookmarks from "../../app/Bookmarks";
 import Profile from "../../app/Profile";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +19,7 @@ const TabNavigator = () => {
     activeButton: {
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: "#00A9FF",
+      backgroundColor: PRIMARY_COLOR,
       flexDirection: "row",
       gap: 3,
       borderRadius: 50,
@@ -29,7 +30,7 @@ const TabNavigator = () => {
     headerShown: false,
     tabBarShowLabel: false,
     tabBarStyle: {
-      backgroundColor: "#fff",
+      backgroundColor: WHITE_COLOR,
       borderTopColor: "#eeeeee",
       borderTopWidth: 2,
       paddingVertical: 5,
@@ -80,10 +81,10 @@ const TabNavigator = () => {
               options={{
                 headerShown: item.name === "Home" ? false : true,
                 headerStyle: {
-                  backgroundColor: "#00A9FF",
+                  backgroundColor: PRIMARY_COLOR,
                   elevation: 10
                 },
-                headerTintColor: "#fff",
+                headerTintColor: WHITE_COLOR,
                 tabBarIcon: ({ focused }) => (
                   <View
                     style={
@@ -95,12 +96,12 @@ const TabNavigator = () => {
                     <Feather
                       name={item.icon}
                       size={focused ? 18 : 24}
-                      color={focused ? "#fff" : "#A9A9A9"}
+                      color={focused ? WHITE_COLOR : "#A9A9A9"}
                     />
                     {focused && (
                       <Text
                         style={{
-                          color: "#fff",
+                          color: WHITE_COLOR,
                           fontSize: 12,
                           fontWeight: "500"
                         }}

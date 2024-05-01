@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { handleFollow } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const PeopleCard = ({
   image,
@@ -94,7 +95,7 @@ const PeopleCard = ({
               handleFollowFunc();
             }}
             style={{
-              borderColor: "#00A9FF",
+              borderColor: PRIMARY_COLOR,
               //   borderWidth: followed ? 0 : 1,
               borderWidth: 1,
               marginHorizontal: 5,
@@ -102,13 +103,13 @@ const PeopleCard = ({
               borderRadius: 30,
               marginTop: 10,
               width: 80,
-              backgroundColor: followed ? "#00A9FF" : "white"
+              backgroundColor: followed ? PRIMARY_COLOR : "white"
             }}
           >
             <Text
               style={{
                 fontSize: 12,
-                color: followed ? "white" : "#00A9FF",
+                color: followed ? "white" : PRIMARY_COLOR,
                 textAlign: "center"
               }}
             >
@@ -128,7 +129,7 @@ const PeopleCard = ({
           >
             {header}
           </Text>
-          <Text style={{ color: "#00A9FF" }}>{tags}</Text>
+          <Text style={{ color: PRIMARY_COLOR }}>{tags}</Text>
         </View>
       </View>
     </Pressable>

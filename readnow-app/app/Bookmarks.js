@@ -15,6 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import PostCard from "../components/PostCard";
 import NewsCard from "../components/NewsCard";
 import { Chip } from "react-native-paper";
+import { WHITE_COLOR } from "../styles/colors";
 
 const Bookmarks = () => {
   const [newsBookmarks, setNewsBookmarks] = useState([]);
@@ -127,7 +128,7 @@ const Bookmarks = () => {
           alignItems: "center",
           paddingVertical: 10,
           gap: 10,
-          backgroundColor: "#fff",
+          backgroundColor: WHITE_COLOR,
           elevation: 1
         }}
       >

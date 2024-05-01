@@ -24,6 +24,7 @@ import {
   getShortProfileInfo,
   getSpecificEvent
 } from "../api/apis";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 
 const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
@@ -67,9 +68,10 @@ const AdminEventPage = () => {
   useEffect(() => {
     const fetchEventData = async () => {
       const eventInfo = await getSpecificEvent(currentEventId);
+      console.log(eventInfo);
       setEventData({
-        ...eventInfo.data.attributes,
-        eventDateAndTime: new Date(eventInfo?.data?.attributes?.eventDateAndTime)
+        ...eventInfo,
+        eventDateAndTime: new Date(eventInfo?.eventDateAndTime)
       });
     };
     const fetchOrganizerData = async () => {
@@ -157,7 +159,7 @@ const AdminEventPage = () => {
             <Entypo name="dot-single" size={30} color="red" />
             <Text
               style={{
-                color: "#fff",
+                color: WHITE_COLOR,
                 fontSize: 16,
                 fontWeight: "bold"
               }}
@@ -170,7 +172,7 @@ const AdminEventPage = () => {
           style={{
             paddingTop: 10,
             paddingHorizontal: 10,
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             elevation: 1
           }}
         >
@@ -261,24 +263,24 @@ const AdminEventPage = () => {
           >
             <TouchableOpacity
               style={{
-                backgroundColor: "#00A9FF",
+                backgroundColor: PRIMARY_COLOR,
                 padding: 7,
                 borderRadius: 50,
                 flex: 1
               }}
             >
-              <Text style={{ color: "#fff", textAlign: "center" }}>Invite</Text>
+              <Text style={{ color: WHITE_COLOR, textAlign: "center" }}>Invite</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
-                borderColor: "#00A9FF",
+                borderColor: PRIMARY_COLOR,
                 borderWidth: 1,
                 padding: 7,
                 borderRadius: 50,
                 flex: 1
               }}
             >
-              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
+              <Text style={{ color: PRIMARY_COLOR, textAlign: "center" }}>
                 Options
               </Text>
             </TouchableOpacity>
@@ -289,7 +291,7 @@ const AdminEventPage = () => {
           style={{
             marginVertical: 10,
             flexDirection: "row",
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             paddingVertical: 15,
             paddingHorizontal: 10,
             // marginHorizontal: 10,
@@ -306,7 +308,7 @@ const AdminEventPage = () => {
             flex: 1,
             paddingHorizontal: 10,
             paddingVertical: 10,
-            backgroundColor: "#fff"
+            backgroundColor: WHITE_COLOR
           }}
         >
           <Text
@@ -322,7 +324,7 @@ const AdminEventPage = () => {
             <Text
               style={{
                 marginTop: 10,
-                color: "#00A9FF",
+                color: PRIMARY_COLOR,
                 fontWeight: "500",
                 fontSize: 16,
                 textAlign: "center"
@@ -338,7 +340,7 @@ const AdminEventPage = () => {
             paddingHorizontal: 10,
             marginVertical: 10,
             paddingVertical: 10,
-            backgroundColor: "#fff"
+            backgroundColor: WHITE_COLOR
           }}
         >
           <Text
@@ -384,7 +386,7 @@ const AdminEventPage = () => {
         enablePanDownToClose={true}
         onChange={handleSheetChanges}
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: WHITE_COLOR,
           borderTopLeftRadius: 50,
           borderTopRightRadius: 50,
           elevation: 15
@@ -392,7 +394,7 @@ const AdminEventPage = () => {
       >
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10
             // paddingHorizontal: 10,
           }}

@@ -19,6 +19,7 @@ import { login } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { ActivityIndicator } from "react-native-paper";
 import { CommonActions } from "@react-navigation/native";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const Login = () => {
   const [userCredentials, setUserCredentials] = useState({
@@ -81,12 +82,12 @@ const Login = () => {
             style={{
               fontWeight: "500",
               fontFamily: "Montserrat_600SemiBold",
-              color: "#00A9FF"
+              color: PRIMARY_COLOR
             }}
           >
             SignUp
           </Text>
-          <AntDesign name="arrowright" size={16} color="#00A9FF" />
+          <AntDesign name="arrowright" size={16} color={PRIMARY_COLOR} />
         </TouchableOpacity>
         <View style={{ marginTop: 10, justifyContent: "center" }}>
           <View

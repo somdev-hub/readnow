@@ -20,6 +20,7 @@ import {
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import GroupPostCard from "../components/GroupPostCard";
+import { WHITE_COLOR } from "../styles/colors";
 
 const ViewGroupInfo = () => {
   const navigator = useNavigation();
@@ -59,7 +60,7 @@ const ViewGroupInfo = () => {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
-        <View style={{ backgroundColor: "#fff", paddingBottom: 20 }}>
+        <View style={{ backgroundColor: WHITE_COLOR, paddingBottom: 20 }}>
           <View
             style={{
               paddingBottom: 45
@@ -226,7 +227,7 @@ const ViewGroupInfo = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -267,7 +268,7 @@ const ViewGroupInfo = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10,
             paddingVertical: 15,
@@ -330,7 +331,7 @@ const ViewGroupInfo = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -343,7 +344,7 @@ const ViewGroupInfo = () => {
               alignItems: "center",
               paddingVertical: 10,
               gap: 10,
-              backgroundColor: "#fff",
+              backgroundColor: WHITE_COLOR,
               elevation: 1
             }}
           >

@@ -84,8 +84,7 @@ const uploadEventMediaController = async (req, res) => {
   });
 
   try {
-    // const data=await axios.get(`${process.env.STRAPI_API}/api/events/${eventId}`)
-    // console.log(data.data);
+ 
     const mediaResponse = await axios.post(
       `${process.env.STRAPI_API}/api/upload`,
       formData,

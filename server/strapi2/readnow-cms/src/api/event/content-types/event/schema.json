@@ -36,6 +36,20 @@
       "type": "text"
     },
     "eventCover": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "eventAttendees": {
+      "type": "json"
+    },
+    "eventMedia": {
       "allowedTypes": [
         "images",
         "files",
@@ -44,9 +58,6 @@
       ],
       "type": "media",
       "multiple": false
-    },
-    "eventAttendees": {
-      "type": "json"
     }
   }
 }

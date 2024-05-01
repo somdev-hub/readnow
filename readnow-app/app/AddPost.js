@@ -28,6 +28,7 @@ import { getAIResponse, getFollowedGroups, getUserGroups } from "../api/apis";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { WHITE_COLOR } from "../styles/colors";
 
 const screenHeights = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -219,7 +220,7 @@ const AddPost = () => {
               width: "100%",
               position: "fixed",
               bottom: 0,
-              backgroundColor: "#fff",
+              backgroundColor: WHITE_COLOR,
               padding: 10,
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10
@@ -256,7 +257,7 @@ const AddPost = () => {
                   top: -3,
                   // right: 10,
                   right: -5,
-                  backgroundColor: "#fff",
+                  backgroundColor: WHITE_COLOR,
                   alignItems: "center",
                   justifyContent: "center",
                   elevation: 3
@@ -272,7 +273,7 @@ const AddPost = () => {
             style={{
               padding: 3,
               paddingHorizontal: 10,
-              backgroundColor: "#fff",
+              backgroundColor: WHITE_COLOR,
               height: 350,
               width: screenWidth * 0.9,
               alignSelf: "center",
@@ -303,12 +304,12 @@ const AddPost = () => {
               }}
             >
               {isAILoading ? (
-                <ActivityIndicator animating={true} color="#fff" />
+                <ActivityIndicator animating={true} color={WHITE_COLOR} />
               ) : (
                 <Text
                   style={{
                     textAlign: "center",
-                    color: "#fff",
+                    color: WHITE_COLOR,
                     fontWeight: "500"
                   }}
                 >
@@ -320,13 +321,13 @@ const AddPost = () => {
         )}
         <FAB
           icon="plus"
-          color="#fff"
+          color={WHITE_COLOR}
           style={{
             position: "absolute",
             bottom: 20,
             right: 20,
             backgroundColor: "#49755D",
-            color: "#fff"
+            color: WHITE_COLOR
           }}
           onPress={() => setSurfaceVisible(!surfaceVisible)}
         />

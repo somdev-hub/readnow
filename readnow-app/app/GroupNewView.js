@@ -19,6 +19,7 @@ import {
   joinThisGroup
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
+import { WHITE_COLOR } from "../styles/colors";
 
 const GroupNewView = () => {
   const navigator = useNavigation();
@@ -85,7 +86,7 @@ const GroupNewView = () => {
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
-        <View style={{ backgroundColor: "#fff", paddingBottom: 20 }}>
+        <View style={{ backgroundColor: WHITE_COLOR, paddingBottom: 20 }}>
           <View
             style={{
               paddingBottom: 45
@@ -230,7 +231,7 @@ const GroupNewView = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -271,7 +272,7 @@ const GroupNewView = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -378,7 +379,7 @@ const GroupNewView = () => {
 
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -391,7 +392,7 @@ const GroupNewView = () => {
               alignItems: "center",
               paddingVertical: 10,
               gap: 10,
-              backgroundColor: "#fff",
+              backgroundColor: WHITE_COLOR,
               elevation: 1
             }}
           >

@@ -22,6 +22,7 @@ import {
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { Video, ResizeMode } from "expo-av";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;
@@ -137,7 +138,7 @@ const EventPage = () => {
                 <Entypo name="dot-single" size={30} color="red" />
                 <Text
                   style={{
-                    color: "#fff",
+                    color: WHITE_COLOR,
                     fontSize: 16,
                     fontWeight: "bold"
                   }}
@@ -185,7 +186,7 @@ const EventPage = () => {
           style={{
             paddingTop: 10,
             paddingHorizontal: 10,
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             elevation: 1
           }}
         >
@@ -278,21 +279,21 @@ const EventPage = () => {
             <TouchableOpacity
               onPress={handleEventAttendence}
               style={{
-                backgroundColor: "#00A9FF",
+                backgroundColor: PRIMARY_COLOR,
                 padding: 7,
                 borderRadius: 50,
                 flex: 1
                 // elevation: 3
               }}
             >
-              <Text style={{ color: "#fff", textAlign: "center" }}>
+              <Text style={{ color: WHITE_COLOR, textAlign: "center" }}>
                 {attendingEvent ? "Attending" : "Attend"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{
-                // backgroundColor: "#00A9FF",
-                borderColor: "#00A9FF",
+                // backgroundColor: PRIMARY_COLOR,
+                borderColor: PRIMARY_COLOR,
                 borderWidth: 1,
                 padding: 7,
                 borderRadius: 50,
@@ -300,7 +301,7 @@ const EventPage = () => {
                 // elevation: 3
               }}
             >
-              <Text style={{ color: "#00A9FF", textAlign: "center" }}>
+              <Text style={{ color: PRIMARY_COLOR, textAlign: "center" }}>
                 Share
               </Text>
             </TouchableOpacity>
@@ -311,7 +312,7 @@ const EventPage = () => {
           style={{
             marginVertical: 10,
             flexDirection: "row",
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             paddingVertical: 15,
             paddingHorizontal: 10,
             // marginHorizontal: 10,
@@ -329,7 +330,7 @@ const EventPage = () => {
             paddingHorizontal: 10,
             // marginTop: ,
             paddingVertical: 10,
-            backgroundColor: "#fff"
+            backgroundColor: WHITE_COLOR
           }}
         >
           <Text
@@ -346,7 +347,7 @@ const EventPage = () => {
             <Text
               style={{
                 marginTop: 10,
-                color: "#00A9FF",
+                color: PRIMARY_COLOR,
                 fontWeight: "500",
                 fontSize: 16,
                 textAlign: "center"
@@ -362,7 +363,7 @@ const EventPage = () => {
             paddingHorizontal: 10,
             marginVertical: 10,
             paddingVertical: 10,
-            backgroundColor: "#fff"
+            backgroundColor: WHITE_COLOR
           }}
         >
           <Text
@@ -399,7 +400,7 @@ const EventPage = () => {
         enablePanDownToClose={true}
         onChange={handleSheetChanges}
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: WHITE_COLOR,
           borderTopLeftRadius: 50,
           borderTopRightRadius: 50,
           elevation: 15
@@ -407,7 +408,7 @@ const EventPage = () => {
       >
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10
             // paddingHorizontal: 10,
           }}

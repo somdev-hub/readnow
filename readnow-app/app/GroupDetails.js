@@ -10,6 +10,7 @@ import React, { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { getShortProfileInfo } from "../api/apis";
+import { WHITE_COLOR } from "../styles/colors";
 
 const GroupDetails = () => {
   const route = useRoute();
@@ -59,7 +60,7 @@ const GroupDetails = () => {
       <ScrollView>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -132,7 +133,7 @@ const GroupDetails = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -203,7 +204,7 @@ const GroupDetails = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -278,7 +279,7 @@ const GroupDetails = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}
@@ -361,7 +362,7 @@ const GroupDetails = () => {
         </View>
         <View
           style={{
-            backgroundColor: "#fff",
+            backgroundColor: WHITE_COLOR,
             marginTop: 10,
             paddingHorizontal: 10
           }}

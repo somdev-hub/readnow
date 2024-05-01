@@ -20,6 +20,7 @@ import Skeleton from "../components/Skeleton";
 import { Drawer } from "react-native-drawer-layout";
 import DrawerContent from "../components/DrawerContent";
 import { getHeadlines } from "../api/apis";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const sliderWidth = Dimensions.get("window").width;
 const imageWidth = Dimensions.get("window").width * 0.7;
@@ -250,7 +251,7 @@ const styles = StyleSheet.create({
     padding: 7
   },
   textBlue: {
-    color: "#00A9FF",
+    color: PRIMARY_COLOR,
     fontWeight: "500",
     fontSize: 16
   }

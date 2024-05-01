@@ -6,11 +6,19 @@ export const postEventData = createAsyncThunk(
   "event/postEventData",
   async (eventData) => {
     const response = await createEvent(eventData);
-    // console.log(response.status);
-
     return response;
-    // console.log(eventData);
   }
+
+  // async (eventData) => {
+  //   const dummyResponse = {
+  //     status: 200,
+  //     data: {
+  //       id: "dummyId"
+  //     }
+  //   };
+
+  //   return dummyResponse;
+  // }
 );
 
 const eventSlice = createSlice({

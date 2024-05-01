@@ -5,6 +5,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStorage from "expo-secure-store";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const DrawerContent = () => {
   const drawerItems = [
@@ -45,7 +46,7 @@ const DrawerContent = () => {
         <View>
           <View
             style={{
-              backgroundColor: "#00A9FF",
+              backgroundColor: PRIMARY_COLOR,
               padding: 15,
               borderRadius: 20,
               flexDirection: "row",
@@ -87,8 +88,8 @@ const DrawerContent = () => {
               }
               style={{ flexDirection: "row", gap: 10 }}
             >
-              <AntDesign name="pluscircle" size={24} color="#00A9FF" />
-              <Text style={{ color: "#00A9FF", fontWeight: "bold" }}>
+              <AntDesign name="pluscircle" size={24} color={PRIMARY_COLOR} />
+              <Text style={{ color: PRIMARY_COLOR, fontWeight: "bold" }}>
                 Create
               </Text>
             </Pressable>

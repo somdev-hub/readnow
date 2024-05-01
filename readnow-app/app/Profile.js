@@ -6,6 +6,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import * as SecureStorage from "expo-secure-store";
 import { getShortProfileInfo } from "../api/apis";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 
 const Profile = () => {
   const navigator = useNavigation();
@@ -66,7 +67,7 @@ const Profile = () => {
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            backgroundColor: "#00A9FF",
+            backgroundColor: PRIMARY_COLOR,
             padding: 16,
             borderRadius: 20
           }}
@@ -83,10 +84,10 @@ const Profile = () => {
                 width: 60,
                 height: 60,
                 borderRadius: 50,
-                backgroundColor: "#fff",
+                backgroundColor: WHITE_COLOR,
                 justifyContent: "center",
                 alignItems: "center",
-                borderColor: "#fff",
+                borderColor: WHITE_COLOR,
                 borderWidth: 1
               }}
             >
@@ -107,7 +108,7 @@ const Profile = () => {
               >
                 {userData?.name}
               </Text>
-              <Text style={{ color: "#fff" }}>{userData?.email}</Text>
+              <Text style={{ color: WHITE_COLOR }}>{userData?.email}</Text>
             </View>
           </View>
           <View
@@ -151,7 +152,7 @@ const Profile = () => {
                     <View
                       key={index}
                       style={{
-                        borderBottomColor: "#fff",
+                        borderBottomColor: WHITE_COLOR,
                         borderBottomWidth: 1,
                         paddingBottom: 10,
                         // paddingHorizontal: 10,

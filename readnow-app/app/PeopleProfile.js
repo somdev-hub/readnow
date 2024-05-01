@@ -6,6 +6,7 @@ import { useRoute } from "@react-navigation/native";
 import { getProfile, handleFollow } from "../api/apis";
 import PostCard from "../components/PostCard";
 import * as SecureStorage from "expo-secure-store";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const PeopleProfile = () => {
   const route = useRoute();
@@ -93,7 +94,7 @@ const PeopleProfile = () => {
               >
                 {userData?.header}
               </Text>
-              <Text style={{ marginTop: 10, color: "#00A9FF" }}>
+              <Text style={{ marginTop: 10, color: PRIMARY_COLOR }}>
                 {userData?.tags}
               </Text>
               <View
