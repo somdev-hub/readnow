@@ -9,19 +9,38 @@ import React from "react";
 import { Entypo } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { WHITE_COLOR } from "../styles/colors";
 
-const HeaderMenu = () => {
+const HeaderMenu = ({ title }) => {
   const navigator = useNavigation();
   const [menuItem, setMenuItem] = React.useState({
     news: true,
     following: false
   });
   return (
-    <View>
+    <View
+      style={{
+        flexDirection: "row",
+        flex: 1,
+        width: "100%",
+        justifyContent: "space-between",
+        alignItems: "center"
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 18,
+          fontWeight: "500",
+          color:WHITE_COLOR
+          // color: "#39A7FF"
+        }}
+      >
+        {title}
+      </Text>
       <View
         style={{
           flexDirection: "row",
-          width: "100%",
+          // width: "100%",
           justifyContent: "flex-end",
           alignItems: "center"
         }}
@@ -31,10 +50,10 @@ const HeaderMenu = () => {
             onPress={() => navigator.navigate("Web")}
             style={[styles.iconCircle]}
           >
-            <Entypo name="magnifying-glass" size={22} color="black" />
+            <Entypo name="magnifying-glass" size={22} color="white" />
           </Pressable>
           <View style={[styles.iconCircle]}>
-            <Feather name="bell" size={22} color="black" />
+            <Feather name="bell" size={22} color="white" />
           </View>
         </View>
       </View>

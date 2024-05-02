@@ -8,17 +8,6 @@ export const postEventData = createAsyncThunk(
     const response = await createEvent(eventData);
     return response;
   }
-
-  // async (eventData) => {
-  //   const dummyResponse = {
-  //     status: 200,
-  //     data: {
-  //       id: "dummyId"
-  //     }
-  //   };
-
-  //   return dummyResponse;
-  // }
 );
 
 const eventSlice = createSlice({
@@ -35,6 +24,7 @@ const eventSlice = createSlice({
       eventMedia: null
     },
     eventSnackbar: false,
+    eventSocket: false,
     currentEventId: null
   },
   reducers: {
@@ -52,6 +42,9 @@ const eventSlice = createSlice({
     },
     updateSnackbarVisibility: (state, action) => {
       state.eventSnackbar = action.payload;
+    },
+    updateEventSocket: (state, action) => {
+      state.eventSocket = action.payload;
     }
   },
   extraReducers: (builder) => {

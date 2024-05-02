@@ -54,6 +54,8 @@ const CreateEvent = () => {
   });
   const navigator = useNavigation();
 
+  const currentEventId = useSelector((state) => state.event.currentEventId);
+
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images
@@ -415,7 +417,7 @@ const CreateEvent = () => {
               payload: false
             });
             navigator.navigate("AdminEventPage", {
-              eventData: eventCreationData
+              currentEventId: currentEventId
             });
           }
         }}

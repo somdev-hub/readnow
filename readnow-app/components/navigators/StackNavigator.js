@@ -4,7 +4,12 @@ import { Entypo } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import * as SecureStorage from "expo-secure-store";
 import { useNavigation, CommonActions } from "@react-navigation/native";
-import { addBookmark, decodeUser, getShortProfileInfo } from "../../api/apis";
+import {
+  addBookmark,
+  decodeUser,
+  getShortProfileInfo,
+  socket
+} from "../../api/apis";
 import { useDispatch } from "react-redux";
 import { postFormData, postGroupFormData } from "../../redux/postSlice";
 import TabNavigator from "./TabNavigator";
@@ -40,6 +45,8 @@ import AdminEventPage from "../../app/AdminEventPage";
 import { postEventData } from "../../redux/eventSlice";
 import { PRIMARY_COLOR } from "../../styles/colors";
 import EventTopNavigator from "./EventTopNavigator";
+import DrawerNavigator from "./DrawerNavigator";
+import { CollapsibleScrollView } from "react-navigation-collapsible";
 
 const Stack = createStackNavigator();
 
@@ -105,12 +112,28 @@ const StackNavigator = () => {
     decodeToken();
     getUser();
   }, [token]);
+
+  const socketConnection = useSelector((state) => state.event.eventSocket);
+
+  useEffect(() => {
+    socket.connect();
+    if (socket.connected) {
+      dispatch({ type: "updateEventSocket", payload: true });
+    }
+
+    return () => {
+      socket.disconnect();
+      if (!socket.connect) {
+        dispatch({ type: "updateEventSocket", payload: false });
+      }
+    };
+  }, [socketConnection]);
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Events"
+      initialRouteName="HomeScreen"
     >
-      <Stack.Screen name="HomeScreen" component={TabNavigator} />
+      <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
       <Stack.Screen
         name="ViewGroupInfo"
@@ -355,7 +378,7 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    const res=dispatch(postEventData(eventData));
+                    const res = dispatch(postEventData(eventData));
                     // console.log(res);
                     // dispatch({
                     //   type: "event/updateSnackbarVisibility",

@@ -6,11 +6,12 @@ import { useDispatch } from "react-redux";
 import { Snackbar } from "react-native-paper";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React from "react";
-import DrawerNavigator from "./DrawerNavigator";
+// import DrawerNavigator from "./DrawerNavigator";
 import People from "../../app/People";
 import Bookmarks from "../../app/Bookmarks";
 import Profile from "../../app/Profile";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
+import HomeTopNavigator from "./HomeTopNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -46,7 +47,7 @@ const TabNavigator = () => {
   const navigationItems = [
     {
       name: "Home",
-      component: DrawerNavigator,
+      component: HomeTopNavigator,
       icon: "home"
     },
     {
@@ -68,6 +69,7 @@ const TabNavigator = () => {
   const bookmarkNotification = useSelector(
     (state) => state.notify.addedToBookmark
   );
+
   const dispatch = useDispatch();
   return (
     <View style={{ flex: 1, position: "relative" }}>
@@ -79,7 +81,7 @@ const TabNavigator = () => {
               name={item.name}
               component={item.component}
               options={{
-                headerShown: item.name === "Home" ? false : true,
+                headerShown: false,
                 headerStyle: {
                   backgroundColor: PRIMARY_COLOR,
                   elevation: 10

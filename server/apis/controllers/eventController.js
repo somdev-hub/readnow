@@ -43,7 +43,8 @@ const createEventController = async (req, res) => {
         eventSpeakers: JSON.parse(eventSpeakers),
         eventDescription,
         eventCover: imageResponse.data[0].id,
-        eventAttendees: []
+        eventAttendees: [],
+        eventComments:[]
       }
     };
 
@@ -84,7 +85,6 @@ const uploadEventMediaController = async (req, res) => {
   });
 
   try {
- 
     const mediaResponse = await axios.post(
       `${process.env.STRAPI_API}/api/upload`,
       formData,
@@ -150,7 +150,9 @@ const getAllEventsShortInfoController = async (req, res) => {
         eventOrganizer: event.attributes.eventOrganizer,
         eventName: event.attributes.eventName,
         eventDateAndTime: event.attributes.eventDateAndTime,
-        eventCover: `${process.env.STRAPI_API}${event.attributes.eventCover.data.attributes?.url}`
+        eventCover: `${process.env.STRAPI_API}${event.attributes.eventCover.data.attributes?.url}`,
+        eventAttendees: event.attributes.eventAttendees,
+        
       };
     });
 

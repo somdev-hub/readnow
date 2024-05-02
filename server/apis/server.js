@@ -31,6 +31,9 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const { Server } = require("socket.io");
+const { createServer } = require("node:http");
+const axios = require("axios");
 
 const getAIRouter = require("./routes/getAI");
 const postRouter = require("./routes/postRoute");
@@ -44,6 +47,11 @@ const eventRouter = require("./routes/eventRoute");
 
 // initialize express
 const app = express();
+
+const server = createServer(app);
+
+const io = new Server(server);
+
 //initialize dotenv
 dotenv.config();
 // initialize cors
@@ -62,6 +70,60 @@ mongoose
     if (error) console.log(error);
   });
 
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  let eventId;
+
+  // Join the room for the event
+  socket.on("joinEvent", (id) => {
+    eventId = id;
+    console.log(id);
+    socket.join(eventId);
+  });
+
+  // Listen for new comments
+  socket.on("postEventComment", async (id, email, comment) => {
+    // Broadcast the comment to all users in the event room
+    console.log(comment);
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/events/${id}`
+    );
+    const comments = response.data.data.attributes.eventComments;
+    let newComments = [
+      ...comments,
+      {
+        commentedBy: email,
+        comment: comment,
+        commentedOn: new Date().toISOString()
+      }
+    ];
+    const data = {
+      data: {
+        eventComments: newComments
+      }
+    };
+
+    const commentResponse = await axios.put(
+      `${process.env.STRAPI_API}/api/events/${id}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    io.to(id).emit("newComment", { email, comment });
+  });
+
+  // Leave the room when the user disconnects
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+    if (eventId) {
+      socket.leave(eventId);
+    }
+  });
+});
+
 // routes
 app.use("/get-ai", getAIRouter);
 app.use("/post", postRouter);
@@ -75,7 +137,7 @@ app.use("/event", eventRouter);
 
 // start the server
 const port = process.env.PORT || 3500;
-app.listen(port, (error) => {
+server.listen(port, (error) => {
   if (error) {
     console.log("Error starting the server");
   }

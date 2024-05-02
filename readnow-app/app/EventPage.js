@@ -23,13 +23,16 @@ import {
 import * as SecureStorage from "expo-secure-store";
 import { Video, ResizeMode } from "expo-av";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
+import EventCommentSection from "../components/EventCommentSection";
+import { io } from "socket.io-client";
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;
   const width = Dimensions.get("window").width;
   const bottomSheetRef = React.useRef(null);
   const route = useRoute();
-  const { eventId } = route.params;
+  // const { eventId } = route.params;
+  const eventId = 20;
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const [eventData, setEventData] = useState({});
   const [attendingEvent, setAttendingEvent] = useState(false);
@@ -38,7 +41,7 @@ const EventPage = () => {
   const videoControl = React.useRef(null);
 
   const handleSheetChanges = React.useCallback((index) => {
-    console.log("handleSheetChanges", index);
+    // console.log("handleSheetChanges", index);
   }, []);
 
   const handleEventAttendence = async () => {
@@ -49,13 +52,15 @@ const EventPage = () => {
     } else if (response.data === "attendee removed") {
       setAttendingEvent(false);
     }
-    console.log(response.data);
+    // console.log(response.data);
   };
+
+  // console.log(eventData?.eventComments);
 
   useEffect(() => {
     const getEventDetails = async () => {
       const response = await getSpecificEvent(eventId);
-      console.log(response);
+      // console.log(response);
       const eventOrganizer = await getShortProfileInfo(
         response?.eventOrganizer.toLowerCase()
       );
@@ -64,6 +69,16 @@ const EventPage = () => {
         response?.eventSpeakers?.map(async (speaker) => {
           const speakerInfo = await getCardProfile(speaker.toLowerCase());
           return speakerInfo;
+        })
+      );
+
+      const eventCommentsData = await Promise.all(
+        response?.eventComments?.map(async (comment) => {
+          const commentUser = await getShortProfileInfo(comment?.commentedBy);
+          return {
+            user: commentUser?.data,
+            comment: comment.comment
+          };
         })
       );
 
@@ -81,6 +96,7 @@ const EventPage = () => {
 
       const eventDataWithOrganizerAndSpeakers = {
         ...response,
+        eventComments: eventCommentsData,
         eventOrganizerName: eventOrganizer.data.name,
         eventSpeakers: speakerData
       };
@@ -90,7 +106,7 @@ const EventPage = () => {
     };
     getEventDetails();
   }, []);
-  // console.log(response);
+
   return (
     <View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -406,7 +422,7 @@ const EventPage = () => {
           elevation: 15
         }}
       >
-        <View
+        {/* <View
           style={{
             backgroundColor: WHITE_COLOR,
             marginTop: 10
@@ -476,7 +492,13 @@ const EventPage = () => {
               />
             </View>
           </View>
-        </View>
+        </View> */}
+        {eventData.eventComments && (
+          <EventCommentSection
+            eventId={eventId}
+            eventComments={eventData?.eventComments}
+          />
+        )}
       </BottomSheet>
     </View>
   );

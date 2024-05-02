@@ -38,9 +38,10 @@ const People = () => {
   ];
   useEffect(() => {
     const getPeopleFunc = async () => {
-      const response = await getPeople();
-      // console.log(response.users[1].email);
-      setPeopleList(response.users);
+      if (peopleList.length === 0) {
+        const response = await getPeople();
+        setPeopleList(response.users);
+      }
     };
     getPeopleFunc();
   }, []);

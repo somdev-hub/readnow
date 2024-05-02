@@ -17,7 +17,6 @@ import * as DocumentPicker from "expo-document-picker";
 import { Video, ResizeMode } from "expo-av";
 // import { Audio } from 'expo-av';
 import { useDispatch, useSelector } from "react-redux";
-import { useRoute } from "@react-navigation/native";
 import {
   addEventMedia,
   getCardProfile,
@@ -25,20 +24,22 @@ import {
   getSpecificEvent
 } from "../api/apis";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
+import { useRoute } from "@react-navigation/native";
 
 const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
-  const width = Dimensions.get("window").width;
   const bottomSheetRef = React.useRef(null);
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const [eventMedia, setEventMedia] = React.useState(null);
   const dispatch = useDispatch();
-  const route = useRoute();
-  // const eventData = route.params.eventData;
   const [eventSpeakersData, setEventSpeakersData] = useState([]);
   const [eventOrganizerData, setEventOrganizerData] = useState({});
-  const currentEventId = useSelector((state) => state.event.currentEventId);
+  // const currentEventId = useSelector((state) => state.event.currentEventId);
   const [eventData, setEventData] = useState({});
+
+  const route = useRoute();
+
+  const { currentEventId } = route.params;
 
   const handleSheetChanges = React.useCallback((index) => {
     console.log("handleSheetChanges", index);
@@ -69,34 +70,52 @@ const AdminEventPage = () => {
     const fetchEventData = async () => {
       const eventInfo = await getSpecificEvent(currentEventId);
       console.log(eventInfo);
-      setEventData({
-        ...eventInfo,
-        eventDateAndTime: new Date(eventInfo?.eventDateAndTime)
-      });
+      if (eventInfo) {
+        setEventData({
+          ...eventInfo,
+          eventDateAndTime: new Date(eventInfo?.eventDateAndTime)
+        });
+      }
     };
-    const fetchOrganizerData = async () => {
-      const organizerData = await getShortProfileInfo(
-        eventData.eventOrganizer.toLowerCase()
-      );
-      setEventOrganizerData(organizerData);
-    };
-    const fetchSpeakersData = async () => {
-      const speakerData = await Promise.all(
-        eventData?.eventSpeakers?.map(async (speaker) => {
-          const speakerInfo = await getCardProfile(speaker.toLowerCase());
-          return speakerInfo;
-        })
-      );
-      setEventSpeakersData(speakerData);
-    };
+
     fetchEventData();
-    fetchOrganizerData();
-    fetchSpeakersData();
   }, []);
 
-  console.log(eventData.eventSpeakers);
+  useEffect(() => {
+    const fetchOrganizerData = async () => {
+      if (eventData?.eventOrganizer) {
+        const organizerData = await getShortProfileInfo(
+          eventData.eventOrganizer.toLowerCase()
+        );
+        if (organizerData) {
+          setEventOrganizerData(organizerData.data);
+        }
+      }
+    };
+
+    const fetchSpeakersData = async () => {
+      if (eventData?.eventSpeakers) {
+        const speakerData = await Promise.all(
+          eventData.eventSpeakers.map(async (speaker) => {
+            const speakerInfo = await getCardProfile(speaker.toLowerCase());
+            return speakerInfo;
+          })
+        );
+        if (speakerData) {
+          setEventSpeakersData(speakerData);
+        }
+      }
+    };
+
+    if (eventData) {
+      fetchOrganizerData();
+      fetchSpeakersData();
+    }
+  }, [eventData]);
+
+  console.log(eventData?.eventSpeakers);
   console.log(eventSpeakersData);
-  console.log(eventData.eventDateAndTime);
+  console.log(eventData?.eventDateAndTime);
 
   return (
     <View>
@@ -120,8 +139,7 @@ const AdminEventPage = () => {
               resizeMode={ResizeMode.CONTAIN}
               shouldPlay
               isLooping
-              style={{  width: "100%",
-              height: 200, }}
+              style={{ width: "100%", height: 200 }}
             />
           )}
           <Pressable
@@ -146,27 +164,6 @@ const AdminEventPage = () => {
               Upload media
             </Text>
           </Pressable>
-          {/* <View
-            style={{
-              flexDirection: "row",
-              gap: 1,
-              position: "absolute",
-              top: 10,
-              left: 10,
-              alignItems: "center"
-            }}
-          >
-            <Entypo name="dot-single" size={30} color="red" />
-            <Text
-              style={{
-                color: WHITE_COLOR,
-                fontSize: 16,
-                fontWeight: "bold"
-              }}
-            >
-              Live tomorrow
-            </Text>
-          </View> */}
         </View>
         <View
           style={{
@@ -191,7 +188,7 @@ const AdminEventPage = () => {
               marginTop: 5
             }}
           >
-            Event organized by {eventData?.eventOrganizer}
+            Event organized by {eventOrganizerData?.name}
           </Text>
           <View
             style={{
@@ -232,7 +229,7 @@ const AdminEventPage = () => {
                 marginLeft: 5
               }}
             >
-              200 attendees
+              {eventData?.eventAttendees?.length} attendees
             </Text>
           </View>
           <View
@@ -269,7 +266,9 @@ const AdminEventPage = () => {
                 flex: 1
               }}
             >
-              <Text style={{ color: WHITE_COLOR, textAlign: "center" }}>Invite</Text>
+              <Text style={{ color: WHITE_COLOR, textAlign: "center" }}>
+                Invite
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={{

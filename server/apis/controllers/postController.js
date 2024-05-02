@@ -123,7 +123,6 @@ const commentPostController = async (req, res) => {
     );
 
     const post = response.data.data;
-    // console.log(post);
     const comments = post.attributes.comments;
     let newComments = [
       ...comments,

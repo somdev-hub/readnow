@@ -1,6 +1,11 @@
 import axios from "axios";
+import { io } from "socket.io-client";
 
 const ADDRESS = "http://192.168.25.254:3500";
+
+export const socket = io(ADDRESS, {
+  transports: ["websocket"]
+});
 
 export const getHeadlines = async () => {
   try {
