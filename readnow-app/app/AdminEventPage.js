@@ -25,6 +25,7 @@ import {
 } from "../api/apis";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 import { useRoute } from "@react-navigation/native";
+import EventCommentSection from "../components/EventCommentSection";
 
 const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
@@ -34,7 +35,6 @@ const AdminEventPage = () => {
   const dispatch = useDispatch();
   const [eventSpeakersData, setEventSpeakersData] = useState([]);
   const [eventOrganizerData, setEventOrganizerData] = useState({});
-  // const currentEventId = useSelector((state) => state.event.currentEventId);
   const [eventData, setEventData] = useState({});
 
   const route = useRoute();
@@ -62,18 +62,35 @@ const AdminEventPage = () => {
         result.assets[0].uri,
         currentEventId
       );
-      console.log(response);
+      // console.log(response);
     }
   };
 
   useEffect(() => {
+    dispatch({
+      type: "event/updateCurrentEventId",
+      payload: currentEventId
+    });
+
     const fetchEventData = async () => {
       const eventInfo = await getSpecificEvent(currentEventId);
-      console.log(eventInfo);
+      // console.log(eventInfo);
       if (eventInfo) {
+        const eventCommentsData = await Promise.all(
+          eventInfo?.eventComments?.map(async (comment) => {
+            const commentUser = await getShortProfileInfo(comment?.commentedBy);
+            return {
+              user: commentUser?.data,
+              comment: comment.comment,
+              commentedOn: new Date(comment.commentedOn).toLocaleString()
+            };
+          })
+        );
+
         setEventData({
           ...eventInfo,
-          eventDateAndTime: new Date(eventInfo?.eventDateAndTime)
+          eventDateAndTime: new Date(eventInfo?.eventDateAndTime),
+          eventComments: eventCommentsData
         });
       }
     };
@@ -113,9 +130,9 @@ const AdminEventPage = () => {
     }
   }, [eventData]);
 
-  console.log(eventData?.eventSpeakers);
-  console.log(eventSpeakersData);
-  console.log(eventData?.eventDateAndTime);
+  // console.log(eventData?.eventSpeakers);
+  // console.log(eventSpeakersData);
+  // console.log(eventData?.eventDateAndTime);
 
   return (
     <View>
@@ -365,20 +382,12 @@ const AdminEventPage = () => {
                 />
               );
             })}
-            {/* <PeopleCard
-              name="Dr. Sikha Sharma"
-              header="Biochemist, IISER, Pune"
-              tags="#Plant Healthcare, #Nutrition, #Agriculture, #Plant Science"
-              followed={false}
-              image="https://c.superprof.com/i/a/20975136/10127100/600/20220613124840/assistant-professor-lady-shri-ram-college-for-women-trained-teach-all-aspects-english-language.jpg"
-              background="https://i.cbc.ca/1.4839023.1537972363!/fileImage/httpImage/image.png_gen/derivatives/16x9_780/plants-ft.png"
-              userEmail="stevewings@gmail.com"
-            /> */}
           </View>
         </View>
         {/* </View> */}
       </ScrollView>
       <BottomSheet
+        enableContentPanningGesture={false}
         ref={bottomSheetRef}
         index={-1}
         snapPoints={[height * 0.5, height * 0.9]}
@@ -391,7 +400,7 @@ const AdminEventPage = () => {
           elevation: 15
         }}
       >
-        <View
+        {/* <View
           style={{
             backgroundColor: WHITE_COLOR,
             marginTop: 10
@@ -461,7 +470,14 @@ const AdminEventPage = () => {
               />
             </View>
           </View>
-        </View>
+        </View> */}
+
+        {eventData.eventComments && (
+          <EventCommentSection
+            eventId={currentEventId}
+            eventComments={eventData?.eventComments}
+          />
+        )}
       </BottomSheet>
     </View>
   );

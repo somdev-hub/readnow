@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput } from "react-native";
+import { View, Text, Image, TextInput, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { WHITE_COLOR } from "../styles/colors";
 import * as SecureStorage from "expo-secure-store";
@@ -35,11 +35,15 @@ const EventCommentSection = ({ eventId, eventComments }) => {
   // Second useEffect hook for handling new comments
   useEffect(() => {
     if (socket.connected) {
-      socket.on("newComment", async ({ email, comment }) => {
+      socket.on("newComment", async ({ email, comment, commentedOn }) => {
         const userData = await getShortProfileInfo(email);
         setAllComments((prevComments) => [
           ...prevComments,
-          { user: userData?.data, comment }
+          {
+            user: userData?.data,
+            comment,
+            commentedOn: new Date(commentedOn).toLocaleString()
+          }
         ]);
       });
     }
@@ -49,7 +53,8 @@ const EventCommentSection = ({ eventId, eventComments }) => {
     <View
       style={{
         backgroundColor: WHITE_COLOR,
-        marginTop: 10
+        marginTop: 10,
+        flex: 1
       }}
     >
       <Text
@@ -76,10 +81,9 @@ const EventCommentSection = ({ eventId, eventComments }) => {
       </View>
       <View
         style={{
-          // position: "absolute",
-          // bottom: 0,
           borderTopColor: "#eeeeee",
-          borderTopWidth: 1
+          borderTopWidth: 1,
+          flex: 1
         }}
       >
         <View
@@ -102,13 +106,15 @@ const EventCommentSection = ({ eventId, eventComments }) => {
             }}
           />
           <TextInput
+            multiline
+            // textAlignVertical="top"
             placeholder="Write a comment"
             value={comment}
             style={{
               flex: 1,
               marginLeft: 10,
               borderRadius: 50,
-              padding: 10,
+              paddingVertical: 10,
               paddingHorizontal: 20,
               borderWidth: 2,
               borderColor: "#eeeeee"
@@ -116,61 +122,90 @@ const EventCommentSection = ({ eventId, eventComments }) => {
             onChangeText={(text) => {
               setComment(text);
             }}
-            onSubmitEditing={handleComment}
+            onSubmitEditing={() => {
+              handleComment();
+              setComment("");
+            }}
           />
         </View>
-
-        <View
-          style={{
-            marginTop: 5
-          }}
-        >
-          {[...allComments]?.reverse().map((comment, i) => {
-            return (
-              <View
-                key={i}
-                style={{
-                  marginHorizontal: 10,
-                  marginVertical: 5,
-                  flexDirection: "row",
-                  gap: 10,
-                  alignItems: "center",
-                  borderBottomColor: "#eeeeee",
-                  borderBottomWidth: 1,
-                  paddingBottom: 10
-                }}
-              >
-                <Image
-                  source={{
-                    uri: comment?.user?.profilePicture
-                  }}
+        <View style={{ flex: 1 }}>
+          <ScrollView nestedScrollEnabled={true}>
+            {[...allComments]?.reverse().map((comment, i) => {
+              return (
+                <View
+                  key={i}
                   style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 50,
-                    resizeMode: "cover"
+                    marginHorizontal: 10,
+                    marginVertical: 5,
+                    flexDirection: "row",
+                    gap: 10,
+                    alignItems: "start",
+                    borderBottomColor: "#eeeeee",
+                    borderBottomWidth: 1,
+                    paddingBottom: 10,
+                    width: "95%",
+                    
                   }}
-                />
-                <View>
-                  <Text
-                    style={{
-                      fontWeight: "500"
+                >
+                  <Image
+                    source={{
+                      uri: comment?.user?.profilePicture
                     }}
-                  >
-                    {comment?.user?.name}
-                  </Text>
-                  <Text
                     style={{
-                      fontSize: 14
+                      width: 30,
+                      height: 30,
+                      borderRadius: 50,
+                      resizeMode: "cover",
+                      marginTop: 5
                     }}
-                  >
-                    {comment.comment}
-                  </Text>
+                  />
+                  {/* <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      width: "95%",
+                      // flex:1,
+                      paddingRight: 30
+                    }}
+                  > */}
+                  <View style={{ flex: 1 }}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between"
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontWeight: "500"
+                        }}
+                      >
+                        {comment?.user?.name}
+                      </Text>
+                      <Text
+                        style={{
+                          fontSize: 12
+                        }}
+                      >
+                        {comment?.commentedOn}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontSize: 14
+                      }}
+                    >
+                      {comment.comment}
+                    </Text>
+                  </View>
+                  {/* </View> */}
                 </View>
-              </View>
-            );
-          })}
+              );
+            })}
+          </ScrollView>
         </View>
+        {/* </View> */}
       </View>
     </View>
   );

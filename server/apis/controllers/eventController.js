@@ -44,7 +44,7 @@ const createEventController = async (req, res) => {
         eventDescription,
         eventCover: imageResponse.data[0].id,
         eventAttendees: [],
-        eventComments:[]
+        eventComments: []
       }
     };
 
@@ -71,6 +71,87 @@ const createEventController = async (req, res) => {
   } catch (error) {
     console.log(error);
     res.status(500).send("An error occurred while adding the post");
+  }
+};
+
+const editEventController = async (req, res) => {
+  const { eventId } = req.params;
+  const { isEventCoverSame } = req.body;
+  const {
+    eventOrganizer,
+    eventName,
+    eventMode,
+    eventDateAndTime,
+    eventSpeakers,
+    eventDescription
+    // eventCover
+  } = req.body;
+  const eventCover = req.file;
+  // console.log(typeof isEventCoverSame);
+  let data = {};
+
+  if (isEventCoverSame === "false") {
+    const formData = new FormData();
+    formData.append("files", Buffer.from(eventCover.buffer), {
+      filename: eventCover.originalname,
+      contentType: eventCover.mimetype
+    });
+
+    const imageResponse = await axios.post(
+      `${process.env.STRAPI_API}/api/upload`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+
+    data = {
+      data: {
+        eventOrganizer,
+        eventName,
+        eventMode,
+        eventDateAndTime,
+        eventSpeakers: JSON.parse(eventSpeakers),
+        eventDescription,
+        eventCover: imageResponse.data[0].id
+      }
+    };
+    console.log("image updated");
+  } else {
+    // console.log(isEventCoverSame);
+    data = {
+      data: {
+        eventOrganizer,
+        eventName,
+        eventMode,
+        eventDateAndTime,
+        eventSpeakers: JSON.parse(eventSpeakers),
+        eventDescription
+        // eventCover
+      }
+    };
+    console.log("image not updated");
+  }
+  try {
+    const response = await axios.put(
+      `${process.env.STRAPI_API}/api/events/${eventId}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    console.log("event edited");
+    return res
+      .status(200)
+      .send({ message: "event updated", id: response.data.data.id });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while updating the event");
   }
 };
 
@@ -151,8 +232,7 @@ const getAllEventsShortInfoController = async (req, res) => {
         eventName: event.attributes.eventName,
         eventDateAndTime: event.attributes.eventDateAndTime,
         eventCover: `${process.env.STRAPI_API}${event.attributes.eventCover.data.attributes?.url}`,
-        eventAttendees: event.attributes.eventAttendees,
-        
+        eventAttendees: event.attributes.eventAttendees
       };
     });
 
@@ -210,6 +290,7 @@ const toggleEventAttendenceController = async (req, res) => {
 
 module.exports = {
   createEventController,
+  editEventController,
   uploadEventMediaController,
   getSpecificEventController,
   getAllEventsShortInfoController,

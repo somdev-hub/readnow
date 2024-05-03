@@ -112,7 +112,11 @@ io.on("connection", (socket) => {
         }
       }
     );
-    io.to(id).emit("newComment", { email, comment });
+    io.to(id).emit("newComment", {
+      email,
+      comment,
+      commentedOn: new Date().toISOString()
+    });
   });
 
   // Leave the room when the user disconnects

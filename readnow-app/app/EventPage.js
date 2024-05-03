@@ -24,7 +24,6 @@ import * as SecureStorage from "expo-secure-store";
 import { Video, ResizeMode } from "expo-av";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 import EventCommentSection from "../components/EventCommentSection";
-import { io } from "socket.io-client";
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;
@@ -55,8 +54,6 @@ const EventPage = () => {
     // console.log(response.data);
   };
 
-  // console.log(eventData?.eventComments);
-
   useEffect(() => {
     const getEventDetails = async () => {
       const response = await getSpecificEvent(eventId);
@@ -77,7 +74,8 @@ const EventPage = () => {
           const commentUser = await getShortProfileInfo(comment?.commentedBy);
           return {
             user: commentUser?.data,
-            comment: comment.comment
+            comment: comment.comment,
+            commentedOn: new Date(comment.commentedOn).toLocaleString()
           };
         })
       );
@@ -100,7 +98,7 @@ const EventPage = () => {
         eventOrganizerName: eventOrganizer.data.name,
         eventSpeakers: speakerData
       };
-      console.log(response);
+      // console.log(response);
       setEventData(eventDataWithOrganizerAndSpeakers);
       // setEventData(response);
     };
@@ -410,6 +408,7 @@ const EventPage = () => {
         {/* </View> */}
       </ScrollView>
       <BottomSheet
+        enableContentPanningGesture={false}
         ref={bottomSheetRef}
         index={-1}
         snapPoints={[height * 0.5, height * 0.9]}

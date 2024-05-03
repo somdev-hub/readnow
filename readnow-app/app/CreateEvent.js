@@ -16,7 +16,8 @@ import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
 import { Snackbar } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { getSpecificEvent } from "../api/apis";
 
 const RadioButtonOption = ({ value, currentMode, setMode }) => (
   <View
@@ -37,12 +38,13 @@ const RadioButtonOption = ({ value, currentMode, setMode }) => (
 );
 
 const CreateEvent = () => {
-  // const [visibleSnackbar, setVisibleSnackbar] = useState(false);
   const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
-  // console.log(visibleSnackbar);
   const [open, setOpen] = useState(false);
   const [speaker, setSpeaker] = useState("");
   const dispatch = useDispatch();
+  const eventUpdationMessage = useSelector(
+    (state) => state.event.eventUpdationMessage
+  );
   const [eventCreationData, setEventCreationData] = useState({
     eventOrganizer: "",
     eventName: "",
@@ -50,9 +52,14 @@ const CreateEvent = () => {
     eventDateAndTime: new Date(),
     eventSpeakers: [],
     eventDescription: "",
-    eventCover: null
+    eventCover: null,
+    isEventCoverSame: false,
+    eventId: null
   });
   const navigator = useNavigation();
+  const route = useRoute();
+
+  const { isEdit, eventId } = route.params;
 
   const currentEventId = useSelector((state) => state.event.currentEventId);
 
@@ -64,7 +71,8 @@ const CreateEvent = () => {
     if (!result.canceled) {
       setEventCreationData({
         ...eventCreationData,
-        eventCover: result.assets[0].uri
+        eventCover: result.assets[0].uri,
+        isEventCoverSame: false
       });
     }
   };
@@ -81,6 +89,37 @@ const CreateEvent = () => {
       payload: { ...eventCreationData }
     });
   }, [eventCreationData]);
+
+  useEffect(() => {
+    if (isEdit) {
+      const editEvent = async () => {
+        const response = await getSpecificEvent(eventId);
+        setEventCreationData({
+          eventOrganizer: response?.eventOrganizer,
+          eventName: response?.eventName,
+          eventMode: response?.eventMode,
+          eventDateAndTime: new Date(response?.eventDateAndTime),
+          eventSpeakers: response?.eventSpeakers,
+          eventDescription: response?.eventDescription,
+          eventCover: response?.eventCover,
+          isEventCoverSame: true,
+          eventId: eventId
+        });
+
+        dispatch({
+          type: "event/updateEditedEvent",
+          payload: true
+        });
+      };
+
+      editEvent();
+    } else {
+      dispatch({
+        type: "event/updateEditedEvent",
+        payload: false
+      });
+    }
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -179,6 +218,7 @@ const CreateEvent = () => {
               Event name*
             </Text>
             <TextInput
+              multiline={true}
               value={eventCreationData.eventName}
               onChangeText={(text) =>
                 setEventCreationData({ ...eventCreationData, eventName: text })
@@ -335,7 +375,7 @@ const CreateEvent = () => {
               }}
               placeholder="Enter email then press done"
             />
-            {eventCreationData.eventSpeakers.map((speaker, index) => {
+            {eventCreationData?.eventSpeakers?.map((speaker, index) => {
               return (
                 <View
                   key={index}
@@ -422,7 +462,7 @@ const CreateEvent = () => {
           }
         }}
       >
-        Event successfully created
+        {eventUpdationMessage}
       </Snackbar>
     </View>
   );

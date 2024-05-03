@@ -1,11 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
-import { createEvent } from "../api/apis";
+import { createEvent, editEvent } from "../api/apis";
 
 export const postEventData = createAsyncThunk(
   "event/postEventData",
   async (eventData) => {
     const response = await createEvent(eventData);
+    return response;
+  }
+);
+
+export const editEventData = createAsyncThunk(
+  "event/editEventData",
+  async (eventData) => {
+    const response = await editEvent(eventData);
     return response;
   }
 );
@@ -21,11 +29,15 @@ const eventSlice = createSlice({
       eventSpeakers: [],
       eventDescription: "",
       eventCover: null,
-      eventMedia: null
+      eventMedia: null,
+      eventId: null,
+      isEventCoverSame: false
     },
+    isEditedEvent: false,
     eventSnackbar: false,
     eventSocket: false,
-    currentEventId: null
+    currentEventId: null,
+    eventUpdationMessage: ""
   },
   reducers: {
     updateEventData: (state, action) => {
@@ -36,6 +48,11 @@ const eventSlice = createSlice({
       state.eventdata.eventSpeakers = action.payload.eventSpeakers;
       state.eventdata.eventDescription = action.payload.eventDescription;
       state.eventdata.eventCover = action.payload.eventCover;
+      state.eventdata.eventId = action.payload.eventId
+        ? action.payload.eventId
+        : null;
+
+      state.eventdata.isEventCoverSame = action.payload.isEventCoverSame;
     },
     updateEventMedia: (state, action) => {
       state.eventdata.eventMedia = action.payload;
@@ -45,6 +62,12 @@ const eventSlice = createSlice({
     },
     updateEventSocket: (state, action) => {
       state.eventSocket = action.payload;
+    },
+    updateCurrentEventId: (state, action) => {
+      state.currentEventId = action.payload;
+    },
+    updateEditedEvent: (state, action) => {
+      state.isEditedEvent = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -52,6 +75,17 @@ const eventSlice = createSlice({
       if (action.payload.status === 200) {
         // console.log("extra reducers fulfilled");
         state.eventSnackbar = true;
+        state.eventUpdationMessage = action.payload.data.message;
+        state.currentEventId = action.payload.data.id;
+      }
+    });
+    builder.addCase(editEventData.fulfilled, (state, action) => {
+      console.log("builder case");
+      if (action?.payload?.status === 200) {
+        console.log("update successful");
+        state.isEditedEvent = true;
+        state.eventSnackbar = true;
+        state.eventUpdationMessage = action.payload.data.message;
         state.currentEventId = action.payload.data.id;
       }
     });

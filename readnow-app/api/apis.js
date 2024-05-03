@@ -472,6 +472,7 @@ export const createEvent = async (data) => {
   formData.append("eventDateAndTime", data.eventDateAndTime.toISOString());
   formData.append("eventSpeakers", JSON.stringify(data.eventSpeakers));
   formData.append("eventDescription", data.eventDescription);
+  formData.append("isEventCoverSame", data.isEventCoverSame);
   console.log("====================================");
   console.log(formData);
   console.log("====================================");
@@ -486,6 +487,37 @@ export const createEvent = async (data) => {
       }
     );
     console.log(response.data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const editEvent = async (data) => {
+  const formData = new FormData();
+  formData.append("eventCover", {
+    uri: data.eventCover,
+    name: "eventCover.jpg",
+    type: "image/jpg"
+  });
+  // formData.append("eventId", data.eventId);
+  formData.append("eventOrganizer", data.eventOrganizer);
+  formData.append("eventName", data.eventName);
+  formData.append("eventMode", data.eventMode);
+  formData.append("eventDateAndTime", data.eventDateAndTime.toISOString());
+  formData.append("eventSpeakers", JSON.stringify(data.eventSpeakers));
+  formData.append("eventDescription", data.eventDescription);
+  formData.append("isEventCoverSame", data.isEventCoverSame);
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/event/edit-event/${data.eventId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
     return response;
   } catch (error) {
     console.log(error);

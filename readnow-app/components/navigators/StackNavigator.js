@@ -42,7 +42,7 @@ import EventPage from "../../app/EventPage";
 import { AntDesign } from "@expo/vector-icons";
 import CreateEvent from "../../app/CreateEvent";
 import AdminEventPage from "../../app/AdminEventPage";
-import { postEventData } from "../../redux/eventSlice";
+import { editEventData, postEventData } from "../../redux/eventSlice";
 import { PRIMARY_COLOR } from "../../styles/colors";
 import EventTopNavigator from "./EventTopNavigator";
 import DrawerNavigator from "./DrawerNavigator";
@@ -66,6 +66,8 @@ const StackNavigator = () => {
   const selectedGroupId = useSelector((state) => state.post.selectedGroup);
   const eventData = useSelector((state) => state.event.eventdata);
   const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
+  const currentEventId = useSelector((state) => state.event.currentEventId);
+  const idEditedEvent = useSelector((state) => state.event.isEditedEvent);
 
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
@@ -172,7 +174,38 @@ const StackNavigator = () => {
         component={AdminEventPage}
         options={{
           headerShown: true,
-          headerTitle: "Your Event"
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Event</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("CreateEvent", {
+                      isEdit: true,
+                      eventId: currentEventId
+                    });
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: PRIMARY_COLOR
+                    }}
+                  >
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
         }}
       />
       <Stack.Screen
@@ -282,7 +315,10 @@ const StackNavigator = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>Events</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigator.navigate("CreateEvent");
+                    navigator.navigate("CreateEvent", {
+                      isEdit: false,
+                      eventId: null
+                    });
                   }}
                 >
                   <Text
@@ -378,13 +414,12 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    const res = dispatch(postEventData(eventData));
-                    // console.log(res);
-                    // dispatch({
-                    //   type: "event/updateSnackbarVisibility",
-                    //   payload: true
-                    // });
-                    // console.log(visibleSnackbar);
+                    if (idEditedEvent) {
+                      const res = dispatch(editEventData(eventData));
+                      console.log(eventData.isEventCoverSame);
+                    } else {
+                      const res = dispatch(postEventData(eventData));
+                    }
                   }}
                 >
                   <Text
