@@ -45,8 +45,10 @@ const YourEvents = () => {
       allEventsData?.filter((event) => event.eventOrganizer === email) || [];
     setAdminEventsData(yourEvents);
     const attendingEvents =
-      allEventsData?.filter((event) =>
-        event?.eventAttendees?.includes(email)
+      allEventsData?.filter(
+        (event) =>
+          event?.eventAttendees?.includes(email) &&
+          new Date(event?.eventDateAndTime) >= new Date()
       ) || [];
     setYourEventsData(attendingEvents);
   };

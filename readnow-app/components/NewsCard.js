@@ -47,28 +47,11 @@ const NewsCard = ({ item, isSelected, setSelectedNews, index }) => {
           gap: 7,
           flex: 1,
           alignItems: "center",
-          paddingHorizontal:  15,
+          paddingHorizontal: 10,
           paddingVertical: isSelected ? 10 : 0,
           backgroundColor: isSelected ? "#DDE6ED" : "transparent"
         }}
       >
-        {/* {isSelected && (
-          <Checkbox
-            status={checked ? "checked" : "unchecked"}
-            onPress={() => {
-              setChecked(!checked);
-              setSelectedNews((prevSelectedItems) => {
-                if (prevSelectedItems.includes(index)) {
-                  // If the item is already selected, unselect it
-                  return prevSelectedItems.filter((i) => i !== index);
-                } else {
-                  // If the item is not selected, select it
-                  return [...prevSelectedItems, index];
-                }
-              });
-            }}
-          />
-        )} */}
         <Image
           source={{
             uri: item.urlToImage

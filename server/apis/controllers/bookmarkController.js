@@ -121,7 +121,7 @@ const getBookmarkController = async (req, res) => {
     );
 
     const posts = response.data.data;
-    console.log(posts);
+    // console.log(posts);
 
     // map the posts to the bookmarks and return the bookmarks
     const bookmarksPosts = bookmarks.bookmarks.map((bookmark) => {
@@ -139,9 +139,9 @@ const getBookmarkController = async (req, res) => {
           type: bookmark.type,
           _id: bookmark._id,
           item: {
-            ...post.attributes,
-            id: post.id,
-            image: `${process.env.STRAPI_API}${post.attributes.image.data.attributes?.url}`
+            ...post?.attributes,
+            id: post?.id,
+            image: `${process.env.STRAPI_API}${post?.attributes.image.data.attributes?.url}`
           }
         };
       }
@@ -198,7 +198,7 @@ const deleteBookmarkController = async (req, res) => {
     // if the bookmarks exist, delete the bookmark
     userBookmarks.bookmarks = userBookmarks.bookmarks.filter((bookmark) => {
       if (type === "post") {
-        return bookmark.item.id != bookmarkIds;
+        return bookmark.item != bookmarkIds;
       } else {
         return !bookmarkIds.includes(bookmark._id.toString());
       }

@@ -9,12 +9,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { getAllEventShortInfo, getShortProfileInfo } from "../api/apis";
-import * as SecureStorage from "expo-secure-store";
 import { PRIMARY_COLOR } from "../styles/colors";
 
 const Events = () => {
   const navigator = useNavigation();
   const [allEventsData, setAllEventsData] = useState([]);
+  const [pastEventData, setPastEventData] = useState([]);
 
   const getAllEventsDetails = async () => {
     const response = await getAllEventShortInfo();
@@ -32,25 +32,20 @@ const Events = () => {
       })
     );
 
-    setAllEventsData(eventsWithOrganizerNames);
-  };
+    const pastEvents = response.filter(
+      (event) => new Date(event.eventDateAndTime) < new Date()
+    );
+    const currentEvents = eventsWithOrganizerNames.filter(
+      (event) => new Date(event.eventDateAndTime) >= new Date()
+    );
 
-  // const getEmail = async () => {
-  //   const email = await SecureStorage.getItemAsync("email");
-  //   const yourEvents =
-  //     allEventsData?.filter((event) => event.eventOrganizer === email) || [];
-  //   setYourEventsData(yourEvents);
-  // };
+    setAllEventsData(currentEvents);
+    setPastEventData(pastEvents);
+  };
 
   useEffect(() => {
     getAllEventsDetails();
   }, []);
-
-  // useEffect(() => {
-  //   if (allEventsData) {
-  //     getEmail();
-  //   }
-  // }, [allEventsData]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -97,6 +92,91 @@ const Events = () => {
           </Text>
         </View>
         {allEventsData?.map((event, i) => {
+          return (
+            <Pressable
+              onPress={() =>
+                navigator.navigate("EventPage", { eventId: event.id })
+              }
+              key={i}
+              style={{
+                marginHorizontal: 10,
+                gap: 10,
+                marginVertical: 8
+              }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 10
+                }}
+              >
+                <Image
+                  source={{
+                    uri: event?.eventCover
+                  }}
+                  style={{
+                    width: 100,
+                    height: 80,
+                    borderRadius: 10,
+                    resizeMode: "cover"
+                  }}
+                />
+
+                <View style={{ flex: 1 }}>
+                  <Text>
+                    {new Date(event?.eventDateAndTime).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true
+                    }) +
+                      " " +
+                      new Date(event?.eventDateAndTime).toDateString()}
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: "bold",
+                      fontSize: 16,
+                      marginVertical: 3
+                    }}
+                  >
+                    {event?.eventName}
+                  </Text>
+                  <Text>{event?.eventOrganizerName}</Text>
+                </View>
+              </View>
+            </Pressable>
+          );
+        })}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginHorizontal: 10,
+            marginVertical: 20
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "500"
+              // }}>Upcoming events</Text>
+            }}
+          >
+            Past events
+          </Text>
+          <Text
+            style={{
+              fontSize: 15,
+              fontWeight: "500",
+              color: PRIMARY_COLOR
+              //   }}>View all</Text>
+            }}
+          >
+            View all
+          </Text>
+        </View>
+        {pastEventData?.map((event, i) => {
           return (
             <Pressable
               onPress={() =>

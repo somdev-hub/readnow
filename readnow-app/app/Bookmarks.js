@@ -37,35 +37,38 @@ const Bookmarks = () => {
     // console.log(userMail);
     const bookmarks = await getBookmarks(userMail);
     // console.log(bookmarks.bookmarks[0]);
-    const news = bookmarks.bookmarks.filter(
+    const news = bookmarks?.bookmarks.filter(
       (bookmark) => bookmark.type === "news"
     );
-    const posts = bookmarks.bookmarks.filter(
+    const posts = bookmarks?.bookmarks.filter(
       (bookmark) => bookmark.type === "post"
     );
-    const stories = bookmarks.bookmarks.filter(
+    const stories = bookmarks?.bookmarks.filter(
       (bookmark) => bookmark.type === "story"
     );
+    // console.log(posts);
     setNewsBookmarks(news);
-    const feedsWithProfile = await Promise.all(
-      posts.map(async (feed) => {
-        const profileResponse = await getShortProfileInfo(feed.item.postedBy);
-        return {
-          ...feed.item,
-          _id: feed._id,
-          user: profileResponse?.data.name,
-          header: profileResponse?.data.header,
-          profilePicture: profileResponse?.data.profilePicture
-        };
-      })
-    );
-    setPostBookmarks(feedsWithProfile);
+    // if (posts?.length > 0) {
+      const feedsWithProfile = await Promise.all(
+        posts?.map(async (feed) => {
+          const profileResponse = await getShortProfileInfo(feed.item.postedBy);
+          return {
+            ...feed.item,
+            _id: feed._id,
+            user: profileResponse?.data.name,
+            header: profileResponse?.data.header,
+            profilePicture: profileResponse?.data.profilePicture
+          };
+        })
+      );
+      setPostBookmarks(feedsWithProfile);
+    // }
     setStoryBookmarks(stories);
     setRefreshing(false);
   };
   const deleteSelectedBookmarks = async () => {
     const userMail = await SecureStorage.getItemAsync("email");
-    const newsIds = selectedNews.map((index) => newsBookmarks[index]._id);
+    const newsIds = selectedNews?.map((index) => newsBookmarks[index]._id);
     console.log(newsIds);
     const response = await deleteBookmark(newsIds, userMail);
     console.log(response);
@@ -168,10 +171,10 @@ const Bookmarks = () => {
       </View>
       {selectedValue === "Posts" && (
         <View style={{ marginTop: 5 }}>
-          {postBookmarks.length === 0 && (
+          {postBookmarks?.length === 0 && (
             <Text style={{ textAlign: "center" }}>No bookmarked posts</Text>
           )}
-          {postBookmarks.map((item, index) => {
+          {postBookmarks?.map((item, index) => {
             // const { user, profilePicture, header, ...rest } = item;-
             return (
               <PostCard
@@ -196,7 +199,7 @@ const Bookmarks = () => {
             paddingVertical: 10
           }}
         >
-          {selectedNews.length > 0 && (
+          {selectedNews?.length > 0 && (
             <View
               style={{
                 flexDirection: "row",
@@ -213,7 +216,7 @@ const Bookmarks = () => {
               >
                 <Text>Cancel</Text>
               </Pressable>
-              <Text>{selectedNews.length} selected</Text>
+              <Text>{selectedNews?.length} selected</Text>
               <Pressable
                 onPress={() => {
                   deleteSelectedBookmarks();
@@ -224,11 +227,11 @@ const Bookmarks = () => {
               </Pressable>
             </View>
           )}
-          {newsBookmarks.length === 0 && (
+          {newsBookmarks?.length === 0 && (
             <Text style={{ textAlign: "center" }}>No bookmarked news</Text>
           )}
           <View style={{ marginTop: 10, gap: 15 }}>
-            {newsBookmarks.map((item, index) => {
+            {newsBookmarks?.map((item, index) => {
               const isSelected = selectedNews.includes(index);
               return (
                 <NewsCard

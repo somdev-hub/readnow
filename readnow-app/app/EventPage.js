@@ -30,13 +30,18 @@ const EventPage = () => {
   const width = Dimensions.get("window").width;
   const bottomSheetRef = React.useRef(null);
   const route = useRoute();
-  // const { eventId } = route.params;
-  const eventId = 20;
+  const { eventId } = route.params;
+  // const eventId = 20;
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const [eventData, setEventData] = useState({});
   const [attendingEvent, setAttendingEvent] = useState(false);
-  const [numberofDaysLeft, setNumberofDaysLeft] = useState(0);
+  const [numberofDaysLeft, setNumberofDaysLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0
+  });
   const [playEventMedia, setPlayEventMedia] = useState(false);
+  const [shouldPlayEventMedia, setShouldPlayEventMedia] = useState(false);
   const videoControl = React.useRef(null);
 
   const handleSheetChanges = React.useCallback((index) => {
@@ -84,13 +89,19 @@ const EventPage = () => {
       const attending = response?.eventAttendees?.includes(email);
       setAttendingEvent(attending);
 
-      setNumberofDaysLeft(
-        Math.floor(
-          (new Date(response?.eventDateAndTime).getTime() -
-            new Date().getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
+      const timeLeft = new Date(response?.eventDateAndTime) - new Date();
+
+      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
       );
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+
+      setNumberofDaysLeft({
+        days: days,
+        hours: hours,
+        minutes: minutes
+      });
 
       const eventDataWithOrganizerAndSpeakers = {
         ...response,
@@ -103,6 +114,19 @@ const EventPage = () => {
       // setEventData(response);
     };
     getEventDetails();
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentTime = new Date();
+      const eventTime = new Date(eventData?.eventDateAndTime);
+      if (currentTime >= eventTime) {
+        setShouldPlayEventMedia(true);
+      }
+    }, 10000); // Check every minute
+
+    // Clean up interval on component unmount
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -158,41 +182,39 @@ const EventPage = () => {
                   }}
                 >
                   Live{" "}
-                  {numberofDaysLeft > 0
-                    ? numberofDaysLeft === 1
-                      ? "tomorrow"
-                      : `in ${numberofDaysLeft} days`
-                    : "now"}
+                  {numberofDaysLeft.days > 0
+                    ? numberofDaysLeft.days + " days "
+                    : `${numberofDaysLeft.hours} hours ${numberofDaysLeft.minutes} minutes`}
                 </Text>
               </View>
-              <Pressable
-                onPress={() => {
-                  setPlayEventMedia(true);
-                  // videoControl.current.playAsync();
-                }}
-                style={{
-                  position: "absolute",
-                  top: "40%",
-                  left: "40%",
-                  // marginHorizontal:"auto",
-                  // transform: [{ translateX: -50 }, { translateY: -50 }],
-                  backgroundColor: "#eeeeee",
-                  opacity: 0.7,
-                  padding: 10,
-                  borderRadius: 50,
-                  paddingHorizontal: 20
-                }}
-              >
-                <Text
+              {shouldPlayEventMedia && (
+                <Pressable
+                  onPress={() => {
+                    setPlayEventMedia(true);
+                    // videoControl.current.playAsync();
+                  }}
                   style={{
-                    color: "#000",
-                    fontSize: 16,
-                    fontWeight: "bold"
+                    position: "absolute",
+                    top: "40%",
+                    left: "40%",
+                    backgroundColor: "#eeeeee",
+                    opacity: 0.7,
+                    padding: 10,
+                    borderRadius: 50,
+                    paddingHorizontal: 20
                   }}
                 >
-                  Play
-                </Text>
-              </Pressable>
+                  <Text
+                    style={{
+                      color: "#000",
+                      fontSize: 16,
+                      fontWeight: "bold"
+                    }}
+                  >
+                    Play
+                  </Text>
+                </Pressable>
+              )}
             </>
           )}
         </View>
