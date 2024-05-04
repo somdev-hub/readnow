@@ -20,6 +20,7 @@ import axios from "axios";
 import { editProfile, signup } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { CommonActions } from "@react-navigation/native";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const AddInfo = () => {
   const route = useRoute();
@@ -194,7 +195,7 @@ const AddInfo = () => {
           <TouchableOpacity
             onPress={handleSubmit}
             style={{
-              backgroundColor: "#49755D",
+              backgroundColor: PRIMARY_COLOR,
               padding: 15,
               borderRadius: 30,
               marginHorizontal: 20,

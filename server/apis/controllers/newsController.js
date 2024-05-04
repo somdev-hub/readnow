@@ -33,7 +33,7 @@ const { Readability } = require("@mozilla/readability");
 const getHeadlinesController = async (req, res) => {
   axios
     .get(
-      `https://newsapi.org/v2/everything?q=farmers&apiKey=719a6f11a1024e619d328e8387a80add`
+      `https://newsapi.org/v2/top-headlines?country=in&apiKey=${process.env.NEWS_API}`
     )
     .then((response) => {
       res.send(response.data.articles);
@@ -61,7 +61,7 @@ const searchHeadlinesController = async (req, res) => {
   const query = req.params.query;
   axios
     .get(
-      `https://newsapi.org/v2/everything?q=${query}&apiKey=719a6f11a1024e619d328e8387a80add`
+      `https://newsapi.org/v2/everything?q=${query}&apiKey=${process.env.NEWS_API}`
     )
     .then((response) => {
       res.send(response.data.articles);

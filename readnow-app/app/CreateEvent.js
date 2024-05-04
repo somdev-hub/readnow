@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Snackbar } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getSpecificEvent } from "../api/apis";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const RadioButtonOption = ({ value, currentMode, setMode }) => (
   <View
@@ -394,7 +395,7 @@ const CreateEvent = () => {
                     style={{
                       fontSize: 12,
                       fontWeight: "500",
-                      color: "#49755D"
+                      color: PRIMARY_COLOR
                     }}
                   >
                     {speaker}

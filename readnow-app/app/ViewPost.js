@@ -18,6 +18,7 @@ import {
   getShortProfileInfo
 } from "../api/apis";
 import GroupPostCard from "../components/GroupPostCard";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const ViewPost = () => {
   const route = useRoute();
@@ -140,7 +141,7 @@ const ViewPost = () => {
             />
             <Pressable onPress={handleComment}>
               <Text
-                style={{ fontWeight: "bold", fontSize: 16, color: "#49755D" }}
+                style={{ fontWeight: "bold", fontSize: 16, color: PRIMARY_COLOR }}
               >
                 Post
               </Text>

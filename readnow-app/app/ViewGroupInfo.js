@@ -20,7 +20,7 @@ import {
 } from "../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import GroupPostCard from "../components/GroupPostCard";
-import { WHITE_COLOR } from "../styles/colors";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 
 const ViewGroupInfo = () => {
   const navigator = useNavigation();
@@ -96,9 +96,9 @@ const ViewGroupInfo = () => {
                 }}
               >
                 <Pressable onPress={() => navigator.navigate("GroupSettings")}>
-                  <Feather name="settings" size={22} color="#49755D" />
+                  <Feather name="settings" size={22} color={PRIMARY_COLOR} />
                 </Pressable>
-                <Feather name="bell" size={22} color="#49755D" />
+                <Feather name="bell" size={22} color={PRIMARY_COLOR} />
               </View>
               <View
                 style={{
@@ -113,7 +113,7 @@ const ViewGroupInfo = () => {
                   zIndex: 5,
                   borderRadius: 20,
                   // elevation: 5,
-                  borderColor: "#49755D",
+                  borderColor: PRIMARY_COLOR,
                   borderWidth: 1
                 }}
               >
@@ -166,8 +166,8 @@ const ViewGroupInfo = () => {
                   flex: 1,
                   padding: 8,
                   borderWidth: groupJoin ? 2 : 0,
-                  borderColor: groupJoin ? "#49755D" : "white",
-                  backgroundColor: groupJoin ? "white" : "#49755D",
+                  borderColor: groupJoin ? PRIMARY_COLOR : "white",
+                  backgroundColor: groupJoin ? "white" : PRIMARY_COLOR,
                   borderRadius: 50,
                   justifyContent: "center",
                   alignItems: "center"
@@ -178,7 +178,7 @@ const ViewGroupInfo = () => {
                     textAlign: "center",
                     // marginTop: 5,
                     fontWeight: "500",
-                    color: groupJoin ? "#49755D" : "white"
+                    color: groupJoin ? PRIMARY_COLOR : "white"
                   }}
                 >
                   {groupJoin ? "Exit" : "Join"}
@@ -187,7 +187,7 @@ const ViewGroupInfo = () => {
               <TouchableOpacity
                 style={{
                   flex: 1,
-                  borderColor: "#49755D",
+                  borderColor: PRIMARY_COLOR,
                   borderWidth: 2,
                   borderRadius: 50,
                   padding: 8,
@@ -200,7 +200,7 @@ const ViewGroupInfo = () => {
                     textAlign: "center",
                     // marginTop: 5,
                     fontWeight: "500",
-                    color: "#49755D"
+                    color: PRIMARY_COLOR
                   }}
                 >
                   Invite
@@ -208,7 +208,7 @@ const ViewGroupInfo = () => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
-                  borderColor: "#49755D",
+                  borderColor: PRIMARY_COLOR,
                   borderWidth: 2,
                   borderRadius: 50,
                   padding: 8,
@@ -219,7 +219,7 @@ const ViewGroupInfo = () => {
                 <Entypo
                   name="dots-three-horizontal"
                   size={20}
-                  color="#49755D"
+                  color={PRIMARY_COLOR}
                 />
               </TouchableOpacity>
             </View>
@@ -257,7 +257,7 @@ const ViewGroupInfo = () => {
               style={{
                 textAlign: "center",
                 marginVertical: 10,
-                color: "#49755D",
+                color: PRIMARY_COLOR,
                 fontWeight: "500",
                 fontSize: 16
               }}

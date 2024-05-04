@@ -16,7 +16,7 @@ const Groups = () => {
     };
     getFollowedGroupsMethod();
   }, []);
-  console.log(followedGroups);
+  // console.log(followedGroups);
   return (
     <View>
       <ScrollView>
@@ -25,7 +25,7 @@ const Groups = () => {
             Groups you follow
           </Text>
           <View style={{ marginTop: 10 }}>
-            {followedGroups.map((item, index) => {
+            {followedGroups?.map((item, index) => {
               return (
                 <GroupCard
                   key={index}

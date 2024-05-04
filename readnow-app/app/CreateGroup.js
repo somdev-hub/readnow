@@ -15,6 +15,7 @@ import { fetchEmail } from "../redux/groupSlice";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const CreateGroup = () => {
   const ref = React.useRef(true);
@@ -134,7 +135,7 @@ const CreateGroup = () => {
                   height: 90,
                   zIndex: 5,
                   borderRadius: 20,
-                  borderColor: "#49755D",
+                  borderColor: PRIMARY_COLOR,
                   borderWidth: 1
                 }}
               >
@@ -190,7 +191,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Enter group name*
@@ -222,7 +223,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Enter group description*
@@ -255,7 +256,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Group genre*
@@ -285,7 +286,7 @@ const CreateGroup = () => {
                       alignItems: "center",
                       // alignSelf: "flex-start",
                       gap: 5,
-                      backgroundColor: "#49755D"
+                      backgroundColor: PRIMARY_COLOR
                     }}
                   >
                     <Text
@@ -349,7 +350,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Enter location*
@@ -385,7 +386,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Enter rules*
@@ -418,7 +419,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Enter tags
@@ -447,7 +448,7 @@ const CreateGroup = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10,
-                color: "#49755D"
+                color: PRIMARY_COLOR
               }}
             >
               Group visibility*
@@ -500,7 +501,7 @@ const CreateGroup = () => {
                   });
                   // setChecked("private")
                 }}
-                color="#49755D"
+                color={PRIMARY_COLOR}
                 style={{ justifyContent: "center" }}
               />
             </Pressable>
@@ -551,7 +552,7 @@ const CreateGroup = () => {
                   });
                   // setChecked("private")
                 }}
-                color="#49755D"
+                color={PRIMARY_COLOR}
                 style={{
                   justifyContent: "center"
                 }}

@@ -19,6 +19,7 @@ import {
 } from "../api/apis";
 import { useDispatch } from "react-redux";
 import * as SecureStorage from "expo-secure-store";
+import { PRIMARY_COLOR } from "../styles/colors";
 
 const size = Dimensions.get("window");
 const Feeds = () => {
@@ -217,13 +218,13 @@ const Feeds = () => {
                 height: 65,
                 borderRadius: 50,
                 borderStyle: "dashed",
-                borderColor: "#49755D",
+                borderColor: PRIMARY_COLOR,
                 borderWidth: 2,
                 alignItems: "center",
                 justifyContent: "center"
               }}
             >
-              <Entypo name="plus" size={24} color="#49755D" />
+              <Entypo name="plus" size={24} color={PRIMARY_COLOR} />
             </View>
             <Text
               style={{
@@ -262,7 +263,7 @@ const Feeds = () => {
                       width: "100%",
                       height: "100%",
                       borderRadius: 50,
-                      borderColor: "#49755D",
+                      borderColor: PRIMARY_COLOR,
                       borderWidth: 2
                     }}
                     resizeMode="cover"

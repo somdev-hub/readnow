@@ -5,7 +5,7 @@ const axios = require("axios");
 
 const createGroupController = async (req, res) => {
 
-  console.log(req.body);
+  // console.log(req.body);
   const groupImage = req.files.groupImage ? req.files.groupImage[0] : undefined;
   const groupCoverImage = req.files.groupCoverImage
     ? req.files.groupCoverImage[0]

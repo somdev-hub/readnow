@@ -28,7 +28,7 @@ import { getAIResponse, getFollowedGroups, getUserGroups } from "../api/apis";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { WHITE_COLOR } from "../styles/colors";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 
 const screenHeights = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -326,7 +326,7 @@ const AddPost = () => {
             position: "absolute",
             bottom: 20,
             right: 20,
-            backgroundColor: "#49755D",
+            backgroundColor: PRIMARY_COLOR,
             color: WHITE_COLOR
           }}
           onPress={() => setSurfaceVisible(!surfaceVisible)}
