@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Groups from "../../app/Groups";
-import DiscoverGroups from "../../app/DiscoverGroups";
-import ManageGroups from "../../app/ManageGroups";
+import Groups from "../../app/groups/Groups";
+import DiscoverGroups from "../../app/groups/DiscoverGroups";
+import ManageGroups from "../../app/groups/ManageGroups";
 
 const TopTab = createMaterialTopTabNavigator();
 

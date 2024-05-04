@@ -17,9 +17,9 @@ import {
   getShortProfileInfo,
   getSpecificGroup,
   joinThisGroup
-} from "../api/apis";
+} from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
-import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 
 const GroupNewView = () => {
   const navigator = useNavigation();

@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import PeopleCard from "../components/PeopleCard";
+import PeopleCard from "../../components/PeopleCard";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRoute } from "@react-navigation/native";
 import {
@@ -19,11 +19,11 @@ import {
   getShortProfileInfo,
   getSpecificEvent,
   toggleEventAttendence
-} from "../api/apis";
+} from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { Video, ResizeMode } from "expo-av";
-import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
-import EventCommentSection from "../components/EventCommentSection";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
+import EventCommentSection from "../../components/EventCommentSection";
 
 const EventPage = () => {
   const height = Dimensions.get("window").height;

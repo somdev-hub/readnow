@@ -17,10 +17,10 @@ import {
   getShortGroupInfo,
   getShortProfileInfo,
   getSpecificGroup
-} from "../api/apis";
+} from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
-import GroupPostCard from "../components/GroupPostCard";
-import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
+import GroupPostCard from "../../components/GroupPostCard";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 
 const ViewGroupInfo = () => {
   const navigator = useNavigation();

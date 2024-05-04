@@ -21,7 +21,7 @@ import SignUp from "../../app/SignUp";
 import Login from "../../app/Login";
 import Story from "../../app/Story";
 import AddInfo from "../../app/AddInfo";
-import Groups from "../../app/Groups";
+import Groups from "../../app/groups/Groups";
 import AddPost from "../../app/AddPost";
 import MyProfile from "../../app/MyProfile";
 import People from "../../app/People";
@@ -30,23 +30,25 @@ import ArticlePage from "../../app/ArticlePage";
 import ViewPost from "../../app/ViewPost";
 import Web from "../../app/Web";
 import GroupTopNavigator from "./GroupTopNavigator";
-import ViewGroupInfo from "../../app/ViewGroupInfo";
-import GroupDetails from "../../app/GroupDetails";
-import CreateGroup from "../../app/CreateGroup";
-import GroupSettings from "../../app/GroupSettings";
+import ViewGroupInfo from "../../app/groups/ViewGroupInfo";
+import GroupDetails from "../../app/groups/GroupDetails";
+import CreateGroup from "../../app/groups/CreateGroup";
+import GroupSettings from "../../app/groups/GroupSettings";
 import { postGroupData } from "../../redux/groupSlice";
-import GroupGenreSelection from "../../app/GroupGenreSelection";
-import GroupNewView from "../../app/GroupNewView";
-import Events from "../../app/Events";
-import EventPage from "../../app/EventPage";
+import GroupGenreSelection from "../../app/groups/GroupGenreSelection";
+import GroupNewView from "../../app/groups/GroupNewView";
+import Events from "../../app/events/Events";
+import EventPage from "../../app/events/EventPage";
 import { AntDesign } from "@expo/vector-icons";
-import CreateEvent from "../../app/CreateEvent";
-import AdminEventPage from "../../app/AdminEventPage";
+import CreateEvent from "../../app/events/CreateEvent";
+import AdminEventPage from "../../app/events/AdminEventPage";
 import { editEventData, postEventData } from "../../redux/eventSlice";
 import { PRIMARY_COLOR } from "../../styles/colors";
 import EventTopNavigator from "./EventTopNavigator";
 import DrawerNavigator from "./DrawerNavigator";
 import { CollapsibleScrollView } from "react-navigation-collapsible";
+import GroupAdminPage from "../../app/groups/GroupAdminPage";
+import ManageGroupAdmins from "../../app/groups/ManageGroupAdmins";
 
 const Stack = createStackNavigator();
 
@@ -583,6 +585,22 @@ const StackNavigator = () => {
           headerShown: true,
           headerTitle: "Profile",
           headerMode: "screen"
+        }}
+      />
+      <Stack.Screen
+        name="GroupAdminPage"
+        component={GroupAdminPage}
+        options={{
+          headerShown: true,
+          headerTitle: "Group Admin"
+        }}
+      />
+      <Stack.Screen
+        name="ManageGroupAdmins"
+        component={ManageGroupAdmins}
+        options={{
+          headerShown: true,
+          headerTitle: "Group Admin"
         }}
       />
     </Stack.Navigator>

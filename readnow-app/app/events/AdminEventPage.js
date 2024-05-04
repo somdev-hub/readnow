@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import PeopleCard from "../components/PeopleCard";
+import PeopleCard from "../../components/PeopleCard";
 import BottomSheet from "@gorhom/bottom-sheet";
 import * as DocumentPicker from "expo-document-picker";
 import { Video, ResizeMode } from "expo-av";
@@ -22,10 +22,10 @@ import {
   getCardProfile,
   getShortProfileInfo,
   getSpecificEvent
-} from "../api/apis";
-import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
+} from "../../api/apis";
+import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { useRoute } from "@react-navigation/native";
-import EventCommentSection from "../components/EventCommentSection";
+import EventCommentSection from "../../components/EventCommentSection";
 
 const AdminEventPage = () => {
   const height = Dimensions.get("window").height;
@@ -140,7 +140,7 @@ const AdminEventPage = () => {
         <View style={{ position: "relative", alignItems: "center" }}>
           {!eventMedia ? (
             <Image
-              source={require("../assets/upload-image-bg.jpg")}
+              source={require("../../assets/upload-image-bg.jpg")}
               style={{
                 width: "100%",
                 height: 200,

@@ -1,32 +1,40 @@
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const GroupSettings = () => {
+  const navigator = useNavigation();
   const settings = [
     {
       name: "Manage admins",
-      icon: "user"
+      icon: "user",
+      route: "ManageGroupAdmins"
     },
     {
       name: "Posts",
-      icon: "book"
+      icon: "book",
+      route: "ManageGroupAdmins"
     },
     {
       name: "Members",
-      icon: "users"
+      icon: "users",
+      route: "ManageGroupAdmins"
     },
     {
       name: "Requests",
-      icon: "user"
+      icon: "user",
+      route: "ManageGroupAdmins"
     },
     {
       name: "Edit group info",
-      icon: "edit"
+      icon: "edit",
+      route: "ManageGroupAdmins"
     },
     {
       name: "Delete group",
-      icon: "trash"
+      icon: "trash",
+      route: "ManageGroupAdmins"
     }
   ];
   const generalSettings = [
@@ -64,7 +72,8 @@ const GroupSettings = () => {
           </Text>
           {settings.map((setting, index) => {
             return (
-              <View
+              <Pressable
+                onPress={() => navigator.navigate(setting.route)}
                 key={index}
                 style={{
                   marginVertical: 10,
@@ -78,7 +87,7 @@ const GroupSettings = () => {
               >
                 <Entypo name={setting.icon} size={20} color="#A9A9A9" />
                 <Text style={{ fontSize: 16 }}>{setting.name}</Text>
-              </View>
+              </Pressable>
             );
           })}
         </View>

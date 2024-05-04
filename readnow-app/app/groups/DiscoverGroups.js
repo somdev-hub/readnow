@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity, Image } from "react-native";
 import React, { useEffect, useState } from "react";
-import DiscoverGroupCard from "../components/DiscoverGroupCard";
-import { getGroups } from "../api/apis";
+import DiscoverGroupCard from "../../components/DiscoverGroupCard";
+import { getGroups } from "../../api/apis";
 
 const DiscoverGroups = () => {
   const [groups, setGroups] = useState([]);

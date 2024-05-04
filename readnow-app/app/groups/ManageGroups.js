@@ -8,8 +8,9 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as SecureStorage from "expo-secure-store";
-import { getManagedGroups } from "../api/apis";
-import { PRIMARY_COLOR } from "../styles/colors";
+import { getManagedGroups } from "../../api/apis";
+import { PRIMARY_COLOR } from "../../styles/colors";
+import { useNavigation } from "@react-navigation/native";
 
 const ManageGroups = () => {
   const [managedGroups, setManagedGroups] = useState([]);
@@ -22,6 +23,8 @@ const ManageGroups = () => {
     };
     fetchManagedGroups();
   }, []);
+
+  const navigator = useNavigation();
   return (
     <View>
       <ScrollView>
@@ -33,6 +36,11 @@ const ManageGroups = () => {
             return (
               <View style={{ marginTop: 10, marginHorizontal: 10 }} key={index}>
                 <Pressable
+                  onPress={() =>
+                    navigator.navigate("GroupAdminPage", {
+                      groupId: item?._id
+                    })
+                  }
                   style={{
                     backgroundColor: "white",
                     elevation: 1,

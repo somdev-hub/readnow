@@ -17,8 +17,8 @@ import * as SecureStorage from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
 import { Snackbar } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getSpecificEvent } from "../api/apis";
-import { PRIMARY_COLOR } from "../styles/colors";
+import { getSpecificEvent } from "../../api/apis";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
 const RadioButtonOption = ({ value, currentMode, setMode }) => (
   <View

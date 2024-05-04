@@ -1,7 +1,7 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Events from "../../app/Events";
-import YourEvents from "../../app/YourEvents";
+import Events from "../../app/events/Events";
+import YourEvents from "../../app/events/YourEvents";
 
 const TopTab = createMaterialTopTabNavigator();
 

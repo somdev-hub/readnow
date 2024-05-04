@@ -8,17 +8,19 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { getAllEventShortInfo, getShortProfileInfo } from "../api/apis";
-import { PRIMARY_COLOR } from "../styles/colors";
+import { getAllEventShortInfo, getShortProfileInfo } from "../../api/apis";
+import * as SecureStorage from "expo-secure-store";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
-const Events = () => {
+const YourEvents = () => {
   const navigator = useNavigation();
   const [allEventsData, setAllEventsData] = useState([]);
-  const [pastEventData, setPastEventData] = useState([]);
+  const [yourEventsData, setYourEventsData] = useState([]);
+  const [adminEventsData, setAdminEventsData] = useState([]);
 
   const getAllEventsDetails = async () => {
     const response = await getAllEventShortInfo();
-    console.log(response);
+    // console.log(response);
 
     const eventsWithOrganizerNames = await Promise.all(
       response.map(async (event) => {
@@ -32,21 +34,36 @@ const Events = () => {
       })
     );
 
-    const pastEvents = response.filter(
-      (event) => new Date(event.eventDateAndTime) < new Date()
-    );
-    const currentEvents = eventsWithOrganizerNames.filter(
-      (event) => new Date(event.eventDateAndTime) >= new Date()
-    );
+    setAllEventsData(eventsWithOrganizerNames);
+  };
 
-    setAllEventsData(currentEvents);
-    setPastEventData(pastEvents);
+  // console.log(event.eventAttendees);
+
+  const getEmail = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const yourEvents =
+      allEventsData?.filter((event) => event.eventOrganizer === email) || [];
+    setAdminEventsData(yourEvents);
+    const attendingEvents =
+      allEventsData?.filter(
+        (event) =>
+          event?.eventAttendees?.includes(email) &&
+          new Date(event?.eventDateAndTime) >= new Date()
+      ) || [];
+    setYourEventsData(attendingEvents);
   };
 
   useEffect(() => {
     getAllEventsDetails();
   }, []);
 
+  // console.log(yourEventsData);
+
+  useEffect(() => {
+    if (allEventsData) {
+      getEmail();
+    }
+  }, [allEventsData]);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -61,14 +78,13 @@ const Events = () => {
           }}
           placeholder="Search Events"
         />
-
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
             marginHorizontal: 10,
-            marginVertical: 20
+            marginVertical: 10
           }}
         >
           <Text
@@ -78,7 +94,7 @@ const Events = () => {
               // }}>Upcoming events</Text>
             }}
           >
-            Top events
+            Your events
           </Text>
           <Text
             style={{
@@ -91,11 +107,13 @@ const Events = () => {
             View all
           </Text>
         </View>
-        {allEventsData?.map((event, i) => {
+        {adminEventsData?.map((event, i) => {
           return (
             <Pressable
               onPress={() =>
-                navigator.navigate("EventPage", { eventId: event.id })
+                navigator.navigate("AdminEventPage", {
+                  currentEventId: event.id
+                })
               }
               key={i}
               style={{
@@ -153,7 +171,7 @@ const Events = () => {
             justifyContent: "space-between",
             alignItems: "center",
             marginHorizontal: 10,
-            marginVertical: 20
+            marginVertical: 10
           }}
         >
           <Text
@@ -163,7 +181,7 @@ const Events = () => {
               // }}>Upcoming events</Text>
             }}
           >
-            Past events
+            Attending events
           </Text>
           <Text
             style={{
@@ -176,11 +194,13 @@ const Events = () => {
             View all
           </Text>
         </View>
-        {pastEventData?.map((event, i) => {
+        {yourEventsData?.map((event, i) => {
           return (
             <Pressable
               onPress={() =>
-                navigator.navigate("EventPage", { eventId: event.id })
+                navigator.navigate("EventPage", {
+                  eventId: event.id
+                })
               }
               key={i}
               style={{
@@ -237,4 +257,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default YourEvents;

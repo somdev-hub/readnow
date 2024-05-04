@@ -9,8 +9,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { getShortProfileInfo } from "../api/apis";
-import { WHITE_COLOR } from "../styles/colors";
+import { getShortProfileInfo } from "../../api/apis";
+import { WHITE_COLOR } from "../../styles/colors";
 
 const GroupDetails = () => {
   const route = useRoute();

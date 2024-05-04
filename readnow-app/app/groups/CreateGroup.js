@@ -11,11 +11,11 @@ import { Entypo } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchEmail } from "../redux/groupSlice";
+import { fetchEmail } from "../../redux/groupSlice";
 import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import { PRIMARY_COLOR } from "../styles/colors";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
 const CreateGroup = () => {
   const ref = React.useRef(true);

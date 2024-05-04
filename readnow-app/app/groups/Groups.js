@@ -1,9 +1,9 @@
 import { View, Text, ScrollView, Image } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
-import GroupCard from "../components/GroupCard";
+import GroupCard from "../../components/GroupCard";
 import * as SecureStorage from "expo-secure-store";
-import { getFollowedGroups } from "../api/apis";
+import { getFollowedGroups } from "../../api/apis";
 
 const Groups = () => {
   const [followedGroups, setFollowedGroups] = useState([]);
