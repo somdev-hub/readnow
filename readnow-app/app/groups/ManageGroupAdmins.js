@@ -1,18 +1,106 @@
-import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  TouchableOpacity,
+  ScrollView
+} from "react-native";
+import React, { useEffect, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { PRIMARY_COLOR } from "../../styles/colors";
-import { Menu, Modal, Portal, TextInput } from "react-native-paper";
+import { Menu, Modal, Portal, TextInput, Snackbar } from "react-native-paper";
+import { useRoute } from "@react-navigation/native";
+import {
+  addGroupAdmin,
+  getShortProfileInfo,
+  getSpecificGroup,
+  removeGroupAdmin
+} from "../../api/apis";
+import { Picker } from "@react-native-picker/picker";
+import { RefreshControl } from "react-native";
 
 const ManageGroupAdmins = () => {
   const [visibleMenu, setVisibleMenu] = useState({
     visible: false,
     index: null
   });
+  const route = useRoute();
+  const { groupId } = route.params;
   const [visibleModal, setVisibleModal] = useState(false);
+  const [adminData, setAdminData] = useState({
+    adminEmail: "",
+    adminRole: ""
+  });
   const [adminEmail, setAdminEmail] = useState("");
+  const [adminRole, setAdminRole] = useState("");
+  const [groupAdmins, setGroupAdmins] = useState([]);
+  const [snackbarVisible, setSnackbarVisible] = useState({
+    visible: false,
+    message: ""
+  });
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    getGroupData();
+  }, []);
+
+  const addAdmin = async () => {
+    const response = await addGroupAdmin(groupId, adminEmail, adminRole);
+    if (response?.status === 200) {
+      setSnackbarVisible({
+        visible: true,
+        message: "Admin added successfully"
+      });
+    } else {
+      setSnackbarVisible({
+        visible: true,
+        message: "Error adding admin"
+      });
+    }
+  };
+
+  const removeAdmin = async (adminMail) => {
+    const response = await removeGroupAdmin(groupId, adminMail);
+    if (response?.status === 200) {
+      setSnackbarVisible({
+        visible: true,
+        message: "Admin removed successfully"
+      });
+    } else {
+      setSnackbarVisible({
+        visible: true,
+        message: "Error removing admin"
+      });
+    }
+  };
+
+  const getGroupData = async () => {
+    setRefreshing(true);
+    const response = await getSpecificGroup(groupId);
+    // console.log(response);
+
+    const groupAdminsData = await Promise.all(
+      response?.groupAdmins?.map(async (admin) => {
+        const response = await getShortProfileInfo(admin.user);
+        return { adminData: response.data, adminRole: admin.role };
+      })
+    );
+    // console.log(groupAdminsData);
+    setGroupAdmins(groupAdminsData);
+    setRefreshing(false);
+  };
+  useEffect(() => {
+    getGroupData();
+  }, []);
   return (
-    <View>
+    <ScrollView
+      contentContainerStyle={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      {/* <RefreshControl refreshing={refreshing} onRefresh={onRefresh} /> */}
       <Text
         style={{
           fontSize: 16,
@@ -29,7 +117,7 @@ const ManageGroupAdmins = () => {
           marginTop: 20
         }}
       >
-        {Array.from({ length: 5 }).map((_, index) => {
+        {groupAdmins?.map((admin, index) => {
           return (
             <View
               style={{
@@ -52,15 +140,17 @@ const ManageGroupAdmins = () => {
               >
                 <Image
                   source={{
-                    uri: "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
+                    uri: admin.adminData?.profilePicture
                   }}
                   style={{ width: 50, height: 50, borderRadius: 50 }}
                 />
                 <View>
                   <Text style={{ fontSize: 16, fontWeight: "500" }}>
-                    John Doe
+                    {admin.adminData?.name}
                   </Text>
-                  <Text style={{ fontSize: 14, color: "#A9A9A9" }}>Admin</Text>
+                  <Text style={{ fontSize: 14, color: "#A9A9A9" }}>
+                    {admin.adminRole}
+                  </Text>
                 </View>
               </View>
               <Menu
@@ -89,7 +179,13 @@ const ManageGroupAdmins = () => {
                 }
               >
                 <Menu.Item
-                  onPress={() => {}}
+                  onPress={() => {
+                    removeAdmin(admin.adminData.email);
+                    setVisibleMenu({
+                      visible: false,
+                      index: null
+                    });
+                  }}
                   title="Remove"
                   leadingIcon="delete"
                 />
@@ -141,7 +237,24 @@ const ManageGroupAdmins = () => {
             style={{ backgroundColor: "white" }}
             activeOutlineColor={PRIMARY_COLOR}
           />
+          <Picker
+            selectedValue={adminRole}
+            onValueChange={(itemValue) => setAdminRole(itemValue)}
+            style={{
+              backgroundColor: "white",
+              borderColor: "black",
+              borderWidth: 2
+            }}
+          >
+            <Picker.Item label="Moderator" value="Moderator" />
+            <Picker.Item label="Editor" value="Editor" />
+            {/* <Picker.Item label="Role 3" value="role3" /> */}
+          </Picker>
           <TouchableOpacity
+            onPress={() => {
+              addAdmin();
+              setVisibleModal(false);
+            }}
             style={{
               backgroundColor: PRIMARY_COLOR,
               padding: 10,
@@ -160,7 +273,19 @@ const ManageGroupAdmins = () => {
           </TouchableOpacity>
         </Modal>
       </Portal>
-    </View>
+      <Snackbar
+        visible={snackbarVisible.visible}
+        onDismiss={() =>
+          setSnackbarVisible({
+            visible: false,
+            message: ""
+          })
+        }
+        style={{}}
+      >
+        {snackbarVisible.message}
+      </Snackbar>
+    </ScrollView>
   );
 };
 

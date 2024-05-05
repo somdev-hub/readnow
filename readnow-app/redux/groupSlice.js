@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
-import { createGroup } from "../api/apis";
+import { createGroup, editGroup } from "../api/apis";
 
 export const postGroupData = createAsyncThunk(
   "group/postGroupData",
@@ -16,6 +16,15 @@ export const fetchEmail = createAsyncThunk("group/fetchEmail", async () => {
   return email;
 });
 
+export const editGroupData = createAsyncThunk(
+  "group/editGroupData",
+  async (groupData) => {
+    // console.log(groupData.groupId);
+    const response = await editGroup(groupData);
+    return response;
+  }
+);
+
 const groupSlice = createSlice({
   name: "group",
   initialState: {
@@ -29,16 +38,18 @@ const groupSlice = createSlice({
         groupLocation: "",
         groupVisibility: "",
         groupGenre: []
-        // createdOn: new Date().toISOString()
       },
       groupImage: null,
-      groupCoverImage: null
+      groupCoverImage: null,
+      isGroupImageSame: true,
+      isGroupCoverImageSame: true,
+      groupId: null
     },
     groupGenresDone: false,
     groupGenres: [],
     loading: false,
     error: "",
-    isEditedGroup: false
+    isEditedGroup: false,
   },
   reducers: {
     updateGroupData: (state, action) => {
@@ -51,9 +62,14 @@ const groupSlice = createSlice({
         action.payload.groupDetails.groupLocation;
       state.groupData.groupDetails.groupVisibility =
         action.payload.groupDetails.groupVisibility;
-      state.groupData.groupDetails.groupGenre = action.payload.groupDetails.groupGenre;
+      state.groupData.groupDetails.groupGenre =
+        action.payload.groupDetails.groupGenre;
       state.groupData.groupImage = action.payload.groupImage;
       state.groupData.groupCoverImage = action.payload.groupCoverImage;
+      state.groupData.isGroupImageSame = action.payload.isGroupImageSame;
+      state.groupData.isGroupCoverImageSame =
+        action.payload.isGroupCoverImageSame;
+      state.groupData.groupId = action.payload.groupId;
     },
     updateGroupGenres: (state, action) => {
       // state.groupGenresDone = action.payload;
@@ -64,7 +80,10 @@ const groupSlice = createSlice({
     },
     updateGroupEditMode: (state, action) => {
       state.isEditedGroup = action.payload;
-    }
+    },
+    // updateGroupId: (state, action) => {
+    //   state.groupId = action.payload;
+    // }
   },
   extraReducers: (builder) => {
     builder
@@ -93,6 +112,10 @@ const groupSlice = createSlice({
       .addCase(postGroupData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(editGroupData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isEditedGroup = true;
       });
   }
 });

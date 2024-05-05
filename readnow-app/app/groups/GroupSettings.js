@@ -15,7 +15,9 @@ const GroupSettings = () => {
       name: "Manage admins",
       icon: "user",
       route: "ManageGroupAdmins",
-      params: {}
+      params: {
+        groupId: groupId
+      }
     },
     {
       name: "Posts",

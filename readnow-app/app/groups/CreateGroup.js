@@ -24,6 +24,7 @@ const CreateGroup = () => {
   const navigator = useNavigation();
   const groupData = useSelector((state) => state.group.groupData);
   const groupGenres = useSelector((state) => state.group.groupGenres);
+  const groupEditMode = useSelector((state) => state.group.isEditedGroup);
   const router = useRoute();
   const { groupId, edit } = router.params;
   const [groupCreationData, setGroupCreationData] = React.useState({
@@ -38,7 +39,10 @@ const CreateGroup = () => {
       groupGenre: groupGenres
     },
     groupImage: null,
-    groupCoverImage: null
+    groupCoverImage: null,
+    isGroupImageSame: true,
+    isGroupCoverImageSame: true,
+    groupId: null
   });
 
   const selectImage = async (type) => {
@@ -50,12 +54,14 @@ const CreateGroup = () => {
       if (type === "groupImage") {
         setGroupCreationData({
           ...groupCreationData,
-          groupImage: result.assets[0].uri
+          groupImage: result.assets[0].uri,
+          isGroupImageSame: false
         });
       } else {
         setGroupCreationData({
           ...groupCreationData,
-          groupCoverImage: result.assets[0].uri
+          groupCoverImage: result.assets[0].uri,
+          isGroupCoverImageSame: false
         });
       }
     }
@@ -86,6 +92,8 @@ const CreateGroup = () => {
         payload: true
       });
 
+      // console.log(groupId);
+
       const getGroupData = async () => {
         const response = await getSpecificGroup(groupId);
 
@@ -100,11 +108,17 @@ const CreateGroup = () => {
             groupVisibility: response?.groupDetails.groupVisibility
           },
           groupImage: response?.groupImage,
-          groupCoverImage: response?.groupCoverImage
+          groupCoverImage: response?.groupCoverImage,
+          groupId: groupId
         });
       };
 
       getGroupData();
+    } else {
+      dispatch({
+        type: "group/updateGroupEditMode",
+        payload: false
+      });
     }
   }, []);
   return (

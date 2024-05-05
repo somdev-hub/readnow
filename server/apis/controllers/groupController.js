@@ -3,44 +3,59 @@ const User = require("../models/user");
 const FormData = require("form-data");
 const axios = require("axios");
 
-const createGroupController = async (req, res) => {
+const uploadImage = async (image, path) => {
+  const formData = new FormData();
+  formData.append("files", Buffer.from(image.buffer), {
+    filename: image.originalname,
+    contentType: image.mimetype
+  });
 
-  // console.log(req.body);
+  const imageResponse = await axios.post(
+    `${process.env.STRAPI_API}/api/upload`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    }
+  );
+
+  return `${process.env.STRAPI_API}${imageResponse.data[0].url}`;
+};
+
+const createGroupController = async (req, res) => {
   const groupImage = req.files.groupImage ? req.files.groupImage[0] : undefined;
   const groupCoverImage = req.files.groupCoverImage
     ? req.files.groupCoverImage[0]
     : undefined;
 
-  const formData = new FormData();
-  formData.append("files", Buffer.from(groupImage.buffer), {
-    filename: groupImage.originalname,
-    contentType: groupImage.mimetype
-  });
-  formData.append("files", Buffer.from(groupCoverImage.buffer), {
-    filename: groupCoverImage.originalname,
-    contentType: groupCoverImage.mimetype
-  });
+  // const formData1 = new FormData();
+  // const formData2 = new FormData();
+  // formData1.append("files", Buffer.from(groupImage.buffer), {
+  //   filename: groupImage.originalname,
+  //   contentType: groupImage.mimetype
+  // });
+  // formData2.append("files", Buffer.from(groupCoverImage.buffer), {
+  //   filename: groupCoverImage.originalname,
+  //   contentType: groupCoverImage.mimetype
+  // });
 
   try {
-    const imageResponse = await axios.post(
-      `${process.env.STRAPI_API}/api/upload`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      }
-    );
+    const imageResponse1 = await uploadImage(groupImage);
+    const imageResponse2 = await uploadImage(groupCoverImage);
 
     const data = {
-      ...req.body,
+      groupName: req.body.groupName,
+      groupDescription: req.body.groupDescription,
+      groupRules: req.body.groupRules,
+      groupTags: JSON.parse(req.body.groupTags),
       groupAdmins: JSON.parse(req.body.groupAdmins),
       groupDetails: {
         ...JSON.parse(req.body.groupDetails),
         createdOn: new Date().toISOString()
       },
-      groupImage: `${process.env.STRAPI_API}${imageResponse.data[0].url}`,
-      groupCoverImage: `${process.env.STRAPI_API}${imageResponse.data[1].url}`
+      groupImage: imageResponse1,
+      groupCoverImage: imageResponse2
     };
 
     const group = new Group(data);
@@ -49,6 +64,44 @@ const createGroupController = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while adding the group");
+  }
+};
+
+const editGroupInfoController = async (req, res) => {
+  const { groupId } = req.params;
+  console.log(groupId);
+  const { isGroupCoverSame, isGroupImageSame } = req.body;
+  const groupImage = req.files.groupImage ? req.files.groupImage[0] : undefined;
+  const groupCoverImage = req.files.groupCoverImage
+    ? req.files.groupCoverImage[0]
+    : undefined;
+
+  let data = {
+    groupName: req.body.groupName,
+    groupDescription: req.body.groupDescription,
+    groupAdmins: JSON.parse(req.body.groupAdmins),
+    groupRules: req.body.groupRules,
+    groupTags: JSON.parse(req.body.groupTags),
+    groupDetails: {
+      ...JSON.parse(req.body.groupDetails),
+      createdOn: new Date().toISOString()
+    }
+  };
+
+  try {
+    if (isGroupCoverSame === "false") {
+      data.groupCoverImage = await uploadImage(groupCoverImage);
+    }
+
+    if (isGroupImageSame === "false") {
+      data.groupImage = await uploadImage(groupImage);
+    }
+
+    const group = await Group.findByIdAndUpdate(groupId, data, { new: true });
+    res.status(200).send("group updated");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while updating the group");
   }
 };
 
@@ -369,8 +422,61 @@ const commentGroupPostController = async (req, res) => {
   }
 };
 
+const addGroupAdminController = async (req, res) => {
+  const { groupId } = req.params;
+  const { adminMail, adminRole } = req.body;
+
+  try {
+    const groupData = await Group.findById(groupId).select("groupAdmins");
+
+    if (!groupData) {
+      return res.status(404).send("Group not found");
+    }else if(groupData.groupAdmins.find((admin) => admin.user === adminMail)){
+      return res.status(400).send("Admin already exists");
+    }
+
+    const group = await Group.findByIdAndUpdate(
+      groupId,
+      { $push: { groupAdmins: { user: adminMail, role: adminRole } } },
+      { new: true }
+    );
+
+    res.status(200).send("group updated");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while updating the group");
+  }
+};
+
+const removeAdminController = async (req, res) => {
+  const { groupId } = req.params;
+  const { adminMail } = req.body;
+
+  try {
+    const groupData = await Group.findById(groupId).select("groupAdmins");
+
+    if (!groupData) {
+      return res.status(404).send("Group not found");
+    }else if(!groupData.groupAdmins.find((admin) => admin.user === adminMail)){
+      return res.status(400).send("Admin does not exist");
+    }
+
+    const group = await Group.findByIdAndUpdate(
+      groupId,
+      { $pull: { groupAdmins: { user: adminMail } } },
+      { new: true }
+    );
+
+    res.status(200).send("group updated");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while updating the group");
+  }
+};
+
 module.exports = {
   createGroupController,
+  editGroupInfoController,
   getGroupController,
   getSpecificGroupController,
   getMyGroupsController,
@@ -382,5 +488,7 @@ module.exports = {
   getGroupFeedsController,
   getShortGroupInfoController,
   likeGroupPostController,
-  commentGroupPostController
+  commentGroupPostController,
+  addGroupAdminController,
+  removeAdminController
 };

@@ -34,7 +34,7 @@ import ViewGroupInfo from "../../app/groups/ViewGroupInfo";
 import GroupDetails from "../../app/groups/GroupDetails";
 import CreateGroup from "../../app/groups/CreateGroup";
 import GroupSettings from "../../app/groups/GroupSettings";
-import { postGroupData } from "../../redux/groupSlice";
+import { editGroupData, postGroupData } from "../../redux/groupSlice";
 import GroupGenreSelection from "../../app/groups/GroupGenreSelection";
 import GroupNewView from "../../app/groups/GroupNewView";
 import Events from "../../app/events/Events";
@@ -71,8 +71,8 @@ const StackNavigator = () => {
   const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
   const currentEventId = useSelector((state) => state.event.currentEventId);
   const idEditedEvent = useSelector((state) => state.event.isEditedEvent);
-  const idEditedGroup = useSelector((state) => state.event.isEditedGroup);
-
+  const idEditedGroup = useSelector((state) => state.group.isEditedGroup);
+  // console.log("isEditedGroup " + idEditedGroup);
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
     getShortProfileInfo(email).then((data) => {
@@ -232,7 +232,11 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    dispatch(postGroupData(groupData));
+                    if (idEditedGroup) {
+                      dispatch(editGroupData(groupData));
+                    } else {
+                      dispatch(postGroupData(groupData));
+                    }
                   }}
                 >
                   <Text

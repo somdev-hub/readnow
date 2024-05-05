@@ -320,6 +320,44 @@ export const createGroup = async (data) => {
   }
 };
 
+export const editGroup = async (data) => {
+  const formData = new FormData();
+
+  formData.append("groupImage", {
+    uri: data.groupImage,
+    name: "groupImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("groupCoverImage", {
+    uri: data.groupCoverImage,
+    name: "groupCoverImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("groupName", data.groupName);
+  formData.append("groupDescription", data.groupDescription);
+  formData.append("groupAdmins", JSON.stringify(data.groupAdmins));
+  formData.append("groupRules", data.groupRules);
+  formData.append("groupTags", JSON.stringify(data.groupTags));
+  formData.append("groupDetails", JSON.stringify(data.groupDetails));
+  formData.append("isGroupImageSame", data.isGroupImageSame);
+  formData.append("isGroupCoverImageSame", data.isGroupCoverImageSame);
+
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/group/edit-group/${data.groupId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getGroups = async () => {
   try {
     const response = await axios.get(`${ADDRESS}/group/get-groups`);
@@ -454,6 +492,32 @@ export const commentGroupPost = async (postId, userId, comment) => {
       comment
     });
     return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addGroupAdmin = async (groupId, adminMail, adminRole) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/group/add-admin/${groupId}`, {
+      adminMail,
+      adminRole
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const removeGroupAdmin = async (groupId, adminMail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/group/remove-admin/${groupId}`,
+      {
+        adminMail
+      }
+    );
+    return response;
   } catch (error) {
     console.log(error);
   }

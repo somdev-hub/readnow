@@ -84,7 +84,6 @@ const editEventController = async (req, res) => {
     eventDateAndTime,
     eventSpeakers,
     eventDescription
-    // eventCover
   } = req.body;
   const eventCover = req.file;
   // console.log(typeof isEventCoverSame);

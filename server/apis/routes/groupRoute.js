@@ -16,7 +16,10 @@ const {
   getGroupFeedsController,
   getShortGroupInfoController,
   likeGroupPostController,
-  commentGroupPostController
+  commentGroupPostController,
+  editGroupInfoController,
+  addGroupAdminController,
+  removeAdminController
 } = require("../controllers/groupController");
 
 router.post(
@@ -31,6 +34,15 @@ router.post(
     console.log(error); // Log any errors
     res.status(500).json({ error: error.toString() });
   }
+);
+
+router.post(
+  "/edit-group/:groupId",
+  uploadMiddleware.fields([
+    { name: "groupImage", maxCount: 1 },
+    { name: "groupCoverImage", maxCount: 1 }
+  ]),
+  editGroupInfoController
 );
 
 router.get("/get-groups", getGroupController);
@@ -60,5 +72,9 @@ router.get("/get-short-group-info/:id", getShortGroupInfoController);
 router.post("/like-group-post", likeGroupPostController);
 
 router.post("/comment-group-post", commentGroupPostController);
+
+router.post("/add-admin/:groupId", addGroupAdminController);
+
+router.post("/remove-admin/:groupId", removeAdminController);
 
 module.exports = router;
