@@ -88,7 +88,13 @@ const GroupAdminPage = () => {
                   gap: 10
                 }}
               >
-                <Pressable onPress={() => navigator.navigate("GroupSettings")}>
+                <Pressable
+                  onPress={() =>
+                    navigator.navigate("GroupSettings", {
+                      groupId: groupId
+                    })
+                  }
+                >
                   <Feather name="settings" size={22} color={PRIMARY_COLOR} />
                 </Pressable>
                 <Feather name="bell" size={22} color={PRIMARY_COLOR} />

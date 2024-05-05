@@ -2,9 +2,11 @@ import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { PRIMARY_COLOR } from "../../styles/colors";
-import { Menu, Modal, Portal, TextInput } from "react-native-paper";
+import { Menu, Modal, Portal, TextInput, Searchbar } from "react-native-paper";
+import { FontAwesome } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 
-const ManageGroupAdmins = () => {
+const ManageGroupMembers = () => {
   const [visibleMenu, setVisibleMenu] = useState({
     visible: false,
     index: null
@@ -13,15 +15,75 @@ const ManageGroupAdmins = () => {
   const [adminEmail, setAdminEmail] = useState("");
   return (
     <View>
+      <Searchbar
+        mode="bar"
+        // label="Search members"
+        placeholder="Search members"
+        style={{
+          marginHorizontal: 10,
+          marginTop: 15,
+          backgroundColor: "#DDE6ED"
+        }}
+      />
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginHorizontal: 15,
+          marginTop: 20
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            backgroundColor: PRIMARY_COLOR,
+            padding: 7,
+            elevation: 1,
+            borderRadius: 5,
+            flexDirection: "row",
+            gap: 5
+          }}
+        >
+          <FontAwesome name="sort" size={20} color="white" />
+          <Text
+            style={{
+              color: "white",
+              fontWeight: "500"
+            }}
+          >
+            Sort by
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: PRIMARY_COLOR,
+            padding: 7,
+            elevation: 1,
+            borderRadius: 5,
+            flexDirection: "row",
+            gap: 5
+          }}
+        >
+          <Feather name="filter" size={20} color="white" />
+          <Text
+            style={{
+              color: "white",
+              fontWeight: "500"
+            }}
+          >
+            Filter
+          </Text>
+        </TouchableOpacity>
+      </View>
       <Text
         style={{
           fontSize: 16,
           fontWeight: "500",
-          marginTop: 10,
+          marginTop: 20,
           marginLeft: 10
         }}
       >
-        Group Admins
+        Group Members
       </Text>
       <View
         style={{
@@ -90,6 +152,11 @@ const ManageGroupAdmins = () => {
               >
                 <Menu.Item
                   onPress={() => {}}
+                  title="Make admin"
+                  leadingIcon="star"
+                />
+                <Menu.Item
+                  onPress={() => {}}
                   title="Remove"
                   leadingIcon="delete"
                 />
@@ -98,70 +165,8 @@ const ManageGroupAdmins = () => {
           );
         })}
       </View>
-      <Pressable onPress={() => setVisibleModal(true)}>
-        <Text
-          style={{
-            fontSize: 16,
-            fontWeight: "500",
-            textAlign: "center",
-            marginTop: 10,
-            marginLeft: 10,
-            color: PRIMARY_COLOR
-          }}
-        >
-          Add admin
-        </Text>
-      </Pressable>
-      <Portal>
-        <Modal
-          visible={visibleModal}
-          onDismiss={() => setVisibleModal(false)}
-          contentContainerStyle={{
-            backgroundColor: "white",
-            padding: 20,
-            margin: 20,
-            borderRadius: 20
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "500",
-              marginBottom: 10
-            }}
-          >
-            Add admin
-          </Text>
-          <TextInput
-            value={adminEmail}
-            onChangeText={setAdminEmail}
-            mode="outlined"
-            label="Admin email"
-            outlineColor="black"
-            style={{ backgroundColor: "white" }}
-            activeOutlineColor={PRIMARY_COLOR}
-          />
-          <TouchableOpacity
-            style={{
-              backgroundColor: PRIMARY_COLOR,
-              padding: 10,
-              borderRadius: 5,
-              marginTop: 20
-            }}
-          >
-            <Text
-              style={{
-                color: "white",
-                textAlign: "center"
-              }}
-            >
-              Add
-            </Text>
-          </TouchableOpacity>
-        </Modal>
-      </Portal>
     </View>
   );
 };
 
-export default ManageGroupAdmins;
+export default ManageGroupMembers;

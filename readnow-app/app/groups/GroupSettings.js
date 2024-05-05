@@ -1,40 +1,56 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { Dialog, Portal } from "react-native-paper";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
 const GroupSettings = () => {
   const navigator = useNavigation();
+  const route = useRoute();
+  const { groupId } = route.params;
+  const [dialogVisible, setDialogVisible] = React.useState(false);
   const settings = [
     {
       name: "Manage admins",
       icon: "user",
-      route: "ManageGroupAdmins"
+      route: "ManageGroupAdmins",
+      params: {}
     },
     {
       name: "Posts",
       icon: "book",
-      route: "ManageGroupAdmins"
+      route: "ManageGroupAdmins",
+      params: {}
     },
     {
       name: "Members",
       icon: "users",
-      route: "ManageGroupAdmins"
+      route: "ManageGroupMembers",
+      params: {}
     },
     {
       name: "Requests",
       icon: "user",
-      route: "ManageGroupAdmins"
+      route: "ManageGroupAdmins",
+      params: {
+        groupId: "123"
+      }
     },
     {
       name: "Edit group info",
       icon: "edit",
-      route: "ManageGroupAdmins"
+      route: "CreateGroup",
+      params: {
+        groupId,
+        edit: true
+      }
     },
     {
       name: "Delete group",
       icon: "trash",
-      route: "ManageGroupAdmins"
+      route: "ManageGroupAdmins",
+      params: {}
     }
   ];
   const generalSettings = [
@@ -73,7 +89,14 @@ const GroupSettings = () => {
           {settings.map((setting, index) => {
             return (
               <Pressable
-                onPress={() => navigator.navigate(setting.route)}
+                onPress={() => {
+                  setting.name === "Delete group"
+                    ? setDialogVisible(true)
+                    : navigator.navigate(
+                        setting.route,
+                        setting.params && setting.params
+                      );
+                }}
                 key={index}
                 style={{
                   marginVertical: 10,
@@ -116,6 +139,55 @@ const GroupSettings = () => {
           })}
         </View>
       </ScrollView>
+      <Portal>
+        <Dialog
+          visible={dialogVisible}
+          onDismiss={() => setDialogVisible(false)}
+          style={{
+            backgroundColor: "white"
+          }}
+        >
+          <Dialog.Icon icon="alert" />
+          <Dialog.Title
+            style={{
+              textAlign: "center"
+            }}
+          >
+            Alert
+          </Dialog.Title>
+          <Dialog.Content>
+            <Text>
+              Are you sure you want to delete this group? This action is
+              irreversible!
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions
+            style={{
+              gap: 10
+            }}
+          >
+            <Pressable onPress={() => setDialogVisible(false)}>
+              <Text
+                style={{
+                  fontWeight: "500"
+                }}
+              >
+                Cancel
+              </Text>
+            </Pressable>
+            <Pressable onPress={() => setDialogVisible(false)}>
+              <Text
+                style={{
+                  fontWeight: "500",
+                  color: "#C40C0C"
+                }}
+              >
+                Delete
+              </Text>
+            </Pressable>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 };

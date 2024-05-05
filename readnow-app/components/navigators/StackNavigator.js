@@ -49,6 +49,7 @@ import DrawerNavigator from "./DrawerNavigator";
 import { CollapsibleScrollView } from "react-navigation-collapsible";
 import GroupAdminPage from "../../app/groups/GroupAdminPage";
 import ManageGroupAdmins from "../../app/groups/ManageGroupAdmins";
+import ManageGroupMembers from "../../app/groups/ManageGroupMembers";
 
 const Stack = createStackNavigator();
 
@@ -70,6 +71,7 @@ const StackNavigator = () => {
   const visibleSnackbar = useSelector((state) => state.event.eventSnackbar);
   const currentEventId = useSelector((state) => state.event.currentEventId);
   const idEditedEvent = useSelector((state) => state.event.isEditedEvent);
+  const idEditedGroup = useSelector((state) => state.event.isEditedGroup);
 
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
@@ -240,7 +242,7 @@ const StackNavigator = () => {
                       color: PRIMARY_COLOR
                     }}
                   >
-                    Create
+                    {idEditedGroup ? "Edit" : "Create"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -462,7 +464,10 @@ const StackNavigator = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>Groups</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigator.navigate("CreateGroup");
+                    navigator.navigate("CreateGroup", {
+                      edit: false,
+                      groupId: null
+                    });
                   }}
                 >
                   <Text
@@ -598,6 +603,14 @@ const StackNavigator = () => {
       <Stack.Screen
         name="ManageGroupAdmins"
         component={ManageGroupAdmins}
+        options={{
+          headerShown: true,
+          headerTitle: "Group Admin"
+        }}
+      />
+      <Stack.Screen
+        name="ManageGroupMembers"
+        component={ManageGroupMembers}
         options={{
           headerShown: true,
           headerTitle: "Group Admin"

@@ -37,7 +37,8 @@ const groupSlice = createSlice({
     groupGenresDone: false,
     groupGenres: [],
     loading: false,
-    error: ""
+    error: "",
+    isEditedGroup: false
   },
   reducers: {
     updateGroupData: (state, action) => {
@@ -60,6 +61,9 @@ const groupSlice = createSlice({
     },
     updateGroupGenresDone: (state, action) => {
       state.groupGenresDone = action.payload;
+    },
+    updateGroupEditMode: (state, action) => {
+      state.isEditedGroup = action.payload;
     }
   },
   extraReducers: (builder) => {

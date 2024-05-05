@@ -16,6 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import { PRIMARY_COLOR } from "../../styles/colors";
+import { getSpecificGroup } from "../../api/apis";
 
 const CreateGroup = () => {
   const ref = React.useRef(true);
@@ -23,8 +24,8 @@ const CreateGroup = () => {
   const navigator = useNavigation();
   const groupData = useSelector((state) => state.group.groupData);
   const groupGenres = useSelector((state) => state.group.groupGenres);
-  // console.log(groupGenres);
   const router = useRoute();
+  const { groupId, edit } = router.params;
   const [groupCreationData, setGroupCreationData] = React.useState({
     groupName: "",
     groupDescription: "",
@@ -77,6 +78,35 @@ const CreateGroup = () => {
     });
     dispatch(fetchEmail());
   }, [groupCreationData]);
+
+  useEffect(() => {
+    if (edit) {
+      dispatch({
+        type: "group/updateGroupEditMode",
+        payload: true
+      });
+
+      const getGroupData = async () => {
+        const response = await getSpecificGroup(groupId);
+
+        setGroupCreationData({
+          ...groupCreationData,
+          groupName: response?.groupName,
+          groupDescription: response?.groupDescription,
+          groupRules: response?.groupRules,
+          groupTags: response?.groupTags,
+          groupDetails: {
+            groupLocation: response?.groupDetails.groupLocation,
+            groupVisibility: response?.groupDetails.groupVisibility
+          },
+          groupImage: response?.groupImage,
+          groupCoverImage: response?.groupCoverImage
+        });
+      };
+
+      getGroupData();
+    }
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
