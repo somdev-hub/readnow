@@ -78,7 +78,6 @@ const ManageGroupAdmins = () => {
   const getGroupData = async () => {
     setRefreshing(true);
     const response = await getSpecificGroup(groupId);
-    // console.log(response);
 
     const groupAdminsData = await Promise.all(
       response?.groupAdmins?.map(async (admin) => {
@@ -86,7 +85,6 @@ const ManageGroupAdmins = () => {
         return { adminData: response.data, adminRole: admin.role };
       })
     );
-    // console.log(groupAdminsData);
     setGroupAdmins(groupAdminsData);
     setRefreshing(false);
   };

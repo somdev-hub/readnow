@@ -523,6 +523,20 @@ export const removeGroupAdmin = async (groupId, adminMail) => {
   }
 };
 
+export const removeGroupMember = async (groupId, memberMail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/group/remove-member/${groupId}`,
+      {
+        memberMail
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createEvent = async (data) => {
   const formData = new FormData();
   formData.append("eventCover", {

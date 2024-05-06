@@ -4,11 +4,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  TextInput,
-  Pressable
+  Pressable,
+  Dimensions,
+  TextInput
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Chip } from "react-native-paper";
+import { Checkbox, Chip, RadioButton } from "react-native-paper";
 import { Entypo, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
@@ -21,13 +22,20 @@ import {
 import * as SecureStorage from "expo-secure-store";
 import GroupPostCard from "../../components/GroupPostCard";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const GroupAdminPage = () => {
+  const height = Dimensions.get("window").height;
+  const bottomSheetRef = React.useRef(null);
+  const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const navigator = useNavigation();
   const route = useRoute();
   const { groupId } = route.params;
   const [groupInfo, setGroupInfo] = useState({});
   const [groupPosts, setGroupPosts] = useState([]);
+  const [selectedFollowers, setSelectedFollowers] = useState([]);
+
   const fetchGroupPosts = async () => {
     const response = await getGroupFeed(groupId);
     const postsWithUserAndGroup = await Promise.all(
@@ -39,6 +47,26 @@ const GroupAdminPage = () => {
     );
     setGroupPosts(postsWithUserAndGroup);
   };
+
+  const shareSocialMediaList = [
+    {
+      name: "Whatsapp",
+      icon: "whatsapp"
+    },
+    {
+      name: "Facebook",
+      icon: "facebook"
+    },
+    {
+      name: "Twitter",
+      icon: "twitter"
+    },
+    {
+      name: "Instagram",
+      icon: "instagram"
+    }
+  ];
+
   useEffect(() => {
     const fetchGroupInfo = async () => {
       const email = await SecureStorage.getItemAsync("email");
@@ -102,16 +130,13 @@ const GroupAdminPage = () => {
               <View
                 style={{
                   position: "absolute",
-                  // top: 30,
                   left: 20,
-                  // right: 10,
                   bottom: -40,
                   backgroundColor: "white",
                   width: 90,
                   height: 90,
                   zIndex: 5,
                   borderRadius: 20,
-                  // elevation: 5,
                   borderColor: PRIMARY_COLOR,
                   borderWidth: 1
                 }}
@@ -161,6 +186,7 @@ const GroupAdminPage = () => {
               }}
             >
               <TouchableOpacity
+                onPress={() => open()}
                 style={{
                   flex: 1,
                   //   borderColor: PRIMARY_COLOR,
@@ -315,29 +341,24 @@ const GroupAdminPage = () => {
             }}
           >
             <Chip
-              // selected={selectedValue === "News"}
               showSelectedCheck
               style={{
                 backgroundColor: "transparent"
               }}
               mode="outlined"
-              // onPress={() => setSelectedValue("News")}
             >
               News
             </Chip>
             <Chip
-              // selected={selectedValue === "Posts"}
               showSelectedCheck
               style={{
                 backgroundColor: "transparent"
               }}
               mode="outlined"
-              // onPress={() => setSelectedValue("Posts")}
             >
               Posts
             </Chip>
             <Chip
-              // selected={selectedValue === "Stories"}
               showSelectedCheck
               style={{
                 backgroundColor: "transparent"
@@ -369,6 +390,224 @@ const GroupAdminPage = () => {
           })}
         </View>
       </ScrollView>
+      <BottomSheet
+        enableContentPanningGesture={false}
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={[height * 0.5, height * 0.9]}
+        enablePanDownToClose={true}
+        // onChange={handleSheetChanges}
+        style={{
+          backgroundColor: WHITE_COLOR,
+          borderTopLeftRadius: 50,
+          borderTopRightRadius: 50,
+          elevation: 15
+        }}
+      >
+        <View
+          style={{
+            // paddingHorizontal: 20,
+            paddingVertical: 10
+          }}
+        >
+          <View
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 20
+            }}
+          >
+            <Text
+              style={{
+                // fontSize: 16,
+                fontWeight: "500"
+              }}
+            >
+              Invite from your followers list
+            </Text>
+            <TextInput
+              style={{
+                backgroundColor: "#DDE6ED",
+                paddingVertical: 5,
+                paddingHorizontal: 10,
+                borderRadius: 10,
+                marginTop: 10
+              }}
+              placeholder="Search followers"
+            />
+          </View>
+          <View
+            style={{
+              justifyContent: "center",
+              width: "100%"
+              // alignItems: "center",
+            }}
+          >
+            <ScrollView
+              style={{
+                backgroundColor: "#eeeeee",
+                paddingHorizontal: 10,
+                height: height * 0.59
+              }}
+            >
+              {Array.from({ length: 10 }).map((_, index) => {
+                return (
+                  <Pressable
+                    onPress={() => {
+                      setSelectedFollowers((prev) => {
+                        if (prev.includes(index)) {
+                          return prev.filter((item) => item !== index);
+                        } else {
+                          return [...prev, index];
+                        }
+                      });
+                    }}
+                    key={index}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      paddingVertical: 10,
+                      flex: 1
+                    }}
+                  >
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        flex: 1
+                      }}
+                    >
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center"
+                          // gap: 0
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 50,
+                            height: 50,
+                            borderRadius: 50
+                          }}
+                        >
+                          <Image
+                            source={{
+                              uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                            }}
+                            style={{
+                              width: "100%",
+                              height: "100%",
+                              resizeMode: "cover",
+                              borderRadius: 50
+                            }}
+                          />
+                        </View>
+                        <View style={{ marginLeft: 10 }}>
+                          <Text style={{ fontSize: 16, fontWeight: "500" }}>
+                            John Doe
+                          </Text>
+                          <Text style={{ color: "#A9A9A9" }}>@johndoe</Text>
+                        </View>
+                      </View>
+
+                      <Checkbox
+                        status={
+                          selectedFollowers.includes(index)
+                            ? "checked"
+                            : "unchecked"
+                        }
+                        onPress={() => {
+                          setSelectedFollowers((prev) => {
+                            if (prev.includes(index)) {
+                              return prev.filter((item) => item !== index);
+                            } else {
+                              return [...prev, index];
+                            }
+                          });
+                        }}
+                      />
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+            {selectedFollowers.length > 0 && (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: PRIMARY_COLOR,
+                  padding: 15,
+                  borderRadius: 10,
+                  marginRight: 10,
+                  position: "absolute",
+                  bottom: 20,
+                  width: "90%",
+                  alignSelf: "center",
+                  elevation: 2
+                }}
+              >
+                <Text
+                  style={{
+                    color: WHITE_COLOR,
+                    textAlign: "center",
+                    fontWeight: "500"
+                  }}
+                >
+                  Invite
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          <View
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 20
+            }}
+          >
+            <Text
+              style={{
+                // fontSize: 16,
+                fontWeight: "500"
+              }}
+            >
+              Or share this group with others
+            </Text>
+            <ScrollView
+              horizontal
+              style={{
+                marginTop: 10,
+                width: "100%"
+              }}
+            >
+              {shareSocialMediaList.map((item, index) => {
+                return (
+                  <View
+                    style={{
+                      backgroundColor: "#DDE6ED",
+                      padding: 15,
+                      borderRadius: 50,
+                      marginRight: 10
+                    }}
+                    key={index}
+                  >
+                    <FontAwesome5 name={item.icon} size={24} color="black" />
+                  </View>
+                );
+              })}
+              <View
+                style={{
+                  backgroundColor: "#DDE6ED",
+                  padding: 15,
+                  borderRadius: 50,
+                  marginRight: 10
+                }}
+              >
+                <Entypo name="link" size={24} color="black" />
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </BottomSheet>
     </View>
   );
 };

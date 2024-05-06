@@ -19,7 +19,8 @@ const {
   commentGroupPostController,
   editGroupInfoController,
   addGroupAdminController,
-  removeAdminController
+  removeAdminController,
+  removeMemberController
 } = require("../controllers/groupController");
 
 router.post(
@@ -76,5 +77,7 @@ router.post("/comment-group-post", commentGroupPostController);
 router.post("/add-admin/:groupId", addGroupAdminController);
 
 router.post("/remove-admin/:groupId", removeAdminController);
+
+router.post("/remove-member/:groupId", removeMemberController);
 
 module.exports = router;

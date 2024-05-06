@@ -256,9 +256,9 @@ const getShortGroupInfoController = async (req, res) => {
 
 const addGroupPostController = async (req, res) => {
   const { description, postedBy, group } = req.body;
-  console.log("====================================");
-  console.log(req.body);
-  console.log("====================================");
+  // console.log("====================================");
+  // console.log(req.body);
+  // console.log("====================================");
   const image = req.file;
 
   const formData = new FormData();
@@ -431,7 +431,9 @@ const addGroupAdminController = async (req, res) => {
 
     if (!groupData) {
       return res.status(404).send("Group not found");
-    }else if(groupData.groupAdmins.find((admin) => admin.user === adminMail)){
+    } else if (
+      groupData.groupAdmins.find((admin) => admin.user === adminMail)
+    ) {
       return res.status(400).send("Admin already exists");
     }
 
@@ -457,7 +459,9 @@ const removeAdminController = async (req, res) => {
 
     if (!groupData) {
       return res.status(404).send("Group not found");
-    }else if(!groupData.groupAdmins.find((admin) => admin.user === adminMail)){
+    } else if (
+      !groupData.groupAdmins.find((admin) => admin.user === adminMail)
+    ) {
       return res.status(400).send("Admin does not exist");
     }
 
@@ -474,6 +478,34 @@ const removeAdminController = async (req, res) => {
   }
 };
 
+const removeMemberController = async (req, res) => {
+  const { groupId } = req.params;
+  const { memberMail } = req.body;
+
+  try {
+    const groupData = await Group.findById(groupId).select("groupMembers");
+
+    if (!groupData) {
+      return res.status(404).send("Group not found");
+    } else if (
+      !groupData.groupMembers.find((member) => member.user === memberMail)
+    ) {
+      return res.status(400).send("Member does not exist");
+    }
+
+    const group = await Group.findByIdAndUpdate(
+      groupId,
+      { $pull: { groupMembers: { user: memberMail } } },
+      { new: true }
+    );
+
+    res.status(200).send("group updated");
+    // const group=await
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while updating the group");
+  }
+};
 module.exports = {
   createGroupController,
   editGroupInfoController,
@@ -490,5 +522,6 @@ module.exports = {
   likeGroupPostController,
   commentGroupPostController,
   addGroupAdminController,
-  removeAdminController
+  removeAdminController,
+  removeMemberController
 };

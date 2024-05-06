@@ -29,7 +29,9 @@ const GroupSettings = () => {
       name: "Members",
       icon: "users",
       route: "ManageGroupMembers",
-      params: {}
+      params: {
+        groupId: groupId
+      }
     },
     {
       name: "Requests",
