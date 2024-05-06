@@ -308,6 +308,21 @@ const getProfileGroups = async (req, res) => {
   }
 };
 
+const getUserFollowersController = async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      res.status(200).json({ followers: user.followers });
+    } else {
+      res.status(404).message("User not found");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Internal server error");
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
@@ -317,5 +332,6 @@ module.exports = {
   getShortProfileInfoController,
   handleFollowController,
   getProfileGroups,
-  getCardProfileInfoController
+  getCardProfileInfoController,
+  getUserFollowersController
 };

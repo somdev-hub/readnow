@@ -52,6 +52,17 @@ export const login = async (userCredentials) => {
   }
 };
 
+export const getUserFollowers = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/profile/get-user-followers/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const editProfile = async (userCredentials) => {
   try {
     const response = await axios.post(

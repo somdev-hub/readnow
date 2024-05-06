@@ -5,7 +5,8 @@ import {
   Image,
   TouchableOpacity,
   TextInput,
-  Pressable
+  Pressable,
+  Dimensions
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Chip } from "react-native-paper";
@@ -21,8 +22,13 @@ import {
 import * as SecureStorage from "expo-secure-store";
 import GroupPostCard from "../../components/GroupPostCard";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
+import GroupShareSection from "../../components/GroupShareSection";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 const ViewGroupInfo = () => {
+  const height = Dimensions.get("window").height;
+  const bottomSheetRef = React.useRef(null);
+  const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const navigator = useNavigation();
   const route = useRoute();
   const { groupId } = route.params;
@@ -95,9 +101,9 @@ const ViewGroupInfo = () => {
                   gap: 10
                 }}
               >
-                <Pressable onPress={() => navigator.navigate("GroupSettings")}>
+                {/* <Pressable onPress={() => navigator.navigate("GroupSettings")}>
                   <Feather name="settings" size={22} color={PRIMARY_COLOR} />
-                </Pressable>
+                </Pressable> */}
                 <Feather name="bell" size={22} color={PRIMARY_COLOR} />
               </View>
               <View
@@ -185,6 +191,7 @@ const ViewGroupInfo = () => {
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
+                onPress={() => open()}
                 style={{
                   flex: 1,
                   borderColor: PRIMARY_COLOR,
@@ -403,6 +410,22 @@ const ViewGroupInfo = () => {
           })}
         </View>
       </ScrollView>
+      <BottomSheet
+        enableContentPanningGesture={false}
+        ref={bottomSheetRef}
+        index={-1}
+        snapPoints={[height * 0.5, height * 0.9]}
+        enablePanDownToClose={true}
+        // onChange={handleSheetChanges}
+        style={{
+          backgroundColor: WHITE_COLOR,
+          borderTopLeftRadius: 50,
+          borderTopRightRadius: 50,
+          elevation: 15
+        }}
+      >
+        <GroupShareSection />
+      </BottomSheet>
     </View>
   );
 };
