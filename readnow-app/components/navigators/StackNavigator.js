@@ -52,6 +52,7 @@ import ManageGroupAdmins from "../../app/groups/ManageGroupAdmins";
 import ManageGroupMembers from "../../app/groups/ManageGroupMembers";
 import StoriesTopNavigator from "./StoriesTopNavigator";
 import PublisherInfo from "../../app/stories/PublisherInfo";
+import Journal from "../../app/stories/Journal";
 
 const Stack = createStackNavigator();
 
@@ -139,7 +140,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Stories"
+      initialRouteName="Journal"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -637,6 +638,14 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Publisher Info"
+        }}
+      />
+      <Stack.Screen
+        name="Journal"
+        component={Journal}
+        options={{
+          headerShown: true,
+          headerTitle: "Journal"
         }}
       />
     </Stack.Navigator>

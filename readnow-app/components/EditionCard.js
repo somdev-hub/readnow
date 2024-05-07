@@ -1,11 +1,16 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Pressable } from "react-native";
 import React from "react";
 import { Entypo, AntDesign, FontAwesome } from "@expo/vector-icons";
 import { WHITE_COLOR } from "../styles/colors";
+import { useNavigation } from "@react-navigation/native";
 
 const EditionCard = () => {
+  const navigator = useNavigation();
   return (
-    <View
+    <Pressable
+      onPress={() => {
+        navigator.navigate("Journal");
+      }}
       style={{
         backgroundColor: WHITE_COLOR,
         paddingVertical: 10,
@@ -92,7 +97,6 @@ const EditionCard = () => {
         <View
           style={{
             flexDirection: "row",
-            // marginVertical: 10,
             marginTop: 15,
             marginBottom: 10,
             marginLeft: 5,
@@ -121,7 +125,7 @@ const EditionCard = () => {
           </View>
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
