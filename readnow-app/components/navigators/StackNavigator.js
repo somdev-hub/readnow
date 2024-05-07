@@ -50,6 +50,8 @@ import { CollapsibleScrollView } from "react-navigation-collapsible";
 import GroupAdminPage from "../../app/groups/GroupAdminPage";
 import ManageGroupAdmins from "../../app/groups/ManageGroupAdmins";
 import ManageGroupMembers from "../../app/groups/ManageGroupMembers";
+import StoriesTopNavigator from "./StoriesTopNavigator";
+import PublisherInfo from "../../app/stories/PublisherInfo";
 
 const Stack = createStackNavigator();
 
@@ -137,7 +139,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="HomeScreen"
+      initialRouteName="Stories"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -618,6 +620,23 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Group Admin"
+        }}
+      />
+
+      <Stack.Screen
+        name="Stories"
+        component={StoriesTopNavigator}
+        options={{
+          headerShown: true,
+          headerTitle: "Stories"
+        }}
+      />
+      <Stack.Screen
+        name="PublisherInfo"
+        component={PublisherInfo}
+        options={{
+          headerShown: true,
+          headerTitle: "Publisher Info"
         }}
       />
     </Stack.Navigator>

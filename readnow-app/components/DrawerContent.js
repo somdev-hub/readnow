@@ -28,7 +28,7 @@ const DrawerContent = () => {
     {
       name: "Stories",
       icon: "bulb1",
-      route: ""
+      route: "Stories"
     }
   ];
   const navigator = useNavigation();
