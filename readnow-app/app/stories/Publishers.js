@@ -9,22 +9,28 @@ import {
 import React from "react";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { useNavigation } from "@react-navigation/native";
+import { Searchbar } from "react-native-paper";
 
 const Publishers = () => {
   const navigator = useNavigation();
   return (
-    <ScrollView
-    //   contentContainerStyle={{
-    //     flex: 1
-    //   }}
-    >
+    <ScrollView>
+      <Searchbar
+        placeholder="Search for publishers"
+        style={{
+          margin: 10,
+          backgroundColor: "#DDE6ED",
+          fontSize: 14,
+          // borderRadius: 50,
+          // elevation: 1
+        }}
+      />
       <Text
         style={{
           fontSize: 18,
           marginLeft: 10,
           fontWeight: "500",
-
-          marginTop: 10
+          marginTop: 5
         }}
       >
         Top publishers

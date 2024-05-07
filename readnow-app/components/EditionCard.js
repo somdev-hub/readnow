@@ -51,10 +51,10 @@ const EditionCard = () => {
             </Text>
             <Text
               style={{
-                fontSize: 13
+                fontSize: 13,
               }}
             >
-              May 7th, 1 hour ago
+             Nanotech technology news and publishing
             </Text>
           </View>
         </View>
@@ -97,32 +97,50 @@ const EditionCard = () => {
         <View
           style={{
             flexDirection: "row",
-            marginTop: 15,
+            alignItems: "center",
+            justifyContent: "space-between",
             marginBottom: 10,
-            marginLeft: 5,
-            gap: 30
+            marginTop: 15
           }}
         >
           <View
             style={{
               flexDirection: "row",
-              gap: 5,
-              alignItems: "center"
+
+              marginLeft: 5,
+              gap: 30
             }}
           >
-            <AntDesign name="like2" size={22} color="black" />
-            <Text>12</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 5,
+                alignItems: "center"
+              }}
+            >
+              <AntDesign name="like2" size={20} color="black" />
+              <Text>12</Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 5,
+                alignItems: "center"
+              }}
+            >
+              <FontAwesome name="comment-o" size={20} color="black" />
+              <Text>12</Text>
+            </View>
           </View>
-          <View
+          <Text
             style={{
-              flexDirection: "row",
-              gap: 5,
-              alignItems: "center"
+              // marginTop: 10,
+              color: "gray",
+              fontSize: 12
             }}
           >
-            <FontAwesome name="comment-o" size={22} color="black" />
-            <Text>12</Text>
-          </View>
+            May 7th, 1 hour ago
+          </Text>
         </View>
       </View>
     </Pressable>

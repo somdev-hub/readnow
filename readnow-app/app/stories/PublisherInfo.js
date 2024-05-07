@@ -7,7 +7,7 @@ import {
   ScrollView
 } from "react-native";
 import React from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Entypo } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import EditionCard from "../../components/EditionCard";
 
@@ -125,7 +125,14 @@ const PublisherInfo = () => {
               </Text>
             </View>
           </View>
-          <Pressable>
+          <Pressable
+            style={{
+              flexDirection: "row",
+              gap: 2,
+              alignItems: "center",
+            }}
+          >
+            <Entypo name="plus" size={20} color={PRIMARY_COLOR} />
             <Text
               style={{
                 color: PRIMARY_COLOR,
