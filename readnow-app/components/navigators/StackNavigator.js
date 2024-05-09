@@ -54,6 +54,11 @@ import StoriesTopNavigator from "./StoriesTopNavigator";
 import PublisherInfo from "../../app/stories/PublisherInfo";
 import Journal from "../../app/stories/Journal";
 import JournalComments from "../../app/stories/JournalComments";
+import ManagePublisher from "../../app/stories/ManagePublisher";
+import CreatePublisher from "../../app/stories/CreatePublisher";
+import PublisherAdmin from "../../app/stories/PublisherAdmin";
+import CreateJournal from "../../app/stories/CreateJournal";
+import JournalEditor from "../../app/stories/JournalEditor";
 
 const Stack = createStackNavigator();
 
@@ -141,7 +146,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="JournalComments"
+      initialRouteName="CreateJournal"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -630,7 +635,35 @@ const StackNavigator = () => {
         component={StoriesTopNavigator}
         options={{
           headerShown: true,
-          headerTitle: "Stories"
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Stories</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("ManagePublisher");
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: PRIMARY_COLOR
+                    }}
+                  >
+                    Manage
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
         }}
       />
       <Stack.Screen
@@ -655,6 +688,134 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Journal Comments"
+        }}
+      />
+      <Stack.Screen
+        name="PublisherAdmin"
+        component={PublisherAdmin}
+        options={{
+          headerShown: true,
+          headerTitle: "Publisher admin"
+        }}
+      />
+      <Stack.Screen
+        name="CreateJournal"
+        component={CreateJournal}
+        options={{
+          headerShown: true,
+          headerTitle: "Create Journal"
+        }}
+      />
+      <Stack.Screen
+        name="JournalEditor"
+        component={JournalEditor}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Journal Editor
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("CreateJournal");
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: PRIMARY_COLOR
+                    }}
+                  >
+                    Publish
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+        }}
+      />
+      <Stack.Screen
+        name="ManagePublisher"
+        component={ManagePublisher}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>Manage</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("CreatePublisher");
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: PRIMARY_COLOR
+                    }}
+                  >
+                    Create
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
+        }}
+      />
+      <Stack.Screen
+        name="CreatePublisher"
+        component={CreatePublisher}
+        options={{
+          headerShown: true,
+          headerTitle: () => {
+            return (
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  width: "100%"
+                }}
+              >
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Create Publisher
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigator.navigate("ManagePublisher");
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: PRIMARY_COLOR
+                    }}
+                  >
+                    Create
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          }
         }}
       />
     </Stack.Navigator>

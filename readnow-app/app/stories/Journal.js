@@ -16,6 +16,7 @@ const Journel = () => {
   const navigator = useNavigation();
   return (
     <View style={{ flex: 1 }}>
+      <ScrollView>
       <View
         style={{
           flexDirection: "row",
@@ -99,7 +100,6 @@ const Journel = () => {
           </Text>
         </TouchableOpacity>
       </View>
-      <ScrollView>
         <View>
           <Image
             source={{

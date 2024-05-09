@@ -6,6 +6,7 @@ import { PaperProvider } from "react-native-paper";
 import StackNavigator from "./components/navigators/StackNavigator";
 import { useEffect } from "react";
 import { socket } from "./api/apis";
+import { registerRootComponent } from 'expo';
 
 export default function App() {
   // const dispatch = useDispatch();
@@ -20,3 +21,5 @@ export default function App() {
     </PaperProvider>
   );
 }
+
+registerRootComponent(App);
