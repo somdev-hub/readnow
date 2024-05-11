@@ -81,6 +81,7 @@ const StackNavigator = () => {
   const currentEventId = useSelector((state) => state.event.currentEventId);
   const idEditedEvent = useSelector((state) => state.event.isEditedEvent);
   const idEditedGroup = useSelector((state) => state.group.isEditedGroup);
+  const publisherData = useSelector((state) => state.publisher.publisherData);
   // console.log("isEditedGroup " + idEditedGroup);
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
@@ -146,7 +147,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="CreateJournal"
+      initialRouteName="Stories"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -726,7 +727,10 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigator.navigate("CreateJournal");
+                    dispatch({
+                      type: "journal/updatePublishJournal",
+                      payload: true
+                    });
                   }}
                 >
                   <Text
@@ -800,7 +804,10 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigator.navigate("ManagePublisher");
+                    dispatch({
+                      type: "publisher/postPublisherData",
+                      payload: publisherData
+                    });
                   }}
                 >
                   <Text

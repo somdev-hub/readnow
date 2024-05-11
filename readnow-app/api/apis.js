@@ -673,3 +673,34 @@ export const toggleEventAttendence = async (eventId, email) => {
     console.log(error);
   }
 };
+
+export const addPublisher = async (data) => {
+  const formData = new FormData();
+  formData.append("publisherImage", {
+    uri: data.publisherImage,
+    name: "publisherImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("publisherCoverImage", {
+    uri: data.publisherCoverImage,
+    name: "publisherCoverImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("publisherName", data.publisherName);
+  formData.append("publisherManager", data.publisherManager);
+  formData.append("publisherCategory", data.publisherCategory);
+  formData.append("publisherTags", JSON.stringify(data.publisherTags));
+  formData.append("editorEmails", JSON.stringify(data.editorEmails));
+  formData.append("publisherSocials", JSON.stringify(data.publisherSocials));
+  formData.append("publisherDescription", data.publisherDescription);
+  try {
+    const response = await axios.post(`${ADDRESS}/add-publisher`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    });
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

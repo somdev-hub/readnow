@@ -6,13 +6,77 @@ import {
   Pressable,
   TextInput
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
-import { EvilIcons, Entypo } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
+import { EvilIcons, AntDesign, Entypo } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useDispatch, useSelector } from "react-redux";
+import * as SecureStorage from "expo-secure-store";
+import { Snackbar } from "react-native-paper";
 
 const CreatePublisher = () => {
+  const [publisherData, setPublisherData] = useState({
+    publisherManager: "",
+    publisherName: "",
+    publisherCategory: "",
+    publisherTags: [],
+    editorEmails: [],
+    publisherSocials: {
+      twitter: "",
+      facebook: "",
+      instagram: "",
+      website: ""
+    },
+    publisherDescription: "",
+    publisherImage: "",
+    publisherCoverImage: ""
+  });
+  const dispatch = useDispatch();
+  const [editorEmail, setEditorEmail] = useState("");
+  const publisherSnackbar = useSelector(
+    (state) => state.publisher.publisherSnackbar
+  );
+  const publisherSnackbarMessage = useSelector(
+    (state) => state.publisher.publisherSnackbarMessage
+  );
+  const selectImage = async (type) => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
+    });
+
+    if (!result.canceled) {
+      if (type === "publisherCoverImage") {
+        setPublisherData({
+          ...publisherData,
+          publisherCoverImage: result.assets[0].uri
+        });
+      } else {
+        setPublisherData({
+          ...publisherData,
+          publisherImage: result.assets[0].uri
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    dispatch({
+      type: "publisher/updatePublisherData",
+      payload: publisherData
+    });
+  }, [publisherData]);
+
+  useEffect(() => {
+    const getEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      setPublisherData({
+        ...publisherData,
+        publisherManager: email
+      });
+    };
+    getEmail();
+  }, []);
+
   return (
     <View
       style={{
@@ -33,9 +97,9 @@ const CreatePublisher = () => {
               }}
             >
               <Pressable
-                // onPress={() => {
-                //   selectImage("groupCoverImage");
-                // }}
+                onPress={() => {
+                  selectImage("publisherCoverImage");
+                }}
                 style={{
                   position: "absolute",
                   backgroundColor: PRIMARY_COLOR,
@@ -53,7 +117,9 @@ const CreatePublisher = () => {
               </Pressable>
               <Image
                 source={{
-                  uri: "https://images.ctfassets.net/hrltx12pl8hq/28ECAQiPJZ78hxatLTa7Ts/2f695d869736ae3b0de3e56ceaca3958/free-nature-images.jpg?fit=fill&w=1200&h=630"
+                  uri: publisherData.publisherCoverImage
+                    ? publisherData.publisherCoverImage
+                    : "https://www.desktopbackground.org/download/1920x1080/2015/01/14/886856_dark-grey-red-material-design-4k-wallpapers_3840x2160_h.jpg"
                 }}
                 style={{
                   width: "100%",
@@ -78,9 +144,9 @@ const CreatePublisher = () => {
                 }}
               >
                 <Pressable
-                  //   onPress={() => {
-                  //     selectImage("groupImage");
-                  //   }}
+                  onPress={() => {
+                    selectImage("publisherImage");
+                  }}
                   style={{
                     position: "absolute",
                     backgroundColor: PRIMARY_COLOR,
@@ -99,7 +165,9 @@ const CreatePublisher = () => {
                 </Pressable>
                 <Image
                   source={{
-                    uri: "https://images.pexels.com/photos/268533/pexels-photo-268533.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                    uri: publisherData.publisherImage
+                      ? publisherData.publisherImage
+                      : "https://i.pinimg.com/564x/a7/5a/e4/a75ae4a186483cb9965e00bc5007f7ff.jpg"
                   }}
                   style={{
                     width: "100%",
@@ -112,6 +180,7 @@ const CreatePublisher = () => {
             </View>
           </View>
         </View>
+
         <View
           style={{
             paddingHorizontal: 20
@@ -123,12 +192,16 @@ const CreatePublisher = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10
-                // color: PRIMARY_COLOR
               }}
             >
               Enter publisher name*
             </Text>
             <TextInput
+              name="publisherName"
+              value={publisherData.publisherName}
+              onChangeText={(value) =>
+                setPublisherData({ ...publisherData, publisherName: value })
+              }
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
@@ -150,13 +223,18 @@ const CreatePublisher = () => {
               Select publisher category*
             </Text>
             <TextInput
+              name="publisherCategory"
+              value={publisherData.publisherCategory}
+              onChangeText={(value) =>
+                setPublisherData({ ...publisherData, publisherCategory: value })
+              }
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="Publisher Name"
+              placeholder="Publisher category"
             />
           </View>
           <View style={{ marginBottom: 10 }}>
@@ -171,13 +249,21 @@ const CreatePublisher = () => {
               Select publisher tags*
             </Text>
             <TextInput
+              name="publisherTags"
+              value={publisherData.publisherTags.join(",")}
+              onChangeText={(value) => {
+                setPublisherData({
+                  ...publisherData,
+                  publisherTags: value.split(",")
+                });
+              }}
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="Publisher Name"
+              placeholder="Publisher tags seperated by commas"
             />
           </View>
           <View style={{ marginBottom: 10 }}>
@@ -186,20 +272,72 @@ const CreatePublisher = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10
-                // color: PRIMARY_COLOR
               }}
             >
               Enter editors emails*
             </Text>
             <TextInput
+              name="editorEmails"
+              value={editorEmail}
+              onChangeText={(value) => setEditorEmail(value)}
+              onSubmitEditing={() => {
+                setPublisherData({
+                  ...publisherData,
+                  editorEmails: [...publisherData.editorEmails, editorEmail]
+                });
+                setEditorEmail("");
+              }}
               style={{
                 borderBottomWidth: 1,
                 borderBottomColor: "#ccc",
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="Publisher Name"
+              placeholder="Type editor email and press enter"
             />
+            {publisherData.editorEmails.length > 0 && (
+              <View>
+                {publisherData.editorEmails.map((email, index) => {
+                  return (
+                    <View
+                      key={index}
+                      style={{
+                        borderWidth: 2,
+                        borderColor: PRIMARY_COLOR,
+                        paddingVertical: 5,
+                        paddingHorizontal: 10,
+                        borderRadius: 5,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: 5
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: PRIMARY_COLOR
+                        }}
+                      >
+                        {email}
+                      </Text>
+                      <Pressable
+                        onPress={() => {
+                          const newEmails = publisherData.editorEmails.filter(
+                            (editorEmail, i) => i !== index
+                          );
+                          setPublisherData({
+                            ...publisherData,
+                            editorEmails: newEmails
+                          });
+                        }}
+                      >
+                        <Entypo name="cross" size={24} color={PRIMARY_COLOR} />
+                      </Pressable>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
           </View>
           <View style={{ marginBottom: 10 }}>
             <Text
@@ -207,7 +345,6 @@ const CreatePublisher = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10
-                // color: PRIMARY_COLOR
               }}
             >
               Enter publisher socials
@@ -215,26 +352,26 @@ const CreatePublisher = () => {
             <View
               style={{
                 flexDirection: "row",
-                gap: 10,
+                gap: 20,
                 alignItems: "center",
                 flex: 1
               }}
             >
-              <Picker
-                style={{
-                  // backgroundColor: "white",
-                  borderColor: "black",
-                  borderWidth: 2,
-                  borderRadius: 10,
-                  padding: 10,
-                  flex: 1,
-                  fontSize: 14
-                }}
-              >
-                <Picker.Item label="Select" value="Select" />
-              </Picker>
-
+              <View>
+                <AntDesign name="twitter" size={20} color="black" />
+              </View>
               <TextInput
+                name="twitter"
+                value={publisherData.publisherSocials.twitter}
+                onChangeText={(value) => {
+                  setPublisherData({
+                    ...publisherData,
+                    publisherSocials: {
+                      ...publisherData.publisherSocials,
+                      twitter: value
+                    }
+                  });
+                }}
                 style={{
                   borderBottomWidth: 1,
                   borderBottomColor: "#ccc",
@@ -242,7 +379,106 @@ const CreatePublisher = () => {
                   marginBottom: 10,
                   flex: 1
                 }}
-                placeholder="Publisher Name"
+                placeholder="Twitter Handle"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 20,
+                alignItems: "center",
+                flex: 1
+              }}
+            >
+              <View>
+                <AntDesign name="facebook-square" size={20} color="black" />
+              </View>
+              <TextInput
+                name="facebook"
+                value={publisherData.publisherSocials.facebook}
+                onChangeText={(value) => {
+                  setPublisherData({
+                    ...publisherData,
+                    publisherSocials: {
+                      ...publisherData.publisherSocials,
+                      facebook: value
+                    }
+                  });
+                }}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#ccc",
+                  paddingBottom: 5,
+                  marginBottom: 10,
+                  flex: 1
+                }}
+                placeholder="Facebook Handle"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 20,
+                alignItems: "center",
+                flex: 1
+              }}
+            >
+              <View>
+                <AntDesign name="instagram" size={20} color="black" />
+              </View>
+              <TextInput
+                name="instagram"
+                value={publisherData.publisherSocials.instagram}
+                onChangeText={(value) => {
+                  setPublisherData({
+                    ...publisherData,
+                    publisherSocials: {
+                      ...publisherData.publisherSocials,
+                      instagram: value
+                    }
+                  });
+                }}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#ccc",
+                  paddingBottom: 5,
+                  marginBottom: 10,
+                  flex: 1
+                }}
+                placeholder="Instagram Handle"
+              />
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 20,
+                alignItems: "center",
+                flex: 1
+              }}
+            >
+              <View>
+                <AntDesign name="link" size={20} color="black" />
+              </View>
+              <TextInput
+                name="website"
+                value={publisherData.publisherSocials.website}
+                onChangeText={(value) => {
+                  setPublisherData({
+                    ...publisherData,
+                    publisherSocials: {
+                      ...publisherData.publisherSocials,
+                      website: value
+                    }
+                  });
+                }}
+                style={{
+                  borderBottomWidth: 1,
+                  borderBottomColor: "#ccc",
+                  paddingBottom: 5,
+                  marginBottom: 10,
+                  flex: 1
+                }}
+                placeholder="Website URL"
               />
             </View>
           </View>
@@ -252,12 +488,19 @@ const CreatePublisher = () => {
                 fontSize: 14,
                 fontWeight: "500",
                 marginBottom: 10
-                // color: PRIMARY_COLOR
               }}
             >
               Enter publisher description*
             </Text>
             <TextInput
+              name="publisherDescription"
+              value={publisherData.publisherDescription}
+              onChangeText={(value) =>
+                setPublisherData({
+                  ...publisherData,
+                  publisherDescription: value
+                })
+              }
               multiline
               style={{
                 borderBottomWidth: 1,
@@ -265,11 +508,22 @@ const CreatePublisher = () => {
                 paddingBottom: 5,
                 marginBottom: 10
               }}
-              placeholder="Publisher Name"
+              placeholder="Publisher description"
             />
           </View>
         </View>
       </ScrollView>
+      <Snackbar
+        visible={publisherSnackbar}
+        onDismiss={() => {
+          dispatch({
+            type: "publisher/updateSnackbarVisibility",
+            payload: false
+          });
+        }}
+      >
+        {publisherSnackbarMessage}
+      </Snackbar>
     </View>
   );
 };

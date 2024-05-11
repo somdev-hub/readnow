@@ -7,7 +7,7 @@ import {
   ScrollView
 } from "react-native";
 import React from "react";
-import { Ionicons, Entypo } from "@expo/vector-icons";
+import { Ionicons, Entypo, AntDesign } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import EditionCard from "../../components/EditionCard";
 
@@ -80,12 +80,18 @@ const PublisherInfo = () => {
           incididunt tempor consectetur qui dolore do esse ad. Laborum nostrud
           et culpa exercitation aliqua sint sint reprehenderit ut. Lorem commodo
         </Text>
+        
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            marginTop: 20
+            marginTop: 20,
+            // borderTopColor: "#ccc",
+            // borderTopWidth: 1,
+            // borderBottomColor: "#ccc",
+            // borderBottomWidth: 1,
+            // paddingVertical: 15
           }}
         >
           <View
@@ -129,7 +135,7 @@ const PublisherInfo = () => {
             style={{
               flexDirection: "row",
               gap: 2,
-              alignItems: "center",
+              alignItems: "center"
             }}
           >
             <Entypo name="plus" size={20} color={PRIMARY_COLOR} />
@@ -158,6 +164,7 @@ const PublisherInfo = () => {
             Robotics, nanotech and innovation | 120,000 subscribers
           </Text>
         </View>
+       
         <View
           style={{
             marginTop: 20,
@@ -203,6 +210,23 @@ const PublisherInfo = () => {
               Share
             </Text>
           </TouchableOpacity>
+        </View>
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ fontWeight: "500" }}>Social profiles</Text>
+          <View style={{ flexDirection: "row", gap: 20, marginTop: 10 }}>
+            <Pressable>
+              <AntDesign name="twitter" size={22} color="black" />
+            </Pressable>
+            <Pressable>
+              <AntDesign name="facebook-square" size={22} color="black" />
+            </Pressable>
+            <Pressable>
+              <AntDesign name="instagram" size={22} color="black" />
+            </Pressable>
+            <Pressable>
+              <AntDesign name="link" size={22} color="black" />
+            </Pressable>
+          </View>
         </View>
       </View>
       <View

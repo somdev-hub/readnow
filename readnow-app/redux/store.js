@@ -4,6 +4,8 @@ import bookmarkReducer from "./bookmarkSlice";
 import notifyReducer from "./notifySlice";
 import groupReducer from "./groupSlice";
 import eventReducer from "./eventSlice";
+import journalReducer from "./journalSlice";
+import publisherReducer from "./publisherSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +13,9 @@ export const store = configureStore({
     bookmark: bookmarkReducer,
     notify: notifyReducer,
     group: groupReducer,
-    event: eventReducer
+    event: eventReducer,
+    journal: journalReducer,
+    publisher: publisherReducer
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({
