@@ -12,13 +12,60 @@ import { Ionicons, Entypo, AntDesign } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import EditionCard from "../../components/EditionCard";
 import { useRoute } from "@react-navigation/native";
-import { getShortProfileInfo, getSpecificPublisher } from "../../api/apis";
+import {
+  getShortProfileInfo,
+  getSpecificPublisher,
+  getUserFollowers,
+  handleFollow,
+  toggleSubscriber
+} from "../../api/apis";
+import * as SecureStorage from "expo-secure-store";
+import { Snackbar } from "react-native-paper";
 
 const PublisherInfo = () => {
   const [publisherData, setPublisherData] = useState({});
   const { publisherId } = useRoute().params;
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [followedManager, setFollowedManager] = useState(false);
+
+  const [hasSubscribed, setHasSubscribed] = useState({
+    visible: false,
+    message: ""
+  });
+
+  const toggleSubscribeHandler = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await toggleSubscriber(publisherData?._id, email);
+    setSubscribed(!subscribed);
+    setHasSubscribed({
+      visible: true,
+      message: response.message
+    });
+  };
+
+  const handleFollowPublisherManager = async () => {
+    const response = await handleFollow(email, publisherData?.publisherManager);
+    setFollowedManager(!followedManager);
+  };
 
   useEffect(() => {
+    setSubscribed(publisherData?.publisherSubscribers?.includes(email));
+  }, [publisherData, email]);
+
+  useEffect(() => {
+    const fetchManagerFollowers = async () => {
+      const response = await getUserFollowers(publisherData?.publisherManager);
+      setFollowedManager(response?.followers?.includes(email));
+    };
+    fetchManagerFollowers();
+  }, [publisherData, email]);
+
+  useEffect(() => {
+    const getEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      setEmail(email);
+    };
     const fetchPublisherData = async () => {
       const response = await getSpecificPublisher(publisherId);
       const publisherManagerData = await getShortProfileInfo(
@@ -32,6 +79,7 @@ const PublisherInfo = () => {
     };
 
     fetchPublisherData();
+    getEmail();
   }, []);
 
   const socialMediaMapping = {
@@ -42,7 +90,11 @@ const PublisherInfo = () => {
   };
 
   return (
-    <ScrollView>
+    <ScrollView
+      contentContainerStyle={{
+        flex: 1
+      }}
+    >
       <View
         style={{
           paddingHorizontal: 10,
@@ -152,22 +204,44 @@ const PublisherInfo = () => {
               </Text>
             </View>
           </View>
-          <Pressable
-            style={{
-              flexDirection: "row",
-              gap: 2,
-              alignItems: "center"
-            }}
-          >
-            <Entypo name="plus" size={20} color={PRIMARY_COLOR} />
-            <Text
-              style={{
-                color: PRIMARY_COLOR,
-                fontWeight: "500"
-              }}
-            >
-              Follow
-            </Text>
+          <Pressable onPress={handleFollowPublisherManager}>
+            {followedManager ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 2,
+                  alignItems: "center"
+                }}
+              >
+                <Entypo name="check" size={20} color={PRIMARY_COLOR} />
+                <Text
+                  style={{
+                    color: PRIMARY_COLOR,
+                    fontWeight: "500"
+                  }}
+                >
+                  Following
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 2,
+                  alignItems: "center"
+                }}
+              >
+                <Entypo name="plus" size={20} color={PRIMARY_COLOR} />
+                <Text
+                  style={{
+                    color: PRIMARY_COLOR,
+                    fontWeight: "500"
+                  }}
+                >
+                  Follow
+                </Text>
+              </View>
+            )}
           </Pressable>
         </View>
         <View
@@ -196,21 +270,24 @@ const PublisherInfo = () => {
           }}
         >
           <TouchableOpacity
+            onPress={toggleSubscribeHandler}
             style={{
-              backgroundColor: PRIMARY_COLOR,
+              backgroundColor: subscribed ? "transparent" : PRIMARY_COLOR,
               paddingVertical: 8,
               borderRadius: 50,
-              flex: 1
+              flex: 1,
+              borderColor: PRIMARY_COLOR,
+              borderWidth: 2
             }}
           >
             <Text
               style={{
-                color: "white",
+                color: subscribed ? PRIMARY_COLOR : WHITE_COLOR,
                 textAlign: "center",
                 fontWeight: "500"
               }}
             >
-              Subscribe
+              {subscribed ? "Subscribed" : "Subscribe"}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -277,6 +354,18 @@ const PublisherInfo = () => {
           })}
         </View>
       </View>
+      <Snackbar
+        visible={hasSubscribed.visible}
+        onDismiss={() => setHasSubscribed({ visible: false, message: "" })}
+        action={{
+          label: "Dismiss",
+          onPress: () => {
+            setHasSubscribed({ visible: false, message: "" });
+          }
+        }}
+      >
+        {hasSubscribed.message}
+      </Snackbar>
     </ScrollView>
   );
 };

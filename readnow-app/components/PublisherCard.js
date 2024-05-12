@@ -28,7 +28,9 @@ const PublisherCard = ({
     <Pressable
       onPress={() => {
         admin
-          ? navigator.navigate("PublisherAdmin")
+          ? navigator.navigate("PublisherAdmin", {
+              publisherId: publisher?._id
+            })
           : navigator.navigate("PublisherInfo", {
               publisherId: publisher?._id
             });

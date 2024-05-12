@@ -7,20 +7,76 @@ import {
   TextInput,
   TouchableOpacity
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { EvilIcons, Entypo } from "@expo/vector-icons";
 import { PRIMARY_COLOR } from "../../styles/colors";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import * as SecureStorage from "expo-secure-store";
+import { addJournal } from "../../api/apis";
+import { ActivityIndicator } from "react-native-paper";
 
 const CreateJournal = () => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const navigator = useNavigation();
+  const route = useRoute();
+  const { publisherId } = route.params;
+  const [journalData, setJournalData] = useState({
+    journalTitle: "",
+    journalDescription: "",
+    journalPublishingDate: new Date(),
+    journalEditorEmail: "",
+    journalTags: [],
+    journalCoverImage: "",
+    publisherId
+  });
+  const [loading, setLoading] = useState(false);
+
+  const selectImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
+    });
+
+    if (!result.canceled) {
+      setJournalData({
+        ...journalData,
+        journalCoverImage: result.assets[0].uri
+      });
+    }
+  };
+
+  const postJournal = async () => {
+    // setLoading(true);
+    // const response = await addJournal(journalData);
+    // if (response && response.id) {
+      navigator.navigate("JournalEditor", {
+        publisherId,
+        journalId: 2
+      });
+    // }
+    // setLoading(false);
+  };
+
+  useEffect(() => {
+    const setEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      setJournalData({
+        ...journalData,
+        journalEditorEmail: email
+      });
+    };
+    setEmail();
+  }, []);
   return (
     <ScrollView>
       <View>
         <Image
-          source={{ uri: "https://picsum.photos/200/300" }}
+          source={{
+            uri: journalData.journalCoverImage
+              ? journalData.journalCoverImage
+              : "https://picsum.photos/200/300"
+          }}
           style={{
             width: "100%",
             height: 200
@@ -28,9 +84,9 @@ const CreateJournal = () => {
           }}
         />
         <Pressable
-          // onPress={() => {
-          //   selectImage("groupCoverImage");
-          // }}
+          onPress={() => {
+            selectImage();
+          }}
           style={{
             position: "absolute",
             backgroundColor: PRIMARY_COLOR,
@@ -65,13 +121,20 @@ const CreateJournal = () => {
             Enter journal title*
           </Text>
           <TextInput
+            onChangeText={(text) => {
+              setJournalData({
+                ...journalData,
+                journalTitle: text
+              });
+            }}
+            value={journalData.journalTitle}
             style={{
               borderBottomWidth: 1,
               borderBottomColor: "#ccc",
               paddingBottom: 5,
               marginBottom: 10
             }}
-            placeholder="Publisher Name"
+            placeholder="Journal title"
           />
         </View>
         <View style={{ marginBottom: 10 }}>
@@ -86,6 +149,13 @@ const CreateJournal = () => {
             Enter journal description*
           </Text>
           <TextInput
+            onChangeText={(text) => {
+              setJournalData({
+                ...journalData,
+                journalDescription: text
+              });
+            }}
+            value={journalData.journalDescription}
             multiline
             style={{
               borderBottomWidth: 1,
@@ -93,7 +163,7 @@ const CreateJournal = () => {
               paddingBottom: 5,
               marginBottom: 10
             }}
-            placeholder="Publisher Name"
+            placeholder="Journal description"
           />
         </View>
         <View
@@ -123,29 +193,21 @@ const CreateJournal = () => {
                 marginBottom: 10
               }}
             >
-              <Text>
-                {/* {eventCreationData.eventDateAndTime.toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  hour12: true
-                }) +
-                  " " +
-                  eventCreationData.eventDateAndTime.toDateString()} */}
-              </Text>
+              <Text>{journalData.journalPublishingDate.toDateString()}</Text>
               <Entypo name="calendar" size={24} color="black" />
             </View>
           </TouchableOpacity>
           <DateTimePickerModal
-            //   date={eventCreationData.eventDateAndTime}
+            date={journalData.journalPublishingDate}
             isVisible={open}
-            mode="datetime"
-            //   onConfirm={(dateTime) => {
-            //     setEventCreationData({
-            //       ...eventCreationData,
-            //       eventDateAndTime: dateTime
-            //     });
-            //     setOpen(false);
-            //   }}
+            mode="date"
+            onConfirm={(date) => {
+              setJournalData({
+                ...journalData,
+                journalPublishingDate: date
+              });
+              setOpen(false);
+            }}
             onCancel={() => {
               setOpen(false);
             }}
@@ -163,6 +225,13 @@ const CreateJournal = () => {
             Journal editor email*
           </Text>
           <TextInput
+            onChangeText={(text) => {
+              setJournalData({
+                ...journalData,
+                journalEditorEmail: text
+              });
+            }}
+            value={journalData.journalEditorEmail}
             style={{
               borderBottomWidth: 1,
               borderBottomColor: "#ccc",
@@ -184,17 +253,24 @@ const CreateJournal = () => {
             Journal tags*
           </Text>
           <TextInput
+            onChangeText={(text) => {
+              setJournalData({
+                ...journalData,
+                journalTags: text.split(",")
+              });
+            }}
+            value={journalData.journalTags.join(",")}
             style={{
               borderBottomWidth: 1,
               borderBottomColor: "#ccc",
               paddingBottom: 5,
               marginBottom: 10
             }}
-            placeholder="Publisher Name"
+            placeholder="Journal tags (separated by commas)"
           />
         </View>
         <TouchableOpacity
-          onPress={() => navigator.navigate("JournalEditor")}
+          onPress={postJournal}
           style={{
             backgroundColor: PRIMARY_COLOR,
             paddingVertical: 12,
@@ -209,7 +285,11 @@ const CreateJournal = () => {
               fontWeight: "500"
             }}
           >
-            Continue
+            {loading ? (
+              <ActivityIndicator animating={loading} color="white" />
+            ) : (
+              "Continue"
+            )}
           </Text>
         </TouchableOpacity>
       </View>

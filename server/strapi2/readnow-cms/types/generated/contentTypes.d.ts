@@ -788,6 +788,37 @@ export interface PluginI18NLocale extends Schema.CollectionType {
   };
 }
 
+export interface ApiChapterChapter extends Schema.CollectionType {
+  collectionName: 'chapters';
+  info: {
+    singularName: 'chapter';
+    pluralName: 'chapters';
+    displayName: 'Chapters';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    chapterTitle: Attribute.String;
+    chapterContent: Attribute.Blocks;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::chapter.chapter',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::chapter.chapter',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiEventEvent extends Schema.CollectionType {
   collectionName: 'events';
   info: {
@@ -864,6 +895,52 @@ export interface ApiGroupPostGroupPost extends Schema.CollectionType {
   };
 }
 
+export interface ApiJournalJournal extends Schema.CollectionType {
+  collectionName: 'journals';
+  info: {
+    singularName: 'journal';
+    pluralName: 'journals';
+    displayName: 'Journals';
+    description: '';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    journalTitle: Attribute.String;
+    journalDescription: Attribute.Text;
+    journalPublishingDate: Attribute.Date;
+    journalEditorEmail: Attribute.Email;
+    journalTags: Attribute.JSON;
+    journalCoverImage: Attribute.Media;
+    chapters: Attribute.Relation<
+      'api::journal.journal',
+      'oneToMany',
+      'api::chapter.chapter'
+    >;
+    isStandalone: Attribute.Boolean;
+    journalArticle: Attribute.Blocks;
+    publisherId: Attribute.String;
+    journalComments: Attribute.JSON;
+    journalLikes: Attribute.JSON;
+    createdAt: Attribute.DateTime;
+    updatedAt: Attribute.DateTime;
+    publishedAt: Attribute.DateTime;
+    createdBy: Attribute.Relation<
+      'api::journal.journal',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+    updatedBy: Attribute.Relation<
+      'api::journal.journal',
+      'oneToOne',
+      'admin::user'
+    > &
+      Attribute.Private;
+  };
+}
+
 export interface ApiPostPost extends Schema.CollectionType {
   collectionName: 'posts';
   info: {
@@ -909,8 +986,10 @@ declare module '@strapi/types' {
       'plugin::users-permissions.role': PluginUsersPermissionsRole;
       'plugin::users-permissions.user': PluginUsersPermissionsUser;
       'plugin::i18n.locale': PluginI18NLocale;
+      'api::chapter.chapter': ApiChapterChapter;
       'api::event.event': ApiEventEvent;
       'api::group-post.group-post': ApiGroupPostGroupPost;
+      'api::journal.journal': ApiJournalJournal;
       'api::post.post': ApiPostPost;
     }
   }

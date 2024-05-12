@@ -5,7 +5,9 @@ const {
   getPublishersController,
   getManagedPublishersController,
   getSpecificPublisherController,
-  toggleSubscriberController
+  toggleSubscriberController,
+  addJournalController,
+  addChapterController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -33,5 +35,13 @@ router.get(
 );
 
 router.post("/toggle-subscriber", toggleSubscriberController);
+
+router.post(
+  "/add-journal",
+  uploadMiddleware.single("journalCoverImage"),
+  addJournalController
+);
+
+router.post("/add-chapter", addChapterController);
 
 module.exports = router;

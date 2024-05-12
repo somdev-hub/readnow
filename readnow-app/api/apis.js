@@ -758,3 +758,48 @@ export const toggleSubscriber = async (publisherId, email) => {
     console.log(error);
   }
 };
+
+export const addJournal = async (data) => {
+  const formData = new FormData();
+  formData.append("journalCoverImage", {
+    uri: data.journalCoverImage,
+    name: "journalCoverImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("journalTitle", data.journalTitle);
+  formData.append("journalDescription", data.journalDescription);
+  formData.append(
+    "journalPublishingDate",
+    data.journalPublishingDate.toISOString()
+  );
+  formData.append("journalTags", JSON.stringify(data.journalTags));
+  formData.append("journalEditorEmail", data.journalEditorEmail);
+  formData.append("publisherId", data.publisherId);
+
+  // console.log(data.journalPublishingDate.toISOString());
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/add-journal`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addChapter = async (data) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/editorial/add-chapter`, data);
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

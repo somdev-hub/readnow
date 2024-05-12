@@ -2,6 +2,7 @@ const Publisher = require("../models/publishers");
 const FormData = require("form-data");
 const axios = require("axios");
 const uploadImage = require("../utils/uploadImage");
+const uploadImageAndGetId = require("../utils/uploadImageAndGetId");
 
 const addPublisherController = async (req, res) => {
   console.log("hello");
@@ -131,10 +132,121 @@ const toggleSubscriberController = async (req, res) => {
   }
 };
 
+const addJournalController = async (req, res) => {
+  const {
+    journalTitle,
+    journalDescription,
+    journalPublishingDate,
+    journalEditorEmail,
+    journalTags,
+    publisherId
+  } = req.body;
+  const journalCoverImage = req.file;
+
+  try {
+    if (!journalCoverImage)
+      return res
+        .status(400)
+        .json({ message: "Journal cover image is required" });
+    const journalCoverImageId = await uploadImageAndGetId(
+      journalCoverImage,
+      "journal-cover-images"
+    );
+
+    const data = {
+      data: {
+        journalTitle,
+        journalDescription,
+        journalPublishingDate: new Date(journalPublishingDate).toISOString(),
+        journalEditorEmail,
+        journalTags: JSON.parse(journalTags),
+        journalCoverImage: journalCoverImageId,
+        publisherId,
+        isStandAlone: false,
+        journalArticle: {},
+        chapters: [],
+        journalComments: [],
+        journalLikes: []
+      }
+    };
+
+    const response = await axios.post(
+      `${process.env.STRAPI_API}/api/journals`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    if (response.data && response.data.data.id) {
+      return res.status(201).json({
+        message: "Journal added successfully",
+        id: response.data.data.id
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const addChapterController = async (req, res) => {
+  const { journalId, chapter, content, isStandalone } = req.body;
+
+  try {
+    const data = {
+      data: {
+        chapterTitle: chapter,
+        chapterContent: content
+      }
+    };
+
+    const response = await axios.post(
+      `${process.env.STRAPI_API}/api/chapters`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const journalData = await axios.get(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`
+    );
+    const journalEditResponse = await axios.put(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`,
+      {
+        data: {
+          chapters: {
+            connect: [response.data.data.id]
+          }
+        }
+      },
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    res.status(201).json({
+      message: "Chapter added successfully",
+      id: response.data.data.id
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
   getManagedPublishersController,
   getSpecificPublisherController,
-  toggleSubscriberController
+  toggleSubscriberController,
+  addJournalController,
+  addChapterController
 };

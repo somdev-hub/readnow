@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Pressable
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { Feather } from "@expo/vector-icons";
@@ -25,20 +25,30 @@ import {
   useEditorBridge,
   useEditorContent
 } from "@10play/tentap-editor";
-import { Dialog, Portal, TextInput as RNPTextInput } from "react-native-paper";
+import {
+  Dialog,
+  Portal,
+  TextInput as RNPTextInput,
+  Snackbar
+} from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
+import { useRoute } from "@react-navigation/native";
+import { addChapter } from "../../api/apis";
 
 const initialContent = `<blockquote><p>This is a content</p></blockquote>`;
 
 const JournalEditor = () => {
   const height = Dimensions.get("window").height;
+  const route = useRoute();
+  const { publisherId, journalId } = route.params;
   const bottomSheetRef = React.useRef(null);
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const dispatch = useDispatch();
+
   const publishJournalDialog = useSelector(
     (state) => state.journal.publishJournal
   );
-  console.log(publishJournalDialog);
+  // console.log(publishJournalDialog);
 
   const options = [
     {
@@ -66,33 +76,32 @@ const JournalEditor = () => {
       title: "Video"
     }
   ];
-  const customStyles = `code {
-    background-color: #f4f4f4;
-    padding:30px;
-  }`;
-  const customCodeBlockCSS = `
-code {
-    background-color: #ffdede;
-    border-radius: 0.25em;
-    border-color: #e45d5d;
-    border-width: 1px;
-    border-style: solid;
-    box-decoration-break: clone;
-    color: #cd4242;
-    font-size: 0.9rem;
-    padding: 0.25em;
-}
-`;
+
   const editor = useEditorBridge({
     autofocus: true,
-    theme: darkEditorTheme,
-    bridgeExtensions: [
-      ...TenTapStartKit,
-      CodeBridge.configureCSS(customCodeBlockCSS)
-    ]
+    theme: darkEditorTheme
   });
   const content = useEditorContent(editor, { type: "html" });
-  // console.log(content);
+
+  const [journalContent, setJournalContent] = useState({
+    journalId: journalId,
+    chapter: "",
+    content: content,
+    isStandalone: false
+  });
+
+  const postChapterData = async () => {
+    console.log(journalContent);
+    const response = await addChapter(journalContent);
+  };
+
+  useEffect(() => {
+    setJournalContent({
+      ...journalContent,
+      content: content
+    });
+  }, [content]);
+  console.log(content);
   return (
     <View
       style={{
@@ -214,6 +223,11 @@ code {
               type: "journal/updatePublishJournal",
               payload: false
             });
+            setJournalContent({
+              ...journalContent,
+              chapter: "",
+              isStandalone: false
+            });
           }}
           style={{
             borderRadius: 20,
@@ -234,6 +248,13 @@ code {
             /> */}
             <RNPTextInput
               mode="outlined"
+              value={journalContent.chapter}
+              onChangeText={(text) => {
+                setJournalContent({
+                  ...journalContent,
+                  chapter: text
+                });
+              }}
               label="Enter chapter name"
               activeOutlineColor={PRIMARY_COLOR}
               style={{
@@ -248,8 +269,13 @@ code {
               }}
             >
               <Checkbox
-                status="checked"
-                onPress={() => {}}
+                status={journalContent.isStandalone ? "checked" : "unchecked"}
+                onPress={() => {
+                  setJournalContent({
+                    ...journalContent,
+                    isStandalone: !journalContent.isStandalone
+                  });
+                }}
                 color={PRIMARY_COLOR}
               />
               <Text
@@ -282,13 +308,23 @@ code {
                 Cancel
               </Text>
             </Pressable>
-            <Text
-              style={{
-                fontWeight: "500"
+            <Pressable
+              onPress={() => {
+                postChapterData();
+                dispatch({
+                  type: "journal/updatePublishJournal",
+                  payload: false
+                });
               }}
             >
-              Ok
-            </Text>
+              <Text
+                style={{
+                  fontWeight: "500"
+                }}
+              >
+                Ok
+              </Text>
+            </Pressable>
           </Dialog.Actions>
         </Dialog>
       </Portal>
