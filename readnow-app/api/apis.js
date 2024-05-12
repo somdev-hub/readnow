@@ -711,9 +711,11 @@ export const addPublisher = async (data) => {
   }
 };
 
-export const getPublishers = async () => {
+export const getPublishers = async (email) => {
   try {
-    const response = await axios.get(`${ADDRESS}/editorial/get-publishers`);
+    const response = await axios.get(
+      `${ADDRESS}/editorial/get-publishers/${email}`
+    );
     return response.data;
   } catch (error) {
     console.log(error);
@@ -724,6 +726,32 @@ export const getManagedPublishers = async (email) => {
   try {
     const response = await axios.get(
       `${ADDRESS}/editorial/get-managed-publishers/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getSpecificPublisher = async (publisherId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/editorial/get-specific-publisher/${publisherId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const toggleSubscriber = async (publisherId, email) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/toggle-subscriber`,
+      {
+        publisherId,
+        email
+      }
     );
     return response.data;
   } catch (error) {

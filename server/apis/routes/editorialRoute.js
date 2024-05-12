@@ -3,7 +3,9 @@ const multer = require("multer");
 const {
   addPublisherController,
   getPublishersController,
-  getManagedPublishersController
+  getManagedPublishersController,
+  getSpecificPublisherController,
+  toggleSubscriberController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -18,8 +20,18 @@ router.post(
   addPublisherController
 );
 
-router.get("/get-publishers", getPublishersController);
+router.get("/get-publishers/:email", getPublishersController);
 
-router.get("/get-managed-publishers/:publisherManager", getManagedPublishersController);
+router.get(
+  "/get-managed-publishers/:publisherManager",
+  getManagedPublishersController
+);
+
+router.get(
+  "/get-specific-publisher/:publisherId",
+  getSpecificPublisherController
+);
+
+router.post("/toggle-subscriber", toggleSubscriberController);
 
 module.exports = router;

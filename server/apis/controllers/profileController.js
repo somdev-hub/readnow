@@ -213,7 +213,8 @@ const getShortProfileInfoController = async (req, res) => {
       name: users.name,
       email: users.email,
       profilePicture: users.profilePicture,
-      header: users.header
+      header: users.header,
+      followers: users.followers.length
     };
     res.status(200).json({ data: shortData });
   } catch (error) {

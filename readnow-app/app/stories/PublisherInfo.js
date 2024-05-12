@@ -4,14 +4,43 @@ import {
   Image,
   Pressable,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  Linking
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons, Entypo, AntDesign } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import EditionCard from "../../components/EditionCard";
+import { useRoute } from "@react-navigation/native";
+import { getShortProfileInfo, getSpecificPublisher } from "../../api/apis";
 
 const PublisherInfo = () => {
+  const [publisherData, setPublisherData] = useState({});
+  const { publisherId } = useRoute().params;
+
+  useEffect(() => {
+    const fetchPublisherData = async () => {
+      const response = await getSpecificPublisher(publisherId);
+      const publisherManagerData = await getShortProfileInfo(
+        response?.publisher?.publisherManager
+      );
+
+      setPublisherData({
+        ...response?.publisher,
+        managerInfo: publisherManagerData.data
+      });
+    };
+
+    fetchPublisherData();
+  }, []);
+
+  const socialMediaMapping = {
+    twitter: "twitter",
+    facebook: "facebook-square",
+    instagram: "instagram",
+    website: "link"
+  };
+
   return (
     <ScrollView>
       <View
@@ -28,7 +57,7 @@ const PublisherInfo = () => {
           }}
         >
           <Image
-            source={{ uri: "https://picsum.photos/200/300" }}
+            source={{ uri: publisherData?.publisherImage }}
             style={{
               width: 100,
               height: 100,
@@ -65,7 +94,7 @@ const PublisherInfo = () => {
                 marginTop: 5
               }}
             >
-              Nanotech technology news and publishing
+              {publisherData?.publisherName}
             </Text>
           </View>
         </View>
@@ -75,23 +104,15 @@ const PublisherInfo = () => {
             fontSize: 16
           }}
         >
-          Ad incididunt eiusmod voluptate dolore tempor ullamco tempor tempor
-          laboris anim. Fugiat consectetur labore pariatur excepteur Lorem et
-          incididunt tempor consectetur qui dolore do esse ad. Laborum nostrud
-          et culpa exercitation aliqua sint sint reprehenderit ut. Lorem commodo
+          {publisherData?.publisherDescription}
         </Text>
-        
+
         <View
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
             alignItems: "center",
-            marginTop: 20,
-            // borderTopColor: "#ccc",
-            // borderTopWidth: 1,
-            // borderBottomColor: "#ccc",
-            // borderBottomWidth: 1,
-            // paddingVertical: 15
+            marginTop: 20
           }}
         >
           <View
@@ -104,7 +125,7 @@ const PublisherInfo = () => {
           >
             <Image
               source={{
-                uri: "https://picsum.photos/200/300"
+                uri: publisherData?.managerInfo?.profilePicture
               }}
               style={{
                 width: 40,
@@ -120,14 +141,14 @@ const PublisherInfo = () => {
                   fontSize: 16
                 }}
               >
-                By John Doe
+                By {publisherData?.managerInfo?.name}
               </Text>
               <Text
                 style={{
                   color: "gray"
                 }}
               >
-                1200 followers
+                {publisherData?.managerInfo?.followers} followers
               </Text>
             </View>
           </View>
@@ -161,10 +182,11 @@ const PublisherInfo = () => {
               color: "grey"
             }}
           >
-            Robotics, nanotech and innovation | 120,000 subscribers
+            {publisherData?.publisherCategory} |{" "}
+            {publisherData?.publisherSubscribers?.length} subscribers
           </Text>
         </View>
-       
+
         <View
           style={{
             marginTop: 20,
@@ -214,18 +236,30 @@ const PublisherInfo = () => {
         <View style={{ marginTop: 20 }}>
           <Text style={{ fontWeight: "500" }}>Social profiles</Text>
           <View style={{ flexDirection: "row", gap: 20, marginTop: 10 }}>
-            <Pressable>
-              <AntDesign name="twitter" size={22} color="black" />
-            </Pressable>
-            <Pressable>
-              <AntDesign name="facebook-square" size={22} color="black" />
-            </Pressable>
-            <Pressable>
-              <AntDesign name="instagram" size={22} color="black" />
-            </Pressable>
-            <Pressable>
-              <AntDesign name="link" size={22} color="black" />
-            </Pressable>
+            {Object.entries(socialMediaMapping).map(
+              ([socialMedia, iconName]) => {
+                const url = publisherData?.publisherSocials?.[socialMedia];
+                return (
+                  url && (
+                    <Pressable
+                      key={socialMedia}
+                      onPress={async () => {
+                        const supported = await Linking.canOpenURL(url);
+                        if (supported) {
+                          await Linking.openURL(url);
+                        } else {
+                          console.log(
+                            `Don't know how to open this URL: ${url}`
+                          );
+                        }
+                      }}
+                    >
+                      <AntDesign name={iconName} size={22} color="black" />
+                    </Pressable>
+                  )
+                );
+              }
+            )}
           </View>
         </View>
       </View>

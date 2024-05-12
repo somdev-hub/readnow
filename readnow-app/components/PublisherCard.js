@@ -1,14 +1,37 @@
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 import { useNavigation } from "@react-navigation/native";
+import * as SecureStorage from "expo-secure-store";
+import { toggleSubscriber } from "../api/apis";
 
-const PublisherCard = ({ admin, publisher }) => {
+const PublisherCard = ({
+  admin,
+  publisher,
+  hasSubscribed,
+  setHasSubscribed
+}) => {
   const navigator = useNavigation();
+  const [subscribed, setSubscribed] = useState(publisher?.subscribed);
+
+  const toggleSubscribeHandler = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await toggleSubscriber(publisher?._id, email);
+    setSubscribed(!subscribed);
+    setHasSubscribed({
+      visible: true,
+      message: response.message
+    });
+  };
+
   return (
     <Pressable
       onPress={() => {
-        navigator.navigate(admin ? "PublisherAdmin" : "PublisherInfo");
+        admin
+          ? navigator.navigate("PublisherAdmin")
+          : navigator.navigate("PublisherInfo", {
+              publisherId: publisher?._id
+            });
       }}
       style={{
         marginTop: 10,
@@ -16,7 +39,7 @@ const PublisherCard = ({ admin, publisher }) => {
         backgroundColor: WHITE_COLOR,
         elevation: 1,
         borderRadius: 10,
-        marginBottom:5
+        marginBottom: 5
       }}
       //   key={index}
     >
@@ -65,21 +88,23 @@ const PublisherCard = ({ admin, publisher }) => {
         >
           {!admin && (
             <TouchableOpacity
+              onPress={toggleSubscribeHandler}
               style={{
-                backgroundColor: PRIMARY_COLOR,
+                backgroundColor: subscribed ? WHITE_COLOR : PRIMARY_COLOR,
                 padding: 7,
                 paddingHorizontal: 15,
                 borderRadius: 50,
-                marginHorizontal: 10
-                // marginTop:10
+                marginHorizontal: 10,
+                borderColor: PRIMARY_COLOR,
+                borderWidth: 2
               }}
             >
               <Text
                 style={{
-                  color: WHITE_COLOR
+                  color: subscribed ? PRIMARY_COLOR : WHITE_COLOR
                 }}
               >
-                Subscribe
+                {subscribed ? "Subscribed" : "Subscribe"}
               </Text>
             </TouchableOpacity>
           )}
