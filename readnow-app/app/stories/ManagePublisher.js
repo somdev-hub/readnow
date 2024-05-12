@@ -1,8 +1,28 @@
 import { View, Text } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import PublisherCard from "../../components/PublisherCard";
+import * as SecureStorage from "expo-secure-store";
+import { getManagedPublishers, getShortProfileInfo } from "../../api/apis";
 
 const ManagePublisher = () => {
+  const [publisherData, setPublisherData] = useState([]);
+
+  useEffect(() => {
+    const fetchPublishers = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      const response = await getManagedPublishers(email);
+      const responseWithManagerInfo = await Promise.all(
+        response?.publishers?.map(async (publisher) => {
+          const managerInfo = await getShortProfileInfo(
+            publisher?.publisherManager
+          );
+          return { ...publisher, managerInfo: managerInfo.data };
+        })
+      );
+      setPublisherData(responseWithManagerInfo);
+    };
+    fetchPublishers();
+  }, []);
   return (
     <View>
       <Text
@@ -20,7 +40,12 @@ const ManagePublisher = () => {
           marginTop: 10
         }}
       >
-        <PublisherCard admin={true} />
+        {publisherData?.map((publisher, index) => {
+          return (
+            <PublisherCard key={index} publisher={publisher} admin={true} />
+          );
+        })}
+        {/* <PublisherCard admin={true} /> */}
       </View>
     </View>
   );

@@ -1,7 +1,9 @@
 const express = require("express");
 const multer = require("multer");
 const {
-    addPublisherController
+  addPublisherController,
+  getPublishersController,
+  getManagedPublishersController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -15,5 +17,9 @@ router.post(
   ]),
   addPublisherController
 );
+
+router.get("/get-publishers", getPublishersController);
+
+router.get("/get-managed-publishers/:publisherManager", getManagedPublishersController);
 
 module.exports = router;

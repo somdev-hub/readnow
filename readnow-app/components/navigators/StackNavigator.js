@@ -59,6 +59,7 @@ import CreatePublisher from "../../app/stories/CreatePublisher";
 import PublisherAdmin from "../../app/stories/PublisherAdmin";
 import CreateJournal from "../../app/stories/CreateJournal";
 import JournalEditor from "../../app/stories/JournalEditor";
+import { postPublisherData } from "../../redux/publisherSlice";
 
 const Stack = createStackNavigator();
 
@@ -804,10 +805,7 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    dispatch({
-                      type: "publisher/postPublisherData",
-                      payload: publisherData
-                    });
+                    dispatch(postPublisherData(publisherData));
                   }}
                 >
                   <Text

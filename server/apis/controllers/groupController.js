@@ -29,17 +29,6 @@ const createGroupController = async (req, res) => {
     ? req.files.groupCoverImage[0]
     : undefined;
 
-  // const formData1 = new FormData();
-  // const formData2 = new FormData();
-  // formData1.append("files", Buffer.from(groupImage.buffer), {
-  //   filename: groupImage.originalname,
-  //   contentType: groupImage.mimetype
-  // });
-  // formData2.append("files", Buffer.from(groupCoverImage.buffer), {
-  //   filename: groupCoverImage.originalname,
-  //   contentType: groupCoverImage.mimetype
-  // });
-
   try {
     const imageResponse1 = await uploadImage(groupImage);
     const imageResponse2 = await uploadImage(groupCoverImage);

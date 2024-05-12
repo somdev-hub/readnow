@@ -1,9 +1,10 @@
-const Publisher = require("../models/publisher");
+const Publisher = require("../models/publishers");
 const FormData = require("form-data");
 const axios = require("axios");
 const uploadImage = require("../utils/uploadImage");
 
 const addPublisherController = async (req, res) => {
+  console.log("hello");
   const {
     publisherName,
     publisherManager,
@@ -11,22 +12,30 @@ const addPublisherController = async (req, res) => {
     publisherTags,
     editorEmails,
     publisherSocials,
-    publisherDescription,
-    publisherImage,
-    publisherCoverImage
+    publisherDescription
   } = req.body;
+  const publisherImage = req.files.publisherImage[0];
+  const publisherCoverImage = req.files.publisherCoverImage[0];
+  console.log(req.body);
 
   try {
-    const publisherCoverImageURL = await uploadImage(
-      publisherCoverImage,
-      "publisher-cover-images"
-    );
-    const publisherImageURL = await uploadImage(
-      publisherImage,
-      "publisher-images"
-    );
+    let publisherImageURL = "";
+    let publisherCoverImageURL = "";
+    if (publisherCoverImage) {
+      publisherCoverImageURL = await uploadImage(
+        publisherCoverImage,
+        "publisher-cover-images"
+      );
+    } else {
+      publisherCoverImageURL = "";
+    }
+    if (!publisherImage) {
+      publisherImageURL = await uploadImage(publisherImage, "publisher-images");
+    } else {
+      publisherImageURL = "";
+    }
 
-    const newPublisher = new Publisher({
+    const data = {
       publisherName,
       publisherManager,
       publisherCategory,
@@ -38,7 +47,9 @@ const addPublisherController = async (req, res) => {
       publisherCoverImage: publisherCoverImageURL,
       publisherSubscribers: [],
       publisherEditorialRequests: []
-    });
+    };
+
+    const newPublisher = new Publisher(data);
 
     await newPublisher.save();
     res.status(201).json({ message: "Publisher added successfully" });
@@ -48,4 +59,33 @@ const addPublisherController = async (req, res) => {
   }
 };
 
-module.exports = { addPublisherController };
+const getPublishersController = async (req, res) => {
+  try {
+    const publishers = await Publisher.find().select(
+      "publisherName publisherImage publisherCoverImage publisherCategory publisherManager publisherTags"
+    );
+    if (publishers.length === 0) res.status(404).json("No publishers found");
+    res.status(200).json({ publishers });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getManagedPublishersController = async (req, res) => {
+  const { publisherManager } = req.params;
+  try {
+    const publishers = await Publisher.find({ publisherManager }).select(
+      "publisherName publisherImage publisherCoverImage publisherCategory publisherManager publisherTags"
+    );
+    if (publishers.length === 0) res.status(404).json("No publishers found");
+    res.status(200).json({ publishers });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = {
+  addPublisherController,
+  getPublishersController,
+  getManagedPublishersController
+};

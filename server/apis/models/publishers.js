@@ -17,5 +17,10 @@ const PublisherSchema = new Schema({
   publisherImage: { type: String },
   publisherCoverImage: { type: String },
   publisherSubscribers: { type: Array },
-  publisherEditorialRequests: { type: Array }
+  publisherEditorialRequests: { type: Array },
+  createdOn: { type: Date, default: Date.now }
 });
+
+const Publisher = mongoose.model("Publisher", PublisherSchema);
+
+module.exports = Publisher;

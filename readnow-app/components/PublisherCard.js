@@ -3,7 +3,7 @@ import React from "react";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 
-const PublisherCard = ({ admin }) => {
+const PublisherCard = ({ admin, publisher }) => {
   const navigator = useNavigation();
   return (
     <Pressable
@@ -15,7 +15,8 @@ const PublisherCard = ({ admin }) => {
         width: "100%",
         backgroundColor: WHITE_COLOR,
         elevation: 1,
-        borderRadius: 10
+        borderRadius: 10,
+        marginBottom:5
       }}
       //   key={index}
     >
@@ -25,7 +26,7 @@ const PublisherCard = ({ admin }) => {
         }}
       >
         <Image
-          source={{ uri: "https://picsum.photos/200/300" }}
+          source={{ uri: publisher?.publisherCoverImage }}
           style={{
             width: "100%",
             height: 100,
@@ -34,7 +35,7 @@ const PublisherCard = ({ admin }) => {
           }}
         />
         <Image
-          source={{ uri: "https://picsum.photos/200/300" }}
+          source={{ uri: publisher?.publisherImage }}
           style={{
             width: 90,
             height: 90,
@@ -97,7 +98,7 @@ const PublisherCard = ({ admin }) => {
             fontWeight: "500"
           }}
         >
-          Nanotech technology news and publishing
+          {publisher?.publisherName}
         </Text>
         <Text
           style={{
@@ -107,7 +108,7 @@ const PublisherCard = ({ admin }) => {
             fontWeight: "500"
           }}
         >
-          Robotics, nanotech and innovation
+          {publisher?.publisherCategory}
         </Text>
         <View
           style={{
@@ -118,7 +119,7 @@ const PublisherCard = ({ admin }) => {
           }}
         >
           <Image
-            source={{ uri: "https://picsum.photos/200/300" }}
+            source={{ uri: publisher?.managerInfo?.profilePicture }}
             style={{
               width: 30,
               height: 30,
@@ -131,14 +132,14 @@ const PublisherCard = ({ admin }) => {
                 fontWeight: "500"
               }}
             >
-              By John Doe
+              By {publisher?.managerInfo?.name}
             </Text>
             <Text
               style={{
                 color: "gray"
               }}
             >
-              Robotics Engineer | Writer
+              {publisher?.managerInfo?.header}
             </Text>
           </View>
         </View>
@@ -148,7 +149,7 @@ const PublisherCard = ({ admin }) => {
             color: PRIMARY_COLOR
           }}
         >
-          #tech #nanotech #green #energy #science #nanoscience
+          {publisher?.publisherTags?.map((tag) => `${tag} `)}
         </Text>
       </View>
     </Pressable>

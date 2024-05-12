@@ -6,14 +6,32 @@ import {
   TouchableOpacity,
   Pressable
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 import { Searchbar } from "react-native-paper";
 import PublisherCard from "../../components/PublisherCard";
+import { getPublishers, getShortProfileInfo } from "../../api/apis";
 
 const Publishers = () => {
   const navigator = useNavigation();
+  const [publisherData, setPublisherData] = useState([]);
+
+  useState(() => {
+    const fetchPublishers = async () => {
+      const response = await getPublishers();
+      const responseWithManagerInfo = await Promise.all(
+        response?.publishers?.map(async (publisher) => {
+          const managerInfo = await getShortProfileInfo(
+            publisher?.publisherManager
+          );
+          return { ...publisher, managerInfo: managerInfo.data };
+        })
+      );
+      setPublisherData(responseWithManagerInfo);
+    };
+    fetchPublishers();
+  }, []);
   return (
     <ScrollView>
       <Searchbar
@@ -40,8 +58,8 @@ const Publishers = () => {
           marginTop: 10
         }}
       >
-        {Array.from({ length: 10 }).map((_, index) => {
-          return <PublisherCard key={index} />;
+        {publisherData?.map((publisher, index) => {
+          return <PublisherCard key={index} publisher={publisher} />;
         })}
       </View>
     </ScrollView>

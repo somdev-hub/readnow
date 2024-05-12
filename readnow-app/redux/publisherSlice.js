@@ -1,11 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addPublisher } from "../api/apis";
+import { addPublisher, createEvent } from "../api/apis";
 
-const postPublisherData = createAsyncThunk(
+export const postPublisherData = createAsyncThunk(
   "publisher/postPublisherData",
   async (publisherData) => {
-    const response = await addPublisher(publisherData);
-    return response;
+    try {
+      // console.log("hello");
+      const response = await addPublisher(publisherData);
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
   }
 );
 
@@ -41,7 +46,7 @@ const publisherSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(postPublisherData.fulfilled, (state, action) => {
-      if (action.payload.status === 201) {
+      if (action?.payload?.status === 201) {
         state.publisherSnackbar = true;
         state.publisherSnackbarMessage = "Publisher added successfully";
       } else {

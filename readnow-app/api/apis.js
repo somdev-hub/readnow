@@ -693,13 +693,39 @@ export const addPublisher = async (data) => {
   formData.append("editorEmails", JSON.stringify(data.editorEmails));
   formData.append("publisherSocials", JSON.stringify(data.publisherSocials));
   formData.append("publisherDescription", data.publisherDescription);
+
   try {
-    const response = await axios.post(`${ADDRESS}/add-publisher`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
+    const response = await axios.post(
+      `${ADDRESS}/editorial/add-publisher`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
       }
-    });
+    );
+
     return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getPublishers = async () => {
+  try {
+    const response = await axios.get(`${ADDRESS}/editorial/get-publishers`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getManagedPublishers = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/editorial/get-managed-publishers/${email}`
+    );
+    return response.data;
   } catch (error) {
     console.log(error);
   }
