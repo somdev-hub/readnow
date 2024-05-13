@@ -8,7 +8,8 @@ const {
   toggleSubscriberController,
   addJournalController,
   addChapterController,
-  getSpecificJournalController
+  getSpecificJournalController,
+  getJournalCommentsController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -46,5 +47,7 @@ router.post(
 router.post("/add-chapter", addChapterController);
 
 router.get("/get-specific-journal/:journalId", getSpecificJournalController);
+
+router.get("/get-journal-comments/:journalId", getJournalCommentsController);
 
 module.exports = router;

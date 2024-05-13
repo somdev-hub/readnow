@@ -41,7 +41,7 @@ const JournalEditor = () => {
   const height = Dimensions.get("window").height;
   const route = useRoute();
   const navigator = useNavigation();
-  const { publisherId, journalId } = route.params;
+  const { journalId } = route.params;
   const bottomSheetRef = React.useRef(null);
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
   const dispatch = useDispatch();

@@ -339,6 +339,27 @@ const getSpecificJournalController = async (req, res) => {
   }
 };
 
+const getJournalCommentsController = async (req, res) => {
+  const { journalId } = req.params;
+  try {
+    const journalComments = await axios.get(
+      `${process.env.STRAPI_API}/api/journals/${journalId}?fields[0]=journalComments`,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return res
+      .status(200)
+      .json({ comments: journalComments.data.data.attributes.journalComments });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
@@ -347,5 +368,6 @@ module.exports = {
   toggleSubscriberController,
   addJournalController,
   addChapterController,
-  getSpecificJournalController
+  getSpecificJournalController,
+  getJournalCommentsController
 };

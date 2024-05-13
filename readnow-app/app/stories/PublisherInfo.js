@@ -111,11 +111,7 @@ const PublisherInfo = () => {
         flex: 1
       }}
     >
-      <ScrollView
-      // contentContainerStyle={{
-      //   flex: 1
-      // }}
-      >
+      <ScrollView>
         <View
           style={{
             paddingHorizontal: 10,

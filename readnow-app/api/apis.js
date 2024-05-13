@@ -814,3 +814,14 @@ export const getSpecificJournal = async (journalId) => {
     console.log(error);
   }
 };
+
+export const getJournalComments = async (journalId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/editorial/get-journal-comments/${journalId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

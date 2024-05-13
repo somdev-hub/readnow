@@ -11,8 +11,11 @@ import React from "react";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
+import { useRoute } from "@react-navigation/native";
 
 const JournalComments = () => {
+  const route = useRoute();
+  const { journalData } = route.params;
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -102,7 +105,7 @@ const JournalComments = () => {
         <View>
           <Image
             source={{
-              uri: "https://picsum.photos/200/300"
+              uri: journalData?.journalCoverImage
             }}
             style={{
               width: "100%",
@@ -123,8 +126,7 @@ const JournalComments = () => {
               paddingHorizontal: 10
             }}
           >
-            Ad est est labore voluptate dolore. Irure exercitation mollit labore
-            aliqua sunt ullamco.
+            {journalData?.journalTitle}
           </Text>
           <View
             style={{
@@ -135,11 +137,7 @@ const JournalComments = () => {
               paddingHorizontal: 10
             }}
           >
-            <Text>
-              Sunt laborum laborum ipsum consequat laborum laboris esse in.
-              Nulla sunt consectetur cupidatat adipisicing enim in nisi labore
-              sit pariatur. Exercitation ipsum adipisicing magna occaecat.
-            </Text>
+            <Text>{journalData?.journalDescription}</Text>
           </View>
           <View
             style={{
@@ -169,7 +167,7 @@ const JournalComments = () => {
                 }}
               >
                 <Image
-                  source={{ uri: "https://picsum.photos/200/300" }}
+                  source={{ uri: journalData?.editorInfo?.profilePicture }}
                   style={{
                     width: 40,
                     height: 40,
@@ -183,14 +181,14 @@ const JournalComments = () => {
                       fontWeight: "500"
                     }}
                   >
-                    Taylor Marie
+                    {journalData?.editorInfo?.name}
                   </Text>
                   <Text
                     style={{
                       fontSize: 13
                     }}
                   >
-                    Editor | Story writer
+                    {journalData?.editorInfo?.header}
                   </Text>
                 </View>
               </View>
@@ -221,7 +219,8 @@ const JournalComments = () => {
               fontWeight: "500"
             }}
           >
-            Published on 7th May 2024
+            Published on{" "}
+            {new Date(journalData?.journalPublishingDate).toLocaleDateString()}
           </Text>
         </View>
         <View

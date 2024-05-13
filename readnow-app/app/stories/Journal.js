@@ -37,10 +37,18 @@ const Journel = () => {
     };
     fetchJournal();
   }, []);
-  const dummyHtml =
-    journalData && journalData.chapters && journalData.chapters[0]
-      ? { html: `${journalData.chapters[0].chapterContent}` }
-      : { html: "" };
+  const journalContentHtml = {
+    html: `<h1>Chapter 1</h1><p>This is a content</p>`
+  };
+
+  if (journalData?.isStandalone) {
+    journalContentHtml.html = journalData?.journalArticle;
+  } else {
+    journalContentHtml.html =
+      journalData && journalData.chapters && journalData.chapters[0]
+        ? journalData.chapters[currentChapter].chapterContent
+        : "";
+  }
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -244,7 +252,8 @@ const Journel = () => {
               fontWeight: "500"
             }}
           >
-            Published on 7th May 2024
+            Published on{" "}
+            {new Date(journalData?.journalPublishingDate).toLocaleDateString()}
           </Text>
         </View>
         <View
@@ -261,59 +270,67 @@ const Journel = () => {
           >
             Chapters
           </Text>
-          <View
-            style={{
-              borderLeftColor: PRIMARY_COLOR,
-              borderLeftWidth: 7,
-              paddingVertical: 10
-            }}
-          >
-            {journalData?.chapters?.map((chapter, index) => {
-              return (
-                <View
-                  style={{
-                    paddingHorizontal: 10,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: 5,
-                    marginBottom: 10
-                  }}
-                  key={index}
-                >
-                  <View
-                    style={{
-                      backgroundColor: PRIMARY_COLOR,
-                      width: 25,
-                      height: 25,
-                      borderRadius: 50
+          {!journalData?.isStandalone && (
+            <View
+              style={{
+                borderLeftColor: PRIMARY_COLOR,
+                borderLeftWidth: 7,
+                paddingTop: 10
+              }}
+            >
+              {journalData?.chapters?.map((chapter, index) => {
+                return (
+                  <Pressable
+                    onPress={() => {
+                      setCurrentChapter(index);
                     }}
+                    style={{
+                      paddingHorizontal: 10,
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 5,
+                      marginBottom: 10
+                    }}
+                    key={index}
                   >
-                    <Text
+                    <View
                       style={{
-                        color: WHITE_COLOR,
-                        fontWeight: "500",
-                        textAlign: "center"
+                        backgroundColor: PRIMARY_COLOR,
+                        width: 25,
+                        height: 25,
+                        borderRadius: 50
                       }}
                     >
-                      {index + 1}
+                      <Text
+                        style={{
+                          color: WHITE_COLOR,
+                          fontWeight: currentChapter === index ? "500" : "400",
+                          textAlign: "center"
+                        }}
+                      >
+                        {index + 1}
+                      </Text>
+                    </View>
+                    <Text
+                      style={{
+                        fontWeight: currentChapter === index ? "500" : "400",
+                        flex: 1
+                      }}
+                    >
+                      {chapter?.chapterTitle}
                     </Text>
-                  </View>
-                  <Text
-                    style={{ fontWeight: index === 0 ? "500" : "400", flex: 1 }}
-                  >
-                    {chapter?.chapterTitle}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
+                  </Pressable>
+                );
+              })}
+            </View>
+          )}
           <View
             style={{
               paddingHorizontal: 10,
               marginTop: 10
             }}
           >
-            <RenderHtml contentWidth={width} source={dummyHtml} />
+            <RenderHtml contentWidth={width} source={journalContentHtml} />
           </View>
         </View>
       </ScrollView>
@@ -387,7 +404,10 @@ const Journel = () => {
           </View>
           <Pressable
             onPress={() => {
-              navigator.navigate("JournalComments");
+              const { chapters, ...otherData } = journalData;
+              navigator.navigate("JournalComments", {
+                journalData: otherData
+              });
             }}
             style={{
               alignItems: "center"

@@ -1,18 +1,30 @@
 import { View, Text, Image, Pressable } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { Entypo, AntDesign, FontAwesome } from "@expo/vector-icons";
 import { WHITE_COLOR } from "../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 import { Menu } from "react-native-paper";
+import { PaperProvider } from "react-native-paper";
 
-const EditionCard = ({ journal }) => {
+const EditionCard = ({ journal, admin }) => {
   const navigator = useNavigation();
   const lastUpdated = new Date(journal?.lastUpdated);
   const now = new Date();
   const diffInHours = Math.abs(now - lastUpdated) / 36e5;
   const diffInMinutes = Math.abs(now - lastUpdated) / 60000;
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const menuItems = [
+    {
+      title: "Add chapter",
+      icon: "plus",
+      onPress: () => {
+        setMenuVisible(false);
+        navigator.navigate("JournalEditor", {
+          journalId: journal?.id
+        });
+      }
+    },
     {
       title: "Edit",
       icon: "pencil",
@@ -84,7 +96,35 @@ const EditionCard = ({ journal }) => {
             </Text>
           </View>
         </View>
-        <Entypo name="dots-three-vertical" size={20} color="black" />
+
+        {admin && (
+          <Menu
+            theme={{ colors: { primary: "green" } }}
+            visible={menuVisible}
+            onDismiss={() => setMenuVisible(false)}
+            anchor={
+              <Entypo
+                name="dots-three-vertical"
+                size={20}
+                color="black"
+                onPress={() => setMenuVisible(true)}
+              />
+            }
+          >
+            {menuItems.map((item, index) => {
+              return (
+                <Menu.Item
+                  key={index}
+                  onPress={item.onPress}
+                  title={item.title}
+                  leadingIcon={item.icon}
+                />
+              );
+            })}
+          </Menu>
+        )}
+
+        {/* <Entypo name="dots-three-vertical" size={20} color="black" /> */}
       </View>
       <View>
         <Image
