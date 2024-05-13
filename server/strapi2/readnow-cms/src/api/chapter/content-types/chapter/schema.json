@@ -4,7 +4,8 @@
   "info": {
     "singularName": "chapter",
     "pluralName": "chapters",
-    "displayName": "Chapters"
+    "displayName": "Chapters",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -15,7 +16,7 @@
       "type": "string"
     },
     "chapterContent": {
-      "type": "blocks"
+      "type": "text"
     }
   }
 }

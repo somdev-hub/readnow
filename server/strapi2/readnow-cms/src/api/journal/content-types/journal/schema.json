@@ -46,9 +46,6 @@
     "isStandalone": {
       "type": "boolean"
     },
-    "journalArticle": {
-      "type": "blocks"
-    },
     "publisherId": {
       "type": "string"
     },
@@ -57,6 +54,12 @@
     },
     "journalLikes": {
       "type": "json"
+    },
+    "journalArticle": {
+      "type": "text"
+    },
+    "lastUpdated": {
+      "type": "datetime"
     }
   }
 }

@@ -32,7 +32,7 @@ import {
   Snackbar
 } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import { addChapter } from "../../api/apis";
 
 const initialContent = `<blockquote><p>This is a content</p></blockquote>`;
@@ -40,6 +40,7 @@ const initialContent = `<blockquote><p>This is a content</p></blockquote>`;
 const JournalEditor = () => {
   const height = Dimensions.get("window").height;
   const route = useRoute();
+  const navigator = useNavigation();
   const { publisherId, journalId } = route.params;
   const bottomSheetRef = React.useRef(null);
   const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
@@ -48,7 +49,10 @@ const JournalEditor = () => {
   const publishJournalDialog = useSelector(
     (state) => state.journal.publishJournal
   );
-  // console.log(publishJournalDialog);
+  const [SnackbarVisible, setSnackbarVisible] = useState({
+    visible: false,
+    message: ""
+  });
 
   const options = [
     {
@@ -91,8 +95,12 @@ const JournalEditor = () => {
   });
 
   const postChapterData = async () => {
-    console.log(journalContent);
+    // console.log(journalContent);
     const response = await addChapter(journalContent);
+    setSnackbarVisible({
+      visible: true,
+      message: response.message
+    });
   };
 
   useEffect(() => {
@@ -101,7 +109,7 @@ const JournalEditor = () => {
       content: content
     });
   }, [content]);
-  console.log(content);
+  // console.log(content);
   return (
     <View
       style={{
@@ -248,6 +256,7 @@ const JournalEditor = () => {
             /> */}
             <RNPTextInput
               mode="outlined"
+              disabled={journalContent.isStandalone}
               value={journalContent.chapter}
               onChangeText={(text) => {
                 setJournalContent({
@@ -328,6 +337,20 @@ const JournalEditor = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+      <Snackbar
+        visible={SnackbarVisible.visible}
+        onDismiss={() => setSnackbarVisible({ visible: false, message: "" })}
+        duration={3000}
+        action={{
+          label: "Ok",
+          onPress: () => {
+            setSnackbarVisible({ visible: false, message: "" });
+            navigator.navigate("Journal");
+          }
+        }}
+      >
+        {SnackbarVisible.message}
+      </Snackbar>
     </View>
   );
 };

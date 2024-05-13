@@ -794,13 +794,14 @@ export interface ApiChapterChapter extends Schema.CollectionType {
     singularName: 'chapter';
     pluralName: 'chapters';
     displayName: 'Chapters';
+    description: '';
   };
   options: {
     draftAndPublish: true;
   };
   attributes: {
     chapterTitle: Attribute.String;
-    chapterContent: Attribute.Blocks;
+    chapterContent: Attribute.Text;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;
@@ -919,10 +920,11 @@ export interface ApiJournalJournal extends Schema.CollectionType {
       'api::chapter.chapter'
     >;
     isStandalone: Attribute.Boolean;
-    journalArticle: Attribute.Blocks;
     publisherId: Attribute.String;
     journalComments: Attribute.JSON;
     journalLikes: Attribute.JSON;
+    journalArticle: Attribute.Text;
+    lastUpdated: Attribute.DateTime;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

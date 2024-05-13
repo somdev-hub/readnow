@@ -104,8 +104,51 @@ const getSpecificPublisherController = async (req, res) => {
   try {
     const publisher = await Publisher.findById(publisherId);
     if (!publisher) return res.status(404).json("Publisher not found");
-    return res.status(200).json({ publisher });
+
+    const publisherJournals = await axios.get(
+      `http://192.168.25.254:1337/api/journals?populate=*&filters[publisherId][$eq]=66405056ac7046a3981db6d5`,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const modifiedJournalData = await publisherJournals.data.data
+      .reverse()
+      .map((journal) => {
+        const data = {
+          // ...journal.attributes,
+          journalTitle: journal.attributes.journalTitle,
+          journalDescription: journal.attributes.journalDescription,
+          journalPublishingDate: journal.attributes.journalPublishingDate,
+          journalEditorEmail: journal.attributes.journalEditorEmail,
+          journalLikes: journal.attributes.journalLikes.length,
+          journalComments: journal.attributes.journalComments.length,
+          lastUpdated: journal.attributes.lastUpdated,
+          id: journal.id,
+          journalCoverImage: `${process.env.STRAPI_API}${journal.attributes?.journalCoverImage.data.attributes.url}`
+          // chapters: journal.attributes.chapters.data.map((chapter) => {
+          //   return {
+          //     id: chapter.id,
+          //     chapterTitle: chapter.attributes.chapterTitle,
+          //     chapterContent: chapter.attributes.chapterContent,
+          //     createdAt: chapter.attributes.createdAt
+          //   };
+          // })
+        };
+
+        return data;
+      });
+
+    const publisherData = {
+      publisher,
+      publisherJournals: modifiedJournalData
+    };
+
+    return res.status(200).json({ publisherData });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -162,11 +205,12 @@ const addJournalController = async (req, res) => {
         journalTags: JSON.parse(journalTags),
         journalCoverImage: journalCoverImageId,
         publisherId,
-        isStandAlone: false,
-        journalArticle: {},
+        isStandalone: false,
+        journalArticle: "",
         chapters: [],
         journalComments: [],
-        journalLikes: []
+        journalLikes: [],
+        lastUpdated: new Date().toISOString()
       }
     };
 
@@ -196,6 +240,29 @@ const addChapterController = async (req, res) => {
   const { journalId, chapter, content, isStandalone } = req.body;
 
   try {
+    if (isStandalone) {
+      const data = {
+        data: {
+          isStandalone: true,
+          journalArticle: content,
+          lastUpdated: new Date().toISOString()
+        }
+      };
+
+      const response = await axios.put(
+        `${process.env.STRAPI_API}/api/journals/${journalId}`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      return res.status(201).json({
+        message: "Article added successfully"
+      });
+    }
     const data = {
       data: {
         chapterTitle: chapter,
@@ -213,16 +280,14 @@ const addChapterController = async (req, res) => {
       }
     );
 
-    const journalData = await axios.get(
-      `${process.env.STRAPI_API}/api/journals/${journalId}`
-    );
     const journalEditResponse = await axios.put(
       `${process.env.STRAPI_API}/api/journals/${journalId}`,
       {
         data: {
           chapters: {
             connect: [response.data.data.id]
-          }
+          },
+          lastUpdated: new Date().toISOString()
         }
       },
       {
@@ -241,6 +306,39 @@ const addChapterController = async (req, res) => {
   }
 };
 
+const getSpecificJournalController = async (req, res) => {
+  const { journalId } = req.params;
+  try {
+    const journal = await axios.get(
+      `${process.env.STRAPI_API}/api/journals/${journalId}?populate=*`,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    const data = {
+      ...journal.data.data.attributes,
+      id: journal.data.data.id,
+      journalCoverImage: `${process.env.STRAPI_API}${journal.data.data.attributes.journalCoverImage.data.attributes.url}`,
+      chapters: journal.data.data.attributes.chapters.data.map((chapter) => {
+        return {
+          id: chapter.id,
+          chapterTitle: chapter.attributes.chapterTitle,
+          chapterContent: chapter.attributes.chapterContent,
+          createdAt: chapter.attributes.createdAt
+        };
+      })
+    };
+
+    return res.status(200).json({ journal: data });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
@@ -248,5 +346,6 @@ module.exports = {
   getSpecificPublisherController,
   toggleSubscriberController,
   addJournalController,
-  addChapterController
+  addChapterController,
+  getSpecificJournalController
 };

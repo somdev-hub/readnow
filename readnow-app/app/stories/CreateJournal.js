@@ -47,15 +47,15 @@ const CreateJournal = () => {
   };
 
   const postJournal = async () => {
-    // setLoading(true);
-    // const response = await addJournal(journalData);
-    // if (response && response.id) {
+    setLoading(true);
+    const response = await addJournal(journalData);
+    if (response && response.id) {
       navigator.navigate("JournalEditor", {
         publisherId,
-        journalId: 2
+        journalId: response.id
       });
-    // }
-    // setLoading(false);
+    }
+    setLoading(false);
   };
 
   useEffect(() => {
