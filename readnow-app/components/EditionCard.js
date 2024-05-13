@@ -3,13 +3,39 @@ import React from "react";
 import { Entypo, AntDesign, FontAwesome } from "@expo/vector-icons";
 import { WHITE_COLOR } from "../styles/colors";
 import { useNavigation } from "@react-navigation/native";
+import { Menu } from "react-native-paper";
 
-const EditionCard = () => {
+const EditionCard = ({ journal }) => {
   const navigator = useNavigation();
+  const lastUpdated = new Date(journal?.lastUpdated);
+  const now = new Date();
+  const diffInHours = Math.abs(now - lastUpdated) / 36e5;
+  const diffInMinutes = Math.abs(now - lastUpdated) / 60000;
+
+  const menuItems = [
+    {
+      title: "Edit",
+      icon: "pencil",
+      onPress: () => {
+        navigator.navigate("EditJournal", {
+          journalId: journal?.id
+        });
+      }
+    },
+    {
+      title: "Delete",
+      icon: "delete",
+      onPress: () => {
+        console.log("Delete");
+      }
+    }
+  ];
   return (
     <Pressable
       onPress={() => {
-        navigator.navigate("Journal");
+        navigator.navigate("Journal", {
+          journalId: journal?.id
+        });
       }}
       style={{
         backgroundColor: WHITE_COLOR,
@@ -33,7 +59,7 @@ const EditionCard = () => {
           }}
         >
           <Image
-            source={{ uri: "https://picsum.photos/200/300" }}
+            source={{ uri: journal?.editorInfo?.profilePicture }}
             style={{
               width: 40,
               height: 40,
@@ -47,14 +73,14 @@ const EditionCard = () => {
                 fontWeight: "500"
               }}
             >
-              Taylor Marie
+              {journal?.editorInfo?.name}
             </Text>
             <Text
               style={{
-                fontSize: 13,
+                fontSize: 13
               }}
             >
-             Nanotech technology news and publishing
+              {journal?.publisher}
             </Text>
           </View>
         </View>
@@ -62,7 +88,7 @@ const EditionCard = () => {
       </View>
       <View>
         <Image
-          source={{ uri: "https://picsum.photos/200/300" }}
+          source={{ uri: journal?.journalCoverImage }}
           style={{
             width: "100%",
             height: 200,
@@ -83,16 +109,14 @@ const EditionCard = () => {
             fontWeight: "500"
           }}
         >
-          How a India based nanotech firm is changing the world with its
-          innovative products and services
+          {journal?.journalTitle}
         </Text>
         <Text
           style={{
             marginTop: 10
           }}
         >
-          Est qui nulla veniam dolore sunt cupidatat. Sunt dolore mollit
-          cupidatat excepteur reprehenderit.
+          {journal?.journalDescription}
         </Text>
         <View
           style={{
@@ -119,7 +143,7 @@ const EditionCard = () => {
               }}
             >
               <AntDesign name="like2" size={20} color="black" />
-              <Text>12</Text>
+              <Text>{journal?.journalLikes}</Text>
             </View>
             <View
               style={{
@@ -129,7 +153,7 @@ const EditionCard = () => {
               }}
             >
               <FontAwesome name="comment-o" size={20} color="black" />
-              <Text>12</Text>
+              <Text>{journal?.journalComments}</Text>
             </View>
           </View>
           <Text
@@ -139,7 +163,10 @@ const EditionCard = () => {
               fontSize: 12
             }}
           >
-            May 7th, 1 hour ago
+            {new Date(journal?.journalPublishingDate).toLocaleDateString()},{" "}
+            {diffInHours < 1
+              ? `${Math.round(diffInMinutes)} minutes ago`
+              : `${diffInHours.toFixed(0)} hours ago`}
           </Text>
         </View>
       </View>

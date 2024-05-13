@@ -127,15 +127,8 @@ const getSpecificPublisherController = async (req, res) => {
           journalComments: journal.attributes.journalComments.length,
           lastUpdated: journal.attributes.lastUpdated,
           id: journal.id,
-          journalCoverImage: `${process.env.STRAPI_API}${journal.attributes?.journalCoverImage.data.attributes.url}`
-          // chapters: journal.attributes.chapters.data.map((chapter) => {
-          //   return {
-          //     id: chapter.id,
-          //     chapterTitle: chapter.attributes.chapterTitle,
-          //     chapterContent: chapter.attributes.chapterContent,
-          //     createdAt: chapter.attributes.createdAt
-          //   };
-          // })
+          journalCoverImage: `${process.env.STRAPI_API}${journal.attributes?.journalCoverImage.data.attributes.url}`,
+          journalPublishingDate: journal.attributes.journalPublishingDate
         };
 
         return data;
@@ -318,10 +311,17 @@ const getSpecificJournalController = async (req, res) => {
       }
     );
 
+    const publisherName = await Publisher.findById(
+      journal.data.data.attributes.publisherId
+    ).select("publisherName");
+
     const data = {
       ...journal.data.data.attributes,
       id: journal.data.data.id,
       journalCoverImage: `${process.env.STRAPI_API}${journal.data.data.attributes.journalCoverImage.data.attributes.url}`,
+      publisher: publisherName.publisherName,
+      journalLikes: journal.data.data.attributes.journalLikes.length,
+      journalComments: journal.data.data.attributes.journalComments.length,
       chapters: journal.data.data.attributes.chapters.data.map((chapter) => {
         return {
           id: chapter.id,

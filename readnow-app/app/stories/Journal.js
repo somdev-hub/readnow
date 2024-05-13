@@ -4,106 +4,133 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
-  ScrollView
+  ScrollView,
+  Dimensions
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { getShortProfileInfo, getSpecificJournal } from "../../api/apis";
+// import { WebView } from "react-native-webview";
+import RenderHtml from "react-native-render-html";
 
 const Journel = () => {
+  const width = Dimensions.get("window").width;
   const navigator = useNavigation();
+  const route = useRoute();
+  const { journalId } = route.params;
+  const [journalData, setJournalData] = useState({});
+  const [currentChapter, setCurrentChapter] = useState(0);
+
+  useEffect(() => {
+    const fetchJournal = async () => {
+      const response = await getSpecificJournal(journalId);
+      const responseWithEditorData = await getShortProfileInfo(
+        response.journal.journalEditorEmail
+      );
+      setJournalData({
+        ...response.journal,
+        editorInfo: responseWithEditorData.data
+      });
+    };
+    fetchJournal();
+  }, []);
+  const dummyHtml =
+    journalData && journalData.chapters && journalData.chapters[0]
+      ? { html: `${journalData.chapters[0].chapterContent}` }
+      : { html: "" };
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
-      <View
-        style={{
-          flexDirection: "row",
-          backgroundColor: WHITE_COLOR,
-          padding: 10,
-          elevation: 2,
-          //   gap:20,
-          alignItems: "center"
-          // justifyContent: "space-between",
-          //   flex:1
-          //   width:"100%"
-        }}
-      >
         <View
           style={{
             flexDirection: "row",
-            gap: 10,
-            alignItems: "center",
-            flex: 1
-            // marginRight: 20
+            backgroundColor: WHITE_COLOR,
+            padding: 10,
+            elevation: 2,
+            //   gap:20,
+            alignItems: "center"
+            // justifyContent: "space-between",
+            //   flex:1
+            //   width:"100%"
           }}
         >
-          <Image
-            source={{
-              uri: "https://picsum.photos/200/300"
-            }}
+          <View
             style={{
-              width: 40,
-              height: 40
-              //   borderRadius: 50
-            }}
-          />
-          <View>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 5,
-                alignItems: "center",
-                marginTop: 5
-              }}
-            >
-              <Ionicons name="newspaper-outline" size={20} color="black" />
-              <Text
-                style={{
-                  fontWeight: "500",
-                  fontSize: 12
-                }}
-              >
-                PUBLISHER
-              </Text>
-            </View>
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: "500",
-                marginTop: 2
-              }}
-            >
-              Nanotech technology news and publishing
-            </Text>
-          </View>
-        </View>
-        <TouchableOpacity
-          style={{
-            backgroundColor: PRIMARY_COLOR,
-            paddingVertical: 8,
-            borderRadius: 50,
-            paddingHorizontal: 10,
-            // flex: 1
-            marginLeft: 10
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              textAlign: "center",
-              fontWeight: "500"
+              flexDirection: "row",
+              gap: 10,
+              alignItems: "center",
+              flex: 1
+              // marginRight: 20
             }}
           >
-            Subscribe
-          </Text>
-        </TouchableOpacity>
-      </View>
+            <Image
+              source={{
+                uri: "https://picsum.photos/200/300"
+              }}
+              style={{
+                width: 40,
+                height: 40
+                //   borderRadius: 50
+              }}
+            />
+            <View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  gap: 5,
+                  alignItems: "center",
+                  marginTop: 5
+                }}
+              >
+                <Ionicons name="newspaper-outline" size={20} color="black" />
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    fontSize: 12
+                  }}
+                >
+                  PUBLISHER
+                </Text>
+              </View>
+              <Text
+                style={{
+                  fontSize: 14,
+                  fontWeight: "500",
+                  marginTop: 2
+                }}
+              >
+                Nanotech technology news and publishing
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: PRIMARY_COLOR,
+              paddingVertical: 8,
+              borderRadius: 50,
+              paddingHorizontal: 10,
+              // flex: 1
+              marginLeft: 10
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                textAlign: "center",
+                fontWeight: "500"
+              }}
+            >
+              Subscribe
+            </Text>
+          </TouchableOpacity>
+        </View>
         <View>
           <Image
             source={{
-              uri: "https://picsum.photos/200/300"
+              uri: journalData?.journalCoverImage
             }}
             style={{
               width: "100%",
@@ -124,8 +151,7 @@ const Journel = () => {
               paddingHorizontal: 10
             }}
           >
-            Ad est est labore voluptate dolore. Irure exercitation mollit labore
-            aliqua sunt ullamco.
+            {journalData?.journalTitle}
           </Text>
           <View
             style={{
@@ -136,11 +162,7 @@ const Journel = () => {
               paddingHorizontal: 10
             }}
           >
-            <Text>
-              Sunt laborum laborum ipsum consequat laborum laboris esse in.
-              Nulla sunt consectetur cupidatat adipisicing enim in nisi labore
-              sit pariatur. Exercitation ipsum adipisicing magna occaecat.
-            </Text>
+            <Text>{journalData?.journalDescription}</Text>
           </View>
           <View
             style={{
@@ -170,7 +192,7 @@ const Journel = () => {
                 }}
               >
                 <Image
-                  source={{ uri: "https://picsum.photos/200/300" }}
+                  source={{ uri: journalData?.editorInfo?.profilePicture }}
                   style={{
                     width: 40,
                     height: 40,
@@ -184,14 +206,14 @@ const Journel = () => {
                       fontWeight: "500"
                     }}
                   >
-                    Taylor Marie
+                    {journalData?.editorInfo?.name}
                   </Text>
                   <Text
                     style={{
                       fontSize: 13
                     }}
                   >
-                    Editor | Story writer
+                    {journalData?.editorInfo?.header}
                   </Text>
                 </View>
               </View>
@@ -246,7 +268,7 @@ const Journel = () => {
               paddingVertical: 10
             }}
           >
-            {Array.from({ length: 3 }).map((_, index) => {
+            {journalData?.chapters?.map((chapter, index) => {
               return (
                 <View
                   style={{
@@ -279,48 +301,20 @@ const Journel = () => {
                   <Text
                     style={{ fontWeight: index === 0 ? "500" : "400", flex: 1 }}
                   >
-                    Minim anim deserunt et ut fugiat id non elit ad id.
+                    {chapter?.chapterTitle}
                   </Text>
                 </View>
               );
             })}
           </View>
-          <Text
+          <View
             style={{
               paddingHorizontal: 10,
-              marginTop: 20
+              marginTop: 10
             }}
           >
-            Aliqua incididunt dolore ad cupidatat veniam duis Lorem in quis.
-            Laborum labore laboris in id cupidatat voluptate nisi sunt dolor in.
-            Excepteur enim ipsum et nulla ex ea culpa aute proident nulla
-            aliquip ad. Ea exercitation sit velit proident commodo aute anim
-            pariatur dolore dolore nulla tempor. Excepteur amet incididunt nisi
-            do Lorem non id exercitation. Ad incididunt do et culpa anim
-            occaecat pariatur ut. Nulla ad ullamco officia laboris mollit
-            commodo. Excepteur Lorem ullamco esse enim Lorem tempor voluptate
-            labore nostrud. Dolore in tempor et sit Lorem non ipsum do. Commodo
-            ad in magna cillum consectetur. Consequat occaecat laboris veniam
-            dolore aliqua laboris aliqua esse duis. In in eiusmod anim culpa
-            ipsum excepteur consequat ex ipsum pariatur est dolore cillum.
-            Ullamco culpa aute pariatur laboris non cupidatat et sit in magna.
-            Duis consectetur nostrud officia commodo proident veniam minim Lorem
-            ea cillum enim exercitation officia minim. Ullamco exercitation
-            reprehenderit aliquip occaecat fugiat commodo est do veniam veniam.
-            Ullamco exercitation nisi consectetur Lorem id irure cupidatat
-            proident mollit nulla nulla consequat. Veniam cillum veniam sint ut
-            nostrud. Quis nulla aliquip nostrud est eiusmod quis officia esse in
-            aliquip. Anim cillum labore ipsum consequat. Nulla cupidatat
-            exercitation consectetur proident cupidatat eiusmod cupidatat labore
-            nostrud laboris nisi. Cillum duis eiusmod nostrud enim non cillum
-            aliqua irure dolore dolor incididunt ea deserunt. Magna mollit amet
-            laboris deserunt pariatur officia pariatur do esse minim ipsum.
-            Tempor esse non adipisicing duis laborum fugiat amet anim
-            consectetur. Nisi mollit laborum nostrud excepteur labore occaecat.
-            Veniam elit qui veniam et aliqua proident dolor sint proident
-            fugiat. Quis enim id deserunt et elit labore aute cillum commodo
-            ullamco. Aliquip non duis cillum ad cupidatat.
-          </Text>
+            <RenderHtml contentWidth={width} source={dummyHtml} />
+          </View>
         </View>
       </ScrollView>
       <View
@@ -356,7 +350,7 @@ const Journel = () => {
               }}
             >
               <AntDesign name="like2" size={22} color="black" />
-              <Text>12</Text>
+              <Text>{journalData?.journalLikes}</Text>
             </View>
             <View
               style={{
@@ -365,7 +359,7 @@ const Journel = () => {
                 alignItems: "center"
               }}
             >
-              <Text>12 comments</Text>
+              <Text>{journalData?.journalComments} comments</Text>
             </View>
           </View>
         </View>

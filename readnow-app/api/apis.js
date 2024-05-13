@@ -803,3 +803,14 @@ export const addChapter = async (data) => {
     console.log(error);
   }
 };
+
+export const getSpecificJournal = async (journalId) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/editorial/get-specific-journal/${journalId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
