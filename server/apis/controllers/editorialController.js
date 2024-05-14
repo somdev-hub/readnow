@@ -320,7 +320,7 @@ const getSpecificJournalController = async (req, res) => {
       id: journal.data.data.id,
       journalCoverImage: `${process.env.STRAPI_API}${journal.data.data.attributes.journalCoverImage.data.attributes.url}`,
       publisher: publisherName.publisherName,
-      journalLikes: journal.data.data.attributes.journalLikes.length,
+      journalLikes: journal.data.data.attributes.journalLikes,
       journalComments: journal.data.data.attributes.journalComments.length,
       chapters: journal.data.data.attributes.chapters.data.map((chapter) => {
         return {
@@ -360,6 +360,96 @@ const getJournalCommentsController = async (req, res) => {
   }
 };
 
+const addJournalCommentController = async (req, res) => {
+  const { journalId, user, comment } = req.body;
+  try {
+    const commentData = await axios.get(
+      `${process.env.STRAPI_API}/api/journals/${journalId}?fields[0]=journalComments`,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+    const data = {
+      data: {
+        journalComments: [
+          ...commentData.data.data.attributes.journalComments,
+          {
+            user,
+            comment,
+            createdAt: new Date().toISOString(),
+            commentLikes: 0,
+            commentReplies: []
+          }
+        ]
+      }
+    };
+
+    const response = await axios.put(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return res.status(201).json({ message: "Comment added successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const toggleJournalLikeController = async (req, res) => {
+  const { journalId, email } = req.body;
+  try {
+    // Fetch only the journalLikes field
+    //.data.data.attributes.
+    const journalLikes = await axios.get(
+      `${process.env.STRAPI_API}/api/journals/${journalId}?fields[0]=journalLikes`
+    );
+
+    // Determine whether the email is already in the journalLikes array
+    const actualJournalLikes = journalLikes.data.data.attributes.journalLikes;
+    const isLiked = actualJournalLikes.includes(email);
+
+    // Add or remove the email from the journalLikes array
+    const updatedJournalLikes = isLiked
+      ? actualJournalLikes.filter((like) => like !== email)
+      : [...actualJournalLikes, email];
+
+    const data = {
+      data: {
+        journalLikes: updatedJournalLikes
+      }
+    };
+
+    // Update the journal
+    await axios.put(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return res
+      .status(200)
+      .json({
+        message: "Like toggled successfully",
+        journalLikes: updatedJournalLikes
+      });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
@@ -369,5 +459,7 @@ module.exports = {
   addJournalController,
   addChapterController,
   getSpecificJournalController,
-  getJournalCommentsController
+  getJournalCommentsController,
+  addJournalCommentController,
+  toggleJournalLikeController
 };

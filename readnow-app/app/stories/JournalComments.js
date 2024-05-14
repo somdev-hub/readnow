@@ -7,15 +7,55 @@ import {
   ScrollView,
   TextInput
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { useRoute } from "@react-navigation/native";
+import {
+  addJournalComment,
+  getJournalComments,
+  getShortProfileInfo
+} from "../../api/apis";
+import * as SecureStorage from "expo-secure-store";
 
 const JournalComments = () => {
   const route = useRoute();
   const { journalData } = route.params;
+  const [journalComments, setJournalComments] = useState([]);
+  const [comment, setComment] = useState("");
+
+  const addComment = async () => {
+    const user = await SecureStorage.getItemAsync("email");
+    const response = await addJournalComment({
+      journalId: journalData.id,
+      comment,
+      user
+    });
+    if (response.status === 201) {
+      fetchComments();
+    }
+  };
+
+  const fetchComments = async () => {
+    const response = await getJournalComments(journalData.id);
+    // console.log(response?.comments);
+    const responseWithUserInfo = await Promise.all(
+      response.comments.length > 0 &&
+        response?.comments?.map(async (comment) => {
+          const userInfo = await getShortProfileInfo(comment?.user);
+          return {
+            ...comment,
+            userInfo: userInfo.data
+          };
+        })
+    );
+    setJournalComments(responseWithUserInfo);
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -231,110 +271,125 @@ const JournalComments = () => {
         >
           <Text style={{ fontWeight: "500" }}>Comments</Text>
           <View style={{ marginTop: 20 }}>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: 5,
-                alignItems: "flex-start"
-              }}
-            >
-              <Image
-                source={{ uri: "https://picsum.photos/200/300" }}
-                style={{
-                  width: 35,
-                  height: 35,
-                  borderRadius: 50
-                }}
-              />
-              <View style={{ flex: 1 }}>
-                <View
-                  style={{
-                    backgroundColor: WHITE_COLOR,
-                    elevation: 1,
-                    padding: 10,
-                    borderRadius: 10,
-                    flex: 1
-                  }}
-                >
+            {journalComments.length > 0 &&
+              journalComments.map((comment, index) => {
+                return (
                   <View
+                    key={index}
                     style={{
                       flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center"
+                      gap: 5,
+                      alignItems: "flex-start"
                     }}
                   >
-                    <View>
-                      <Text
+                    <Image
+                      source={{
+                        uri: comment?.userInfo?.profilePicture
+                      }}
+                      style={{
+                        width: 35,
+                        height: 35,
+                        borderRadius: 50
+                      }}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <View
                         style={{
-                          fontWeight: "500"
+                          backgroundColor: WHITE_COLOR,
+                          elevation: 1,
+                          padding: 10,
+                          borderRadius: 10,
+                          flex: 1
                         }}
                       >
-                        Soumya Singh
-                      </Text>
-                      <Text style={{ color: "grey" }}>Content editor</Text>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                          }}
+                        >
+                          <View>
+                            <Text
+                              style={{
+                                fontWeight: "500"
+                              }}
+                            >
+                              {comment?.userInfo?.name}
+                            </Text>
+                            <Text style={{ color: "grey" }}>
+                              {comment?.userInfo?.header}
+                            </Text>
+                          </View>
+                          <Entypo
+                            name="dots-three-vertical"
+                            size={16}
+                            color="black"
+                          />
+                        </View>
+                        <Text
+                          style={{
+                            marginTop: 5
+                          }}
+                        >
+                          {comment?.comment}
+                        </Text>
+                        <View
+                          style={{
+                            marginTop: 10,
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "space-between"
+                          }}
+                        >
+                          <View
+                            style={{
+                              flexDirection: "row",
+                              gap: 5,
+                              alignItems: "center"
+                            }}
+                          >
+                            <AntDesign
+                              name="like1"
+                              size={16}
+                              color={PRIMARY_COLOR}
+                            />
+                            <Text>{comment?.commentLikes}</Text>
+                          </View>
+                          <Text
+                            style={{
+                              color: "grey",
+                              fontSize: 12
+                            }}
+                          >
+                            {new Date(comment?.createdAt).toLocaleString()}
+                          </Text>
+                        </View>
+                      </View>
+                      <View
+                        style={{ flexDirection: "row", gap: 10, margin: 7 }}
+                      >
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            color: "grey"
+                          }}
+                        >
+                          Like
+                        </Text>
+                        <Text
+                          style={{
+                            fontWeight: "500",
+                            color: "grey"
+                          }}
+                        >
+                          Reply
+                        </Text>
+                      </View>
                     </View>
-                    <Entypo
-                      name="dots-three-vertical"
-                      size={16}
-                      color="black"
-                    />
                   </View>
-                  <Text
-                    style={{
-                      marginTop: 5
-                    }}
-                  >
-                    Tempor voluptate Lorem esse elit irure velit nisi. Tempor
-                    voluptate Lorem esse elit irure velit nisi.
-                  </Text>
-                  <View
-                    style={{
-                      marginTop: 10,
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between"
-                    }}
-                  >
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        gap: 5,
-                        alignItems: "center"
-                      }}
-                    >
-                      <AntDesign name="like1" size={16} color={PRIMARY_COLOR} />
-                      <Text>20</Text>
-                    </View>
-                    <Text
-                      style={{
-                        color: "grey",
-                        fontSize: 12
-                      }}
-                    >
-                      20 minutes ago
-                    </Text>
-                  </View>
-                </View>
-                <View style={{ flexDirection: "row", gap: 10, margin: 7 }}>
-                  <Text
-                    style={{
-                      fontWeight: "500",
-                      color: "grey"
-                    }}
-                  >
-                    Like
-                  </Text>
-                  <Text
-                    style={{
-                      fontWeight: "500",
-                      color: "grey"
-                    }}
-                  >
-                    Reply
-                  </Text>
-                </View>
-              </View>
-            </View>
+                );
+              })}
           </View>
         </View>
       </ScrollView>
@@ -353,8 +408,19 @@ const JournalComments = () => {
           alignItems: "center"
         }}
       >
-        <TextInput placeholder="Write a comment" />
-        <Pressable>
+        <TextInput
+          placeholder="Write a comment"
+          value={comment}
+          onChangeText={(text) => {
+            setComment(text);
+          }}
+        />
+        <Pressable
+          onPress={() => {
+            addComment();
+            setComment("");
+          }}
+        >
           <Text
             style={{
               color: PRIMARY_COLOR,

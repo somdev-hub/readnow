@@ -12,9 +12,14 @@ import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getShortProfileInfo, getSpecificJournal } from "../../api/apis";
+import {
+  getShortProfileInfo,
+  getSpecificJournal,
+  toggleJournalLike
+} from "../../api/apis";
 // import { WebView } from "react-native-webview";
 import RenderHtml from "react-native-render-html";
+import * as SecureStorage from "expo-secure-store";
 
 const Journel = () => {
   const width = Dimensions.get("window").width;
@@ -23,8 +28,24 @@ const Journel = () => {
   const { journalId } = route.params;
   const [journalData, setJournalData] = useState({});
   const [currentChapter, setCurrentChapter] = useState(0);
+  const [userEmail, setUserEmail] = useState("");
+
+  const toggleLike = async () => {
+    const response = await toggleJournalLike(journalId, userEmail);
+    if (response.status === 200) {
+      const updatedJournalData = {
+        ...journalData,
+        journalLikes: response.data.journalLikes
+      };
+      setJournalData(updatedJournalData);
+    }
+  };
 
   useEffect(() => {
+    const fetchUserEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      setUserEmail(email);
+    };
     const fetchJournal = async () => {
       const response = await getSpecificJournal(journalId);
       const responseWithEditorData = await getShortProfileInfo(
@@ -35,6 +56,7 @@ const Journel = () => {
         editorInfo: responseWithEditorData.data
       });
     };
+    fetchUserEmail();
     fetchJournal();
   }, []);
   const journalContentHtml = {
@@ -367,7 +389,7 @@ const Journel = () => {
               }}
             >
               <AntDesign name="like2" size={22} color="black" />
-              <Text>{journalData?.journalLikes}</Text>
+              <Text>{journalData?.journalLikes?.length}</Text>
             </View>
             <View
               style={{
@@ -387,12 +409,25 @@ const Journel = () => {
             justifyContent: "space-around"
           }}
         >
-          <View
+          <Pressable
+            onPress={toggleLike}
             style={{
               alignItems: "center"
             }}
           >
-            <AntDesign name="like2" size={20} color="black" />
+            <AntDesign
+              name={
+                journalData?.journalLikes?.includes(userEmail)
+                  ? "like1"
+                  : "like2"
+              }
+              size={20}
+              color={
+                journalData?.journalLikes?.includes(userEmail)
+                  ? PRIMARY_COLOR
+                  : "black"
+              }
+            />
             <Text
               style={{
                 fontSize: 12,
@@ -401,7 +436,7 @@ const Journel = () => {
             >
               Like
             </Text>
-          </View>
+          </Pressable>
           <Pressable
             onPress={() => {
               const { chapters, ...otherData } = journalData;

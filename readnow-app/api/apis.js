@@ -820,7 +820,35 @@ export const getJournalComments = async (journalId) => {
     const response = await axios.get(
       `${ADDRESS}/editorial/get-journal-comments/${journalId}`
     );
+
     return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addJournalComment = async (data) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/add-journal-comment`,
+      data
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const toggleJournalLike = async (journalId, email) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/toggle-journal-like`,
+      {
+        journalId,
+        email
+      }
+    );
+    return response;
   } catch (error) {
     console.log(error);
   }
