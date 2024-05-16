@@ -5,9 +5,10 @@ import {
   Pressable,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
   Linking
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Ionicons, Entypo, AntDesign } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import EditionCard from "../../components/EditionCard";
@@ -29,6 +30,11 @@ const PublisherInfo = () => {
   const [subscribed, setSubscribed] = useState(false);
   const [followedManager, setFollowedManager] = useState(false);
   const [publisherJournals, setPublisherJournals] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    fetchPublisherData();
+  });
 
   const [hasSubscribed, setHasSubscribed] = useState({
     visible: false,
@@ -62,36 +68,38 @@ const PublisherInfo = () => {
     fetchManagerFollowers();
   }, [publisherData, email]);
 
+  const fetchPublisherData = async () => {
+    setRefreshing(true);
+    const { publisherData } = await getSpecificPublisher(publisherId);
+    const publisherManagerData = await getShortProfileInfo(
+      publisherData.publisher?.publisherManager
+    );
+
+    setPublisherData({
+      ...publisherData.publisher,
+      managerInfo: publisherManagerData.data
+    });
+
+    const publisherJournalsWithEditorData = await Promise.all(
+      publisherData.publisherJournals.map(async (journal) => {
+        const editorData = await getShortProfileInfo(
+          journal.journalEditorEmail
+        );
+        return {
+          ...journal,
+          editorInfo: editorData.data,
+          publisher: publisherData?.publisher?.publisherName
+        };
+      })
+    );
+
+    setPublisherJournals(publisherJournalsWithEditorData);
+    setRefreshing(false);
+  };
   useEffect(() => {
     const getEmail = async () => {
       const email = await SecureStorage.getItemAsync("email");
       setEmail(email);
-    };
-    const fetchPublisherData = async () => {
-      const { publisherData } = await getSpecificPublisher(publisherId);
-      const publisherManagerData = await getShortProfileInfo(
-        publisherData.publisher?.publisherManager
-      );
-
-      setPublisherData({
-        ...publisherData.publisher,
-        managerInfo: publisherManagerData.data
-      });
-
-      const publisherJournalsWithEditorData = await Promise.all(
-        publisherData.publisherJournals.map(async (journal) => {
-          const editorData = await getShortProfileInfo(
-            journal.journalEditorEmail
-          );
-          return {
-            ...journal,
-            editorInfo: editorData.data,
-            publisher: publisherData?.publisher?.publisherName
-          };
-        })
-      );
-
-      setPublisherJournals(publisherJournalsWithEditorData);
     };
 
     fetchPublisherData();
@@ -106,10 +114,13 @@ const PublisherInfo = () => {
   };
 
   return (
-    <View
-      style={{
+    <ScrollView
+      contentContainerStyle={{
         flex: 1
       }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <ScrollView>
         <View
@@ -384,7 +395,7 @@ const PublisherInfo = () => {
       >
         {hasSubscribed.message}
       </Snackbar>
-    </View>
+    </ScrollView>
   );
 };
 

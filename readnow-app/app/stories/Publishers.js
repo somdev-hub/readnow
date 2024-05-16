@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Pressable
-} from "react-native";
-import React, { useState } from "react";
+import { View, Text, ScrollView, RefreshControl } from "react-native";
+import React, { useCallback, useState } from "react";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 import { Searchbar } from "react-native-paper";
@@ -22,21 +15,28 @@ const Publishers = () => {
     visible: false,
     message: ""
   });
+  const [refreshing, setRefreshing] = useState(false);
 
+  const onRefresh = useCallback(() => {
+    fetchPublishers();
+  });
+
+  const fetchPublishers = async () => {
+    setRefreshing(true);
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await getPublishers(email);
+    const responseWithManagerInfo = await Promise.all(
+      response?.publishers?.map(async (publisher) => {
+        const managerInfo = await getShortProfileInfo(
+          publisher?.publisherManager
+        );
+        return { ...publisher, managerInfo: managerInfo.data };
+      })
+    );
+    setPublisherData(responseWithManagerInfo);
+    setRefreshing(false);
+  };
   useState(() => {
-    const fetchPublishers = async () => {
-      const email = await SecureStorage.getItemAsync("email");
-      const response = await getPublishers(email);
-      const responseWithManagerInfo = await Promise.all(
-        response?.publishers?.map(async (publisher) => {
-          const managerInfo = await getShortProfileInfo(
-            publisher?.publisherManager
-          );
-          return { ...publisher, managerInfo: managerInfo.data };
-        })
-      );
-      setPublisherData(responseWithManagerInfo);
-    };
     fetchPublishers();
   }, []);
   return (
@@ -44,11 +44,14 @@ const Publishers = () => {
       contentContainerStyle={{
         flex: 1
       }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <Searchbar
         placeholder="Search for publishers"
         style={{
-          marginTop:20,
+          marginTop: 20,
           margin: 10,
           backgroundColor: "#DDE6ED",
           fontSize: 14

@@ -1,9 +1,19 @@
 import { View, Text, ScrollView } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import EditionCard from "../../components/EditionCard";
 import { Searchbar } from "react-native-paper";
+import * as SecureStorage from "expo-secure-store";
+import { getSubscribedJournals } from "../../api/apis";
 
 const YourPublishers = () => {
+  const [publisherJournals, setPublisherJournals] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchJournals = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await getSubscribedJournals(email);
+  };
+
   return (
     <ScrollView
       style={{
@@ -26,7 +36,7 @@ const YourPublishers = () => {
           marginTop: 5
         }}
       >
-       From publishers you follow
+        From publishers you follow
       </Text>
       <View
         style={{

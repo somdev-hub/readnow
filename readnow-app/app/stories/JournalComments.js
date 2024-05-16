@@ -15,7 +15,8 @@ import { useRoute } from "@react-navigation/native";
 import {
   addJournalComment,
   getJournalComments,
-  getShortProfileInfo
+  getShortProfileInfo,
+  toggleCommentLike
 } from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
 
@@ -24,6 +25,7 @@ const JournalComments = () => {
   const { journalData } = route.params;
   const [journalComments, setJournalComments] = useState([]);
   const [comment, setComment] = useState("");
+  const [email, setEmail] = useState("");
 
   const addComment = async () => {
     const user = await SecureStorage.getItemAsync("email");
@@ -33,6 +35,14 @@ const JournalComments = () => {
       user
     });
     if (response.status === 201) {
+      fetchComments();
+    }
+  };
+
+  const addCommentLike = async (commentId) => {
+    // const user = await SecureStorage.getItemAsync("email");
+    const response = await toggleCommentLike(commentId, journalData.id, email);
+    if (response.status === 200) {
       fetchComments();
     }
   };
@@ -54,6 +64,11 @@ const JournalComments = () => {
   };
 
   useEffect(() => {
+    const getEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      setEmail(email);
+    };
+    getEmail();
     fetchComments();
   }, []);
   return (
@@ -369,14 +384,24 @@ const JournalComments = () => {
                       <View
                         style={{ flexDirection: "row", gap: 10, margin: 7 }}
                       >
-                        <Text
-                          style={{
-                            fontWeight: "500",
-                            color: "grey"
+                        <Pressable
+                          onPress={() => {
+                            addCommentLike(comment.commentId);
                           }}
                         >
-                          Like
-                        </Text>
+                          <Text
+                            style={{
+                              fontWeight: "500",
+                              color: comment?.commentLikedBy.includes(email)
+                                ? PRIMARY_COLOR
+                                : "grey"
+                            }}
+                          >
+                            {comment?.commentLikedBy.includes(email)
+                              ? "Liked"
+                              : "Like"}
+                          </Text>
+                        </Pressable>
                         <Text
                           style={{
                             fontWeight: "500",

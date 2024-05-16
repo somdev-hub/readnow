@@ -5,9 +5,10 @@ import {
   TouchableOpacity,
   Pressable,
   ScrollView,
+  RefreshControl,
   Dimensions
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Ionicons, Entypo } from "@expo/vector-icons";
 import { AntDesign, FontAwesome } from "@expo/vector-icons";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
@@ -21,7 +22,7 @@ import {
 import RenderHtml from "react-native-render-html";
 import * as SecureStorage from "expo-secure-store";
 
-const Journel = () => {
+const Journal = () => {
   const width = Dimensions.get("window").width;
   const navigator = useNavigation();
   const route = useRoute();
@@ -29,6 +30,11 @@ const Journel = () => {
   const [journalData, setJournalData] = useState({});
   const [currentChapter, setCurrentChapter] = useState(0);
   const [userEmail, setUserEmail] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(() => {
+    fetchJournal();
+  });
 
   const toggleLike = async () => {
     const response = await toggleJournalLike(journalId, userEmail);
@@ -41,20 +47,23 @@ const Journel = () => {
     }
   };
 
+  const fetchJournal = async () => {
+    setRefreshing(true);
+    const response = await getSpecificJournal(journalId);
+    const responseWithEditorData = await getShortProfileInfo(
+      response.journal.journalEditorEmail
+    );
+    setJournalData({
+      ...response.journal,
+      editorInfo: responseWithEditorData.data
+    });
+    setRefreshing(false);
+  };
+
   useEffect(() => {
     const fetchUserEmail = async () => {
       const email = await SecureStorage.getItemAsync("email");
       setUserEmail(email);
-    };
-    const fetchJournal = async () => {
-      const response = await getSpecificJournal(journalId);
-      const responseWithEditorData = await getShortProfileInfo(
-        response.journal.journalEditorEmail
-      );
-      setJournalData({
-        ...response.journal,
-        editorInfo: responseWithEditorData.data
-      });
     };
     fetchUserEmail();
     fetchJournal();
@@ -72,7 +81,12 @@ const Journel = () => {
         : "";
   }
   return (
-    <View style={{ flex: 1 }}>
+    <ScrollView
+      contentContainerStyle={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <ScrollView>
         <View
           style={{
@@ -475,8 +489,8 @@ const Journel = () => {
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
-export default Journel;
+export default Journal;

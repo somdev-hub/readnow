@@ -3,6 +3,7 @@ const FormData = require("form-data");
 const axios = require("axios");
 const uploadImage = require("../utils/uploadImage");
 const uploadImageAndGetId = require("../utils/uploadImageAndGetId");
+const User = require("../models/user");
 
 const addPublisherController = async (req, res) => {
   console.log("hello");
@@ -106,7 +107,7 @@ const getSpecificPublisherController = async (req, res) => {
     if (!publisher) return res.status(404).json("Publisher not found");
 
     const publisherJournals = await axios.get(
-      `http://192.168.25.254:1337/api/journals?populate=*&filters[publisherId][$eq]=66405056ac7046a3981db6d5`,
+      `${process.env.STRAPI_API}/api/journals?populate=*&filters[publisherId][$eq]=${publisherId}`,
       {
         headers: {
           "Content-Type": "application/json"
@@ -150,16 +151,22 @@ const toggleSubscriberController = async (req, res) => {
   const { publisherId, email } = req.body;
   try {
     const publisher = await Publisher.findById(publisherId);
+    // const user = User.findOne({ email: email });
     if (publisher.publisherSubscribers.includes(email)) {
       await Publisher.updateOne(
         { _id: publisherId },
         { $pull: { publisherSubscribers: email } }
       );
+      await User.updateOne({ email }, { $pull: { publishers: publisherId } });
       res.status(200).json({ message: "Unsubscribed successfully" });
     } else {
       await Publisher.updateOne(
         { _id: publisherId },
         { $addToSet: { publisherSubscribers: email } }
+      );
+      await User.updateOne(
+        { email },
+        { $addToSet: { publishers: publisherId } }
       );
       res.status(200).json({ message: "Subscribed successfully" });
     }
@@ -376,10 +383,13 @@ const addJournalCommentController = async (req, res) => {
         journalComments: [
           ...commentData.data.data.attributes.journalComments,
           {
+            commentId:
+              commentData.data.data.attributes.journalComments.length + 1,
             user,
             comment,
             createdAt: new Date().toISOString(),
             commentLikes: 0,
+            commentLikedBy: [],
             commentReplies: []
           }
         ]
@@ -438,14 +448,120 @@ const toggleJournalLikeController = async (req, res) => {
       }
     );
 
-    return res
-      .status(200)
-      .json({
-        message: "Like toggled successfully",
-        journalLikes: updatedJournalLikes
-      });
+    return res.status(200).json({
+      message: "Like toggled successfully",
+      journalLikes: updatedJournalLikes
+    });
   } catch (error) {
     console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const toggleCommentLikeController = async (req, res) => {
+  const { journalId, commentId, email } = req.body;
+  try {
+    const commentData = await axios.get(
+      `${process.env.STRAPI_API}/api/journals/${journalId}?fields[0]=journalComments`
+    );
+
+    const journalComments = commentData.data.data.attributes.journalComments;
+    const updatedJournalComments = journalComments.map((comment) => {
+      if (comment.commentId === commentId) {
+        const isLiked = comment.commentLikedBy.includes(email);
+        const updatedCommentLikes = isLiked
+          ? comment.commentLikedBy.filter((like) => like !== email)
+          : [...comment.commentLikedBy, email];
+
+        return {
+          ...comment,
+          commentLikedBy: updatedCommentLikes,
+          commentLikes:
+            commentData.data.data.attributes.journalComments[commentId - 1]
+              .commentLikes + 1
+        };
+      }
+      return comment;
+    });
+
+    const data = {
+      data: {
+        journalComments: updatedJournalComments
+      }
+    };
+
+    await axios.put(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Comment like toggled successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getSubscribedPublisherJournalsController = async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    const subscribedPublishers = await User.findOne({ email }).select(
+      "publishers"
+    );
+    const publisherJournals = (
+      await Promise.all(
+        
+        subscribedPublishers?.publishers?.map(async (publisher,index) => {
+          const {
+            data: { data: journals }
+          } = await axios.get(
+            `${process.env.STRAPI_API}/api/journals?populate=*&filters[publisherId][$eq]=${publisher}`,
+            {
+              headers: {
+                "Content-Type": "application/json"
+              }
+            }
+          );
+          return journals.reverse().map(({ attributes, id }) => {
+            const {
+              journalTitle,
+              journalDescription,
+              journalPublishingDate,
+              journalEditorEmail,
+              journalLikes,
+              journalComments,
+              lastUpdated,
+              journalCoverImage
+            } = attributes;
+
+            return {
+              journalTitle,
+              journalDescription,
+              journalPublishingDate,
+              journalEditorEmail,
+              journalLikes: journalLikes.length,
+              journalComments: journalComments.length,
+              lastUpdated,
+              id,
+              journalCoverImage: `${process.env.STRAPI_API}${journalCoverImage.data.attributes.url}`,
+              // publisher: 
+            };
+          });
+        })
+      )
+    ).flat();
+
+    return res.status(200).json(publisherJournals);
+  } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -461,5 +577,7 @@ module.exports = {
   getSpecificJournalController,
   getJournalCommentsController,
   addJournalCommentController,
-  toggleJournalLikeController
+  toggleJournalLikeController,
+  toggleCommentLikeController,
+  getSubscribedPublisherJournalsController
 };

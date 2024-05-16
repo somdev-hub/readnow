@@ -853,3 +853,34 @@ export const toggleJournalLike = async (journalId, email) => {
     console.log(error);
   }
 };
+
+export const toggleCommentLike = async (commentId, journalId, email) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/toggle-comment-like`,
+      {
+        journalId,
+        commentId,
+        email
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getSubscribedJournals = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/editorial/get-subscribed-publisher-journals`,
+      {
+        email
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
