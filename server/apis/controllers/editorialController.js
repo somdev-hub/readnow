@@ -518,8 +518,7 @@ const getSubscribedPublisherJournalsController = async (req, res) => {
     );
     const publisherJournals = (
       await Promise.all(
-        
-        subscribedPublishers?.publishers?.map(async (publisher,index) => {
+        subscribedPublishers?.publishers?.map(async (publisher, index) => {
           const {
             data: { data: journals }
           } = await axios.get(
@@ -530,6 +529,8 @@ const getSubscribedPublisherJournalsController = async (req, res) => {
               }
             }
           );
+          const publisherData = await Publisher.findOne({ _id: publisher });
+          const publisherName = publisherData ? publisherData.publisherName : "";
           return journals.reverse().map(({ attributes, id }) => {
             const {
               journalTitle,
@@ -552,7 +553,7 @@ const getSubscribedPublisherJournalsController = async (req, res) => {
               lastUpdated,
               id,
               journalCoverImage: `${process.env.STRAPI_API}${journalCoverImage.data.attributes.url}`,
-              // publisher: 
+              publisher: publisherName
             };
           });
         })

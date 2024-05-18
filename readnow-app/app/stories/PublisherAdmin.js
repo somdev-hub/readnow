@@ -296,6 +296,7 @@ const PublisherAdmin = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => navigator.navigate("PublishersAdminOptions")}
               style={{
                 paddingVertical: 8,
                 borderRadius: 50,
@@ -311,7 +312,7 @@ const PublisherAdmin = () => {
                   fontWeight: "500"
                 }}
               >
-                Share
+                Options
               </Text>
             </TouchableOpacity>
           </View>

@@ -204,9 +204,7 @@ const EditionCard = ({ journal, admin }) => {
             }}
           >
             {new Date(journal?.journalPublishingDate).toLocaleDateString()},{" "}
-            {diffInHours < 1
-              ? `${Math.round(diffInMinutes)} minutes ago`
-              : `${diffInHours.toFixed(0)} hours ago`}
+            {new Date(journal?.journalPublishingDate).toLocaleTimeString()}{" "}
           </Text>
         </View>
       </View>

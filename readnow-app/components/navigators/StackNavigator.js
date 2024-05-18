@@ -60,6 +60,7 @@ import PublisherAdmin from "../../app/stories/PublisherAdmin";
 import CreateJournal from "../../app/stories/CreateJournal";
 import JournalEditor from "../../app/stories/JournalEditor";
 import { postPublisherData } from "../../redux/publisherSlice";
+import PublishersAdminOptions from "../../app/stories/PublishersAdminOptions";
 
 const Stack = createStackNavigator();
 
@@ -148,7 +149,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Stories"
+      initialRouteName="PublishersAdminOptions"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -706,6 +707,14 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Create Journal"
+        }}
+      />
+      <Stack.Screen
+        name="PublishersAdminOptions"
+        component={PublishersAdminOptions}
+        options={{
+          headerShown: true,
+          headerTitle: "Admin Options"
         }}
       />
       <Stack.Screen

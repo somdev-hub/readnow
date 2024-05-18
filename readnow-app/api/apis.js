@@ -873,10 +873,7 @@ export const toggleCommentLike = async (commentId, journalId, email) => {
 export const getSubscribedJournals = async (email) => {
   try {
     const response = await axios.get(
-      `${ADDRESS}/editorial/get-subscribed-publisher-journals`,
-      {
-        email
-      }
+      `${ADDRESS}/editorial/get-subscribed-publisher-journals/${email}`
     );
 
     return response.data;

@@ -82,6 +82,7 @@ const Journal = () => {
   }
   return (
     <ScrollView
+      bounces={false}
       contentContainerStyle={{ flex: 1 }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -94,11 +95,7 @@ const Journal = () => {
             backgroundColor: WHITE_COLOR,
             padding: 10,
             elevation: 2,
-            //   gap:20,
             alignItems: "center"
-            // justifyContent: "space-between",
-            //   flex:1
-            //   width:"100%"
           }}
         >
           <View

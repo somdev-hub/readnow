@@ -1,21 +1,45 @@
-import { View, Text, ScrollView } from "react-native";
-import React, { useState } from "react";
+import { View, Text, ScrollView, RefreshControl } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
 import EditionCard from "../../components/EditionCard";
 import { Searchbar } from "react-native-paper";
 import * as SecureStorage from "expo-secure-store";
-import { getSubscribedJournals } from "../../api/apis";
+import { getShortProfileInfo, getSubscribedJournals } from "../../api/apis";
 
 const YourPublishers = () => {
   const [publisherJournals, setPublisherJournals] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
+  const onRefresh = useCallback(() => {
+    fetchJournals();
+  });
+
   const fetchJournals = async () => {
+    setRefreshing(true);
     const email = await SecureStorage.getItemAsync("email");
     const response = await getSubscribedJournals(email);
+
+    const responseWithEditorInfo = await Promise.all(
+      response?.map(async (journal) => {
+        const editorData = await getShortProfileInfo(
+          journal.journalEditorEmail
+        );
+        return { ...journal, editorInfo: editorData.data };
+      })
+    );
+
+    setPublisherJournals(responseWithEditorInfo);
+    setRefreshing(false);
   };
+
+  useEffect(() => {
+    fetchJournals();
+  }, []);
 
   return (
     <ScrollView
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
       style={{
         paddingVertical: 10
       }}
@@ -43,8 +67,8 @@ const YourPublishers = () => {
           marginTop: 20
         }}
       >
-        {Array.from({ length: 10 }).map((_, index) => {
-          return <EditionCard key={index} />;
+        {publisherJournals?.map((journal, index) => {
+          return <EditionCard journal={journal} key={index} />;
         })}
       </View>
     </ScrollView>
