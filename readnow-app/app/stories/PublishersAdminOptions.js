@@ -1,14 +1,21 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const PublishersAdminOptions = () => {
+  const navigator = useNavigation();
+  const route = useRoute();
+  const { publisherId } = route.params;
   const settings = [
     {
       name: "Edit publisher info",
       icon: "pencil",
-      route: "ManagePublishers",
-      params: {}
+      route: "CreatePublisher",
+      params: {
+        publisherId: publisherId,
+        isEdit: true
+      }
     },
     {
       name: "Manage editors",
@@ -45,14 +52,12 @@ const PublishersAdminOptions = () => {
         {settings.map((setting, index) => {
           return (
             <Pressable
-              // onPress={() => {
-              //   setting.name === "Delete group"
-              //     ? setDialogVisible(true)
-              //     : navigator.navigate(
-              //         setting.route,
-              //         setting.params && setting.params
-              //       );
-              // }}
+              onPress={() => {
+                navigator.navigate(
+                  setting.route,
+                  setting.params && setting.params
+                );
+              }}
               key={index}
               style={{
                 marginVertical: 10,

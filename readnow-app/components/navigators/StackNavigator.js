@@ -59,7 +59,10 @@ import CreatePublisher from "../../app/stories/CreatePublisher";
 import PublisherAdmin from "../../app/stories/PublisherAdmin";
 import CreateJournal from "../../app/stories/CreateJournal";
 import JournalEditor from "../../app/stories/JournalEditor";
-import { postPublisherData } from "../../redux/publisherSlice";
+import {
+  editPublisherData,
+  postPublisherData
+} from "../../redux/publisherSlice";
 import PublishersAdminOptions from "../../app/stories/PublishersAdminOptions";
 
 const Stack = createStackNavigator();
@@ -83,6 +86,9 @@ const StackNavigator = () => {
   const currentEventId = useSelector((state) => state.event.currentEventId);
   const idEditedEvent = useSelector((state) => state.event.isEditedEvent);
   const idEditedGroup = useSelector((state) => state.group.isEditedGroup);
+  const isEditedPublisher = useSelector(
+    (state) => state.publisher.isEditedPublisher
+  );
   const publisherData = useSelector((state) => state.publisher.publisherData);
   // console.log("isEditedGroup " + idEditedGroup);
   const getUser = async () => {
@@ -149,7 +155,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="PublishersAdminOptions"
+      initialRouteName="Stories"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="Web" component={Web} />
@@ -810,11 +816,15 @@ const StackNavigator = () => {
                 }}
               >
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>
-                  Create Publisher
+                  {isEditedPublisher ? "Edit Publisher" : "Create Publisher"}
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    dispatch(postPublisherData(publisherData));
+                    if (isEditedPublisher) {
+                      dispatch(editPublisherData(publisherData));
+                    } else {
+                      dispatch(postPublisherData(publisherData));
+                    }
                   }}
                 >
                   <Text
@@ -824,7 +834,7 @@ const StackNavigator = () => {
                       color: PRIMARY_COLOR
                     }}
                   >
-                    Create
+                    {isEditedPublisher ? "Edit" : "Create"}
                   </Text>
                 </TouchableOpacity>
               </View>

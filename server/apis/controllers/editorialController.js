@@ -18,7 +18,7 @@ const addPublisherController = async (req, res) => {
   } = req.body;
   const publisherImage = req.files.publisherImage[0];
   const publisherCoverImage = req.files.publisherCoverImage[0];
-  console.log(req.body);
+  // console.log(req.body);
 
   try {
     let publisherImageURL = "";
@@ -144,6 +144,49 @@ const getSpecificPublisherController = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const editPublisherController = async (req, res) => {
+  const { isPublisherImageSame, isPublisherCoverImageSame } = req.body;
+  const { publisherId } = req.params;
+  const publisherImage = req?.files?.publisherImage[0];
+  const publisherCoverImage = req?.files?.publisherCoverImage[0];
+
+  let data = {
+    publisherName: req.body.publisherName,
+    publisherManager: req.body.publisherManager,
+    publisherCategory: req.body.publisherCategory,
+    publisherTags: JSON.parse(req.body.publisherTags),
+    editorEmails: JSON.parse(req.body.editorEmails),
+    publisherSocials: JSON.parse(req.body.publisherSocials),
+    publisherDescription: req.body.publisherDescription
+  };
+
+  try {
+    if (isPublisherCoverImageSame === "false") {
+      const publisherCoverImageURL = await uploadImage(
+        publisherCoverImage,
+        "publisher-cover-images"
+      );
+      data.publisherCoverImage = publisherCoverImageURL;
+    }
+    if (isPublisherImageSame === "false") {
+      const publisherImageURL = await uploadImage(
+        publisherImage,
+        "publisher-images"
+      );
+      data.publisherImage = publisherImageURL;
+    }
+
+    const publisher = await Publisher.findByIdAndUpdate(publisherId, data, {
+      new: true
+    });
+
+    res.status(200).json({ message: "Publisher updated successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -530,7 +573,9 @@ const getSubscribedPublisherJournalsController = async (req, res) => {
             }
           );
           const publisherData = await Publisher.findOne({ _id: publisher });
-          const publisherName = publisherData ? publisherData.publisherName : "";
+          const publisherName = publisherData
+            ? publisherData.publisherName
+            : "";
           return journals.reverse().map(({ attributes, id }) => {
             const {
               journalTitle,
@@ -580,5 +625,6 @@ module.exports = {
   addJournalCommentController,
   toggleJournalLikeController,
   toggleCommentLikeController,
-  getSubscribedPublisherJournalsController
+  getSubscribedPublisherJournalsController,
+  editPublisherController
 };

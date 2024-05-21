@@ -48,42 +48,44 @@ const Publishers = () => {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <Searchbar
-        placeholder="Search for publishers"
-        style={{
-          marginTop: 20,
-          margin: 10,
-          backgroundColor: "#DDE6ED",
-          fontSize: 14
-        }}
-      />
-      <Text
-        style={{
-          fontSize: 18,
-          marginLeft: 10,
-          fontWeight: "500",
-          marginTop: 5
-        }}
-      >
-        Top publishers
-      </Text>
-      <View
-        style={{
-          paddingHorizontal: 10,
-          marginTop: 10
-        }}
-      >
-        {publisherData?.map((publisher, index) => {
-          return (
-            <PublisherCard
-              key={index}
-              publisher={publisher}
-              hasSubscribed={hasSubscribed}
-              setHasSubscribed={setHasSubscribed}
-            />
-          );
-        })}
-      </View>
+      <ScrollView>
+        <Searchbar
+          placeholder="Search for publishers"
+          style={{
+            marginTop: 20,
+            margin: 10,
+            backgroundColor: "#DDE6ED",
+            fontSize: 14
+          }}
+        />
+        <Text
+          style={{
+            fontSize: 18,
+            marginLeft: 10,
+            fontWeight: "500",
+            marginTop: 5
+          }}
+        >
+          Top publishers
+        </Text>
+        <View
+          style={{
+            paddingHorizontal: 10,
+            marginTop: 10
+          }}
+        >
+          {publisherData?.map((publisher, index) => {
+            return (
+              <PublisherCard
+                key={index}
+                publisher={publisher}
+                hasSubscribed={hasSubscribed}
+                setHasSubscribed={setHasSubscribed}
+              />
+            );
+          })}
+        </View>
+      </ScrollView>
       <Snackbar
         visible={hasSubscribed.visible}
         onDismiss={() => setHasSubscribed({ visible: false, message: "" })}

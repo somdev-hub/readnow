@@ -13,8 +13,12 @@ import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
 import * as SecureStorage from "expo-secure-store";
 import { Snackbar } from "react-native-paper";
+import { useRoute } from "@react-navigation/native";
+import { getSpecificPublisher } from "../../api/apis";
 
 const CreatePublisher = () => {
+  const route = useRoute();
+  const { publisherId, isEdit } = route.params;
   const [publisherData, setPublisherData] = useState({
     publisherManager: "",
     publisherName: "",
@@ -29,7 +33,10 @@ const CreatePublisher = () => {
     },
     publisherDescription: "",
     publisherImage: "",
-    publisherCoverImage: ""
+    publisherCoverImage: "",
+    isPublisherImageSame: true,
+    isPublisherCoverImageSame: true,
+    publisherId: ""
   });
   const dispatch = useDispatch();
   const [editorEmail, setEditorEmail] = useState("");
@@ -48,12 +55,14 @@ const CreatePublisher = () => {
       if (type === "publisherCoverImage") {
         setPublisherData({
           ...publisherData,
-          publisherCoverImage: result.assets[0].uri
+          publisherCoverImage: result.assets[0].uri,
+          isPublisherCoverImageSame: false
         });
       } else {
         setPublisherData({
           ...publisherData,
-          publisherImage: result.assets[0].uri
+          publisherImage: result.assets[0].uri,
+          isPublisherImageSame: false
         });
       }
     }
@@ -65,6 +74,38 @@ const CreatePublisher = () => {
       payload: publisherData
     });
   }, [publisherData]);
+
+  useEffect(() => {
+    const getPublisherData = async () => {
+      const {
+        publisherData: { publisher }
+      } = await getSpecificPublisher(publisherId);
+      setPublisherData({
+        ...publisher,
+        publisherName: publisher?.publisherName,
+        publisherCategory: publisher?.publisherCategory,
+        publisherTags: publisher?.publisherTags,
+        editorEmails: publisher?.editorEmails,
+        publisherSocials: publisher?.publisherSocials,
+        publisherDescription: publisher?.publisherDescription,
+        publisherImage: publisher?.publisherImage,
+        publisherCoverImage: publisher?.publisherCoverImage,
+        publisherId: publisherId
+      });
+    };
+    if (isEdit) {
+      getPublisherData();
+      dispatch({
+        type: "publisher/updateIsEditedPublisher",
+        payload: true
+      });
+    } else {
+      dispatch({
+        type: "publisher/updateIsEditedPublisher",
+        payload: false
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const getEmail = async () => {

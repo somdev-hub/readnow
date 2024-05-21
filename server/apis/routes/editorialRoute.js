@@ -13,7 +13,8 @@ const {
   addJournalCommentController,
   toggleJournalLikeController,
   toggleCommentLikeController,
-  getSubscribedPublisherJournalsController
+  getSubscribedPublisherJournalsController,
+  editPublisherController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -26,6 +27,15 @@ router.post(
     { name: "publisherCoverImage", maxCount: 1 }
   ]),
   addPublisherController
+);
+
+router.post(
+  "/edit-publisher/:publisherId",
+  uploadMiddleware.fields([
+    { name: "publisherImage", maxCount: 1 },
+    { name: "publisherCoverImage", maxCount: 1 }
+  ]),
+  editPublisherController
 );
 
 router.get("/get-publishers/:email", getPublishersController);

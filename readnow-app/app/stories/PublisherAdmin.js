@@ -296,7 +296,11 @@ const PublisherAdmin = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => navigator.navigate("PublishersAdminOptions")}
+              onPress={() =>
+                navigator.navigate("PublishersAdminOptions", {
+                  publisherId
+                })
+              }
               style={{
                 paddingVertical: 8,
                 borderRadius: 50,
