@@ -2,11 +2,19 @@ import { View, Text, ScrollView, Pressable } from "react-native";
 import React from "react";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { Portal, Dialog, Snackbar } from "react-native-paper";
+import { deletePublisher } from "../../api/apis";
+// imporrt {Portal}
 
 const PublishersAdminOptions = () => {
   const navigator = useNavigation();
   const route = useRoute();
   const { publisherId } = route.params;
+  const [visibleModal, setVisibleModal] = React.useState(false);
+  const [visibleSnackbar, setVisibleSnackbar] = React.useState({
+    visible: false,
+    message: ""
+  });
   const settings = [
     {
       name: "Edit publisher info",
@@ -36,8 +44,10 @@ const PublishersAdminOptions = () => {
     {
       name: "Manage subscribers",
       icon: "user",
-      route: "ManageTags",
-      params: {}
+      route: "ManageSubscribers",
+      params: {
+        publisherId: publisherId
+      }
     },
 
     {
@@ -57,10 +67,12 @@ const PublishersAdminOptions = () => {
           return (
             <Pressable
               onPress={() => {
-                navigator.navigate(
-                  setting.route,
-                  setting.params && setting.params
-                );
+                setting.name === "Delete publisher"
+                  ? setVisibleModal(true)
+                  : navigator.navigate(
+                      setting.route,
+                      setting.params && setting.params
+                    );
               }}
               key={index}
               style={{
@@ -79,6 +91,51 @@ const PublishersAdminOptions = () => {
           );
         })}
       </View>
+      <Portal>
+        <Dialog
+          visible={visibleModal}
+          onDismiss={() => setVisibleModal(false)}
+          style={{
+            backgroundColor: "white"
+          }}
+        >
+          <Dialog.Icon icon="alert" />
+          <Dialog.Title style={{ textAlign: "center" }}>Alert</Dialog.Title>
+          <Dialog.Content>
+            <Text
+            // style={{
+            //   fontWeight: "500"
+            // }}
+            >
+              Are you sure you want to delete this publisher?
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Pressable
+              onPress={() => setVisibleModal(false)}
+              style={{ marginRight: 20 }}
+            >
+              <Text style={{ fontWeight: "500" }}>Cancel</Text>
+            </Pressable>
+            <Pressable
+              onPress={async () => {
+                const response = await deletePublisher(publisherId);
+                if (response.status === 200) {
+                  navigator.navigate("Publishers");
+                } else {
+                  setVisibleSnackbar({
+                    visible: true,
+                    message: "Failed to delete publisher"
+                  });
+                }
+                setVisibleModal(false);
+              }}
+            >
+              <Text style={{ color: "red", fontWeight: "500" }}>Delete</Text>
+            </Pressable>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </ScrollView>
   );
 };

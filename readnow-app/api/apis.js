@@ -991,4 +991,29 @@ export const deleteJournal = async (journalId) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
+
+export const removeSubscriber = async (publisherId, subscriberEmail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/remove-subscriber/${publisherId}`,
+      {
+        subscriberEmail
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deletePublisher = async (publisherId) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/delete-publisher/${publisherId}`
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

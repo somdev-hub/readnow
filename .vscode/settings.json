@@ -1,2 +1,6 @@
 {
+    "docify.commentService.docstringFormat": "JsDoc",
+    "cSpell.words": [
+        "READNOW"
+    ]
 }

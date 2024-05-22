@@ -5,6 +5,16 @@ const uploadImage = require("../utils/uploadImage");
 const uploadImageAndGetId = require("../utils/uploadImageAndGetId");
 const User = require("../models/user");
 
+/**
+ * The function `addPublisherController` handles the process of adding a new publisher with various
+ * details to the database.
+ * @param req - The `addPublisherController` function is an asynchronous function that handles the
+ * logic for adding a new publisher to a system. It expects the request (`req`) object to contain the
+ * following properties in the request body:
+ * @param res - The `res` parameter in the `addPublisherController` function is the response object
+ * that will be used to send a response back to the client who made the request. In this function, it
+ * is used to send a success message with status code 201 if the publisher is added successfully, or an
+ */
 const addPublisherController = async (req, res) => {
   console.log("hello");
   const {
@@ -61,6 +71,21 @@ const addPublisherController = async (req, res) => {
   }
 };
 
+/**
+ * The function `getPublishersController` retrieves publishers and includes subscription status for a
+ * specific email address.
+ * @param req - The `req` parameter in the `getPublishersController` function represents the request
+ * object, which contains information about the HTTP request that was made. This object includes
+ * properties such as `params`, `query`, `body`, `headers`, and more, depending on the type of request.
+ * @param res - The `res` parameter in the `getPublishersController` function is the response object
+ * that will be used to send a response back to the client making the request. It is typically used to
+ * send HTTP responses with status codes and data in JSON format.
+ * @returns The `getPublishersController` function returns a list of publishers with their subscription
+ * status for a specific email address. If publishers are found, it returns a JSON response with the
+ * publishers and their subscription status. If no publishers are found, it returns a 404 status with
+ * the message "No publishers found". If there is an internal server error during the process, it
+ * returns a 500 status with the
+ */
 const getPublishersController = async (req, res) => {
   const { email } = req.params;
   try {
@@ -730,6 +755,40 @@ const addEditorController = async (req, res) => {
   }
 };
 
+const removeSubscriberController = async (req, res) => {
+  const { publisherId } = req.params;
+  const { subscriberEmail } = req.body;
+  try {
+    const publisher = await Publisher.findById(publisherId);
+    if (!publisher) return res.status(404).json("Publisher not found");
+    if (!publisher.publisherSubscribers.includes(subscriberEmail))
+      return res.status(400).json("Subscriber does not exist");
+
+    const updatedPublisher = await Publisher.findByIdAndUpdate(
+      publisherId,
+      { $pull: { publisherSubscribers: subscriberEmail } },
+      { new: true }
+    );
+
+    return res.status(200).json({ message: "Subscriber removed successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const deletePublisherController = async (req, res) => {
+  const { publisherId } = req.params;
+  try {
+    const publisher = await Publisher.findByIdAndDelete(publisherId);
+    if (!publisher) return res.status(404).json("Publisher not found");
+    return res.status(200).json({ message: "Publisher deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
@@ -748,5 +807,7 @@ module.exports = {
   removeEditorController,
   addEditorController,
   editJournalController,
-  deleteJournalController
+  deleteJournalController,
+  removeSubscriberController,
+  deletePublisherController
 };

@@ -68,6 +68,7 @@ import PublishersAdminOptions from "../../app/stories/PublishersAdminOptions";
 import NotConnected from "../../app/NotConnected";
 import ManageEditors from "../../app/stories/ManageEditors";
 import ManageJournals from "../../app/stories/ManageJournals";
+import ManageSubscribers from "../../app/stories/ManageSubscribers";
 
 const Stack = createStackNavigator();
 
@@ -742,6 +743,14 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Manage Editors"
+        }}
+      />
+      <Stack.Screen
+        name="ManageSubscribers"
+        component={ManageSubscribers}
+        options={{
+          headerShown: true,
+          headerTitle: "Manage Subscribers"
         }}
       />
       <Stack.Screen
