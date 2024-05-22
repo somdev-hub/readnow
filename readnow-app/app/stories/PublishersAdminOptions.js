@@ -20,14 +20,18 @@ const PublishersAdminOptions = () => {
     {
       name: "Manage editors",
       icon: "email",
-      route: "ManageAdmins",
-      params: {}
+      route: "ManageEditors",
+      params: {
+        publisherId: publisherId
+      }
     },
     {
       name: "Manage journals",
       icon: "book",
-      route: "ManageCategories",
-      params: {}
+      route: "ManageJournals",
+      params: {
+        publisherId: publisherId
+      }
     },
     {
       name: "Manage subscribers",

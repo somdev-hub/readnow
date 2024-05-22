@@ -920,3 +920,75 @@ export const editPublisher = async (data) => {
     console.log(error);
   }
 };
+
+export const removeEditor = async (publisherId, editorEmail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/remove-editor/${publisherId}`,
+      {
+        editorEmail
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addEditor = async (publisherId, editorEmail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/add-editor/${publisherId}`,
+      {
+        editorEmail
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const editJournal = async (data) => {
+  const formData = new FormData();
+  formData.append("journalCoverImage", {
+    uri: data.journalCoverImage,
+    name: "journalCoverImage.jpg",
+    type: "image/jpg"
+  });
+  formData.append("journalTitle", data.journalTitle);
+  formData.append("journalDescription", data.journalDescription);
+  formData.append(
+    "journalPublishingDate",
+    data.journalPublishingDate.toISOString()
+  );
+  formData.append("journalTags", JSON.stringify(data.journalTags));
+  formData.append("journalEditorEmail", data.journalEditorEmail);
+  formData.append("journalId", data.journalId);
+  formData.append("isJournalCoverImageSame", data.isJournalCoverImageSame);
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/edit-journal/${data.journalId}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteJournal = async (journalId) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/delete-journal/${journalId}`
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+}

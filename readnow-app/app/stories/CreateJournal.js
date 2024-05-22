@@ -14,14 +14,14 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
-import { addJournal } from "../../api/apis";
-import { ActivityIndicator } from "react-native-paper";
+import { addJournal, editJournal, getSpecificJournal } from "../../api/apis";
+import { ActivityIndicator, Dialog, Portal } from "react-native-paper";
 
 const CreateJournal = () => {
   const [open, setOpen] = useState(false);
   const navigator = useNavigation();
   const route = useRoute();
-  const { publisherId } = route.params;
+  const { publisherId, isEdit, journalId } = route.params;
   const [journalData, setJournalData] = useState({
     journalTitle: "",
     journalDescription: "",
@@ -29,9 +29,15 @@ const CreateJournal = () => {
     journalEditorEmail: "",
     journalTags: [],
     journalCoverImage: "",
-    publisherId
+    publisherId,
+    journalId,
+    isJournalCoverImageSame: true
   });
   const [loading, setLoading] = useState(false);
+  const [showDialog, setShowDialog] = useState({
+    visible: false,
+    message: ""
+  });
 
   const selectImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -41,7 +47,8 @@ const CreateJournal = () => {
     if (!result.canceled) {
       setJournalData({
         ...journalData,
-        journalCoverImage: result.assets[0].uri
+        journalCoverImage: result.assets[0].uri,
+        isJournalCoverImageSame: false
       });
     }
   };
@@ -58,6 +65,25 @@ const CreateJournal = () => {
     setLoading(false);
   };
 
+  const editJournalData = async () => {
+    setLoading(true);
+    const response = await editJournal(journalData);
+
+    if (response.status === 200) {
+      setShowDialog({
+        visible: true,
+        message: "Journal edited successfully"
+      });
+    } else {
+      setShowDialog({
+        visible: true,
+        message: "Error editing journal"
+      });
+    }
+
+    setLoading(false);
+  };
+
   useEffect(() => {
     const setEmail = async () => {
       const email = await SecureStorage.getItemAsync("email");
@@ -67,6 +93,27 @@ const CreateJournal = () => {
       });
     };
     setEmail();
+  }, []);
+
+  useEffect(() => {
+    const fetchJournal = async () => {
+      const response = await getSpecificJournal(journalId);
+      setJournalData({
+        ...journalData,
+        journalTitle: response.journal?.journalTitle,
+        journalDescription: response.journal?.journalDescription,
+        journalPublishingDate: new Date(
+          response.journal?.journalPublishingDate
+        ),
+        journalEditorEmail: response.journal?.journalEditorEmail,
+        journalTags: response.journal?.journalTags,
+        journalCoverImage: response.journal?.journalCoverImage
+      });
+    };
+
+    if (isEdit) {
+      fetchJournal();
+    }
   }, []);
   return (
     <ScrollView>
@@ -106,7 +153,7 @@ const CreateJournal = () => {
       <View
         style={{
           marginHorizontal: 20,
-          marginTop: 20
+          marginVertical: 20
         }}
       >
         <View style={{ marginBottom: 10 }}>
@@ -121,6 +168,7 @@ const CreateJournal = () => {
             Enter journal title*
           </Text>
           <TextInput
+            multiline={true}
             onChangeText={(text) => {
               setJournalData({
                 ...journalData,
@@ -270,7 +318,9 @@ const CreateJournal = () => {
           />
         </View>
         <TouchableOpacity
-          onPress={postJournal}
+          onPress={() => {
+            isEdit ? editJournalData() : postJournal();
+          }}
           style={{
             backgroundColor: PRIMARY_COLOR,
             paddingVertical: 12,
@@ -287,12 +337,49 @@ const CreateJournal = () => {
           >
             {loading ? (
               <ActivityIndicator animating={loading} color="white" />
+            ) : { isEdit } ? (
+              "Edit Journal"
             ) : (
-              "Continue"
+              "Create Journal"
             )}
           </Text>
         </TouchableOpacity>
       </View>
+      <Portal>
+        <Dialog
+          visible={showDialog.visible}
+          onDismiss={() => setShowDialog({ visible: false, message: "" })}
+          style={{
+            backgroundColor: "white",
+            padding: 20,
+            margin: 20,
+            borderRadius: 20
+          }}
+        >
+          <Dialog.Title>Alert</Dialog.Title>
+          <Dialog.Content>
+            <Text>{showDialog.message}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Pressable
+              onPress={() => {
+                navigator.goBack();
+                setShowDialog({ visible: false, message: "" });
+              }}
+            >
+              <Text
+                style={{
+                  color: PRIMARY_COLOR,
+                  // textAlign: "center"
+                  fontWeight: "500"
+                }}
+              >
+                Ok
+              </Text>
+            </Pressable>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </ScrollView>
   );
 };

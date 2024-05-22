@@ -5,6 +5,7 @@ import { WHITE_COLOR } from "../styles/colors";
 import { useNavigation } from "@react-navigation/native";
 import { Menu } from "react-native-paper";
 import { PaperProvider } from "react-native-paper";
+import { deleteJournal } from "../api/apis";
 
 const EditionCard = ({ journal, admin }) => {
   const navigator = useNavigation();
@@ -29,16 +30,17 @@ const EditionCard = ({ journal, admin }) => {
       title: "Edit",
       icon: "pencil",
       onPress: () => {
-        navigator.navigate("EditJournal", {
-          journalId: journal?.id
+        navigator.navigate("CreateJournal", {
+          journalId: journal?.id,
+          isEdit: true
         });
       }
     },
     {
       title: "Delete",
       icon: "delete",
-      onPress: () => {
-        console.log("Delete");
+      onPress: async () => {
+        const response = await deleteJournal(journal?.id);
       }
     }
   ];
@@ -92,7 +94,9 @@ const EditionCard = ({ journal, admin }) => {
                 fontSize: 13
               }}
             >
-              {journal?.publisher}
+              {journal?.publisher.length > 40
+                ? journal?.publisher.substring(0, 40) + "..."
+                : journal?.publisher}
             </Text>
           </View>
         </View>
@@ -115,7 +119,10 @@ const EditionCard = ({ journal, admin }) => {
               return (
                 <Menu.Item
                   key={index}
-                  onPress={item.onPress}
+                  onPress={() => {
+                    item.onPress();
+                    setMenuVisible(false);
+                  }}
                   title={item.title}
                   leadingIcon={item.icon}
                 />
@@ -140,7 +147,7 @@ const EditionCard = ({ journal, admin }) => {
       <View
         style={{
           marginTop: 10,
-          paddingHorizontal: 10
+          paddingHorizontal: 15
         }}
       >
         <Text

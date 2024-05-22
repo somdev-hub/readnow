@@ -47,7 +47,8 @@
       "type": "boolean"
     },
     "publisherId": {
-      "type": "string"
+      "type": "string",
+      "required": true
     },
     "journalComments": {
       "type": "json"

@@ -3,6 +3,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import * as SecureStorage from "expo-secure-store";
+import NetInfo from "@react-native-community/netinfo";
 import { useNavigation, CommonActions } from "@react-navigation/native";
 import {
   addBookmark,
@@ -64,6 +65,9 @@ import {
   postPublisherData
 } from "../../redux/publisherSlice";
 import PublishersAdminOptions from "../../app/stories/PublishersAdminOptions";
+import NotConnected from "../../app/NotConnected";
+import ManageEditors from "../../app/stories/ManageEditors";
+import ManageJournals from "../../app/stories/ManageJournals";
 
 const Stack = createStackNavigator();
 
@@ -101,40 +105,56 @@ const StackNavigator = () => {
   const openMenu = () => setVisible(true);
 
   const closeMenu = () => setVisible(false);
-  useEffect(() => {
-    const decodeToken = async () => {
-      const token = await SecureStorage.getItemAsync("token");
 
-      if (token) {
-        setToken(token);
-        decodeUser(token)
-          .then((response) => {
-            console.log(response);
-            if (response.status != 200) {
-              SecureStorage.deleteItemAsync("token");
-              SecureStorage.deleteItemAsync("email");
-              navigator.dispatch(
-                CommonActions.reset({
-                  index: 0,
-                  routes: [{ name: "Welcome" }]
-                })
-              );
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } else {
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      if (!state.isConnected) {
         navigator.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: "Welcome" }]
+            routes: [{ name: "NotConnected" }]
           })
         );
+      } else {
+        const decodeToken = async () => {
+          const token = await SecureStorage.getItemAsync("token");
+
+          if (token) {
+            setToken(token);
+            decodeUser(token)
+              .then((response) => {
+                console.log(response);
+                if (response.status != 200) {
+                  SecureStorage.deleteItemAsync("token");
+                  SecureStorage.deleteItemAsync("email");
+                  navigator.dispatch(
+                    CommonActions.reset({
+                      index: 0,
+                      routes: [{ name: "Welcome" }]
+                    })
+                  );
+                }
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          } else {
+            navigator.dispatch(
+              CommonActions.reset({
+                index: 0,
+                routes: [{ name: "Welcome" }]
+              })
+            );
+          }
+        };
+        decodeToken();
+        getUser();
       }
+    });
+
+    return () => {
+      unsubscribe();
     };
-    decodeToken();
-    getUser();
   }, [token]);
 
   const socketConnection = useSelector((state) => state.event.eventSocket);
@@ -158,6 +178,7 @@ const StackNavigator = () => {
       initialRouteName="Stories"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
+      <Stack.Screen name="NotConnected" component={NotConnected} />
       <Stack.Screen name="Web" component={Web} />
       <Stack.Screen
         name="ViewGroupInfo"
@@ -713,6 +734,22 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Create Journal"
+        }}
+      />
+      <Stack.Screen
+        name="ManageEditors"
+        component={ManageEditors}
+        options={{
+          headerShown: true,
+          headerTitle: "Manage Editors"
+        }}
+      />
+      <Stack.Screen
+        name="ManageJournals"
+        component={ManageJournals}
+        options={{
+          headerShown: true,
+          headerTitle: "Manage Journals"
         }}
       />
       <Stack.Screen

@@ -279,6 +279,80 @@ const addJournalController = async (req, res) => {
   }
 };
 
+const editJournalController = async (req, res) => {
+  const { journalId } = req.params;
+  const {
+    journalTitle,
+    journalDescription,
+    journalPublishingDate,
+    journalEditorEmail,
+    journalTags,
+    publisherId,
+    isJournalCoverImageSame
+  } = req.body;
+
+  const journalCoverImage = req.file;
+
+  try {
+    const data = {
+      data: {
+        journalTitle,
+        journalDescription,
+        journalPublishingDate: new Date(journalPublishingDate).toISOString(),
+        journalEditorEmail,
+        journalTags: JSON.parse(journalTags),
+        publisherId
+      }
+    };
+    if (isJournalCoverImageSame === "false") {
+      const journalCoverImageId = await uploadImageAndGetId(
+        journalCoverImage,
+        "journal-cover-images"
+      );
+      data.data.journalCoverImage = journalCoverImageId;
+    }
+
+    const response = await axios.put(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`,
+      JSON.stringify(data),
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    if (response.data && response.data.data.id) {
+      // console.log("hello");
+      res.status(200).json({
+        message: "Journal updated successfully",
+        id: response.data.data.id
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const deleteJournalController = async (req, res) => {
+  const { journalId } = req.params;
+  try {
+    const response = await axios.delete(
+      `${process.env.STRAPI_API}/api/journals/${journalId}`
+    );
+
+    if (response.data && response.data.data.id) {
+      return res.status(200).json({
+        message: "Journal deleted successfully"
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 const addChapterController = async (req, res) => {
   const { journalId, chapter, content, isStandalone } = req.body;
 
@@ -612,6 +686,50 @@ const getSubscribedPublisherJournalsController = async (req, res) => {
   }
 };
 
+const removeEditorController = async (req, res) => {
+  const { publisherId } = req.params;
+  const { editorEmail } = req.body;
+  try {
+    const publisher = await Publisher.findById(publisherId);
+    if (!publisher) return res.status(404).json("Publisher not found");
+    if (!publisher.editorEmails.includes(editorEmail))
+      return res.status(400).json("Editor does not exist");
+
+    const updatedPublisher = await Publisher.findByIdAndUpdate(
+      publisherId,
+      { $pull: { editorEmails: editorEmail } },
+      { new: true }
+    );
+
+    return res.status(200).json({ message: "Editor removed successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const addEditorController = async (req, res) => {
+  const { publisherId } = req.params;
+  const { editorEmail } = req.body;
+  try {
+    const publisher = await Publisher.findById(publisherId);
+    if (!publisher) return res.status(404).json("Publisher not found");
+    if (publisher.editorEmails.includes(editorEmail))
+      return res.status(400).json("Editor already exists");
+
+    const updatedPublisher = await Publisher.findByIdAndUpdate(
+      publisherId,
+      { $addToSet: { editorEmails: editorEmail } },
+      { new: true }
+    );
+
+    return res.status(200).json({ message: "Editor added successfully" });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
@@ -626,5 +744,9 @@ module.exports = {
   toggleJournalLikeController,
   toggleCommentLikeController,
   getSubscribedPublisherJournalsController,
-  editPublisherController
+  editPublisherController,
+  removeEditorController,
+  addEditorController,
+  editJournalController,
+  deleteJournalController
 };

@@ -920,7 +920,7 @@ export interface ApiJournalJournal extends Schema.CollectionType {
       'api::chapter.chapter'
     >;
     isStandalone: Attribute.Boolean;
-    publisherId: Attribute.String;
+    publisherId: Attribute.String & Attribute.Required;
     journalComments: Attribute.JSON;
     journalLikes: Attribute.JSON;
     journalArticle: Attribute.Text;

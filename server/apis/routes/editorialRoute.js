@@ -14,7 +14,11 @@ const {
   toggleJournalLikeController,
   toggleCommentLikeController,
   getSubscribedPublisherJournalsController,
-  editPublisherController
+  editPublisherController,
+  removeEditorController,
+  addEditorController,
+  editJournalController,
+  deleteJournalController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -58,6 +62,14 @@ router.post(
   addJournalController
 );
 
+router.post(
+  "/edit-journal/:journalId",
+  uploadMiddleware.single("journalCoverImage"),
+  editJournalController
+);
+
+router.post("/delete-journal/:journalId", deleteJournalController);
+
 router.post("/add-chapter", addChapterController);
 
 router.get("/get-specific-journal/:journalId", getSpecificJournalController);
@@ -74,5 +86,9 @@ router.get(
   "/get-subscribed-publisher-journals/:email",
   getSubscribedPublisherJournalsController
 );
+
+router.post("/remove-editor/:publisherId", removeEditorController);
+
+router.post("/add-editor/:publisherId", addEditorController);
 
 module.exports = router;
