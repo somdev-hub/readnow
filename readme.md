@@ -53,6 +53,40 @@ READNOW is a social media platform for readers. It allows users to share their r
     - `routes`: Express routes
     - `utils`: Utility functions
 - `strapi2`: Strapi CMS
+
+### Installation
+
+#### Client
+
+1. Clone the repository
+2. Navigate to the `readnow-app` folder
+3. Run `npm install` to install the dependencies
+4. Run `npm expo start` to start the development server
+
+#### Server
+
+1. Navigate to the `server` folder
+2. Navigate to the `strapi2/readnow-cms` folder
+3. Run `npm install` to install the dependencies
+4. Run `npm run strapi start` to start the Strapi server
+5. Navigate back to the `apis` folder
+6. Run `npm install` to install the dependencies
+7. Run `node server` to start the Node.js server
+
+### Screenshots
+
+<img src="screenshots/home.png" width="200">
+<img src="screenshots/news.png" width="200">
+<img src="screenshots/bookmarks.png" width="200">
+<img src="screenshots/feeds.png" width="200">
+<img src="screenshots/groups.png" width="200">
+<img src="screenshots/group.png" width="200">
+<img src="screenshots/event.png" width="200">
+<img src="screenshots/editorial.png" width="200">
+<img src="screenshots/journal.png" width="200">
+<img src="screenshots/publisher.png" width="200">
+
+
     
 
 
