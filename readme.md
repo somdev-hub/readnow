@@ -75,6 +75,8 @@ READNOW is a social media platform for readers. It allows users to share their r
 
 ### Screenshots
 
+<div style="display:flex;gap:5%;flex-wrap:wrap;">
+
 <img src="screenshots/home.png" width="200">
 <img src="screenshots/news.png" width="200">
 <img src="screenshots/bookmarks.png" width="200">
@@ -85,6 +87,8 @@ READNOW is a social media platform for readers. It allows users to share their r
 <img src="screenshots/editorial.png" width="200">
 <img src="screenshots/journal.png" width="200">
 <img src="screenshots/publisher.png" width="200">
+</div>
+
 
 
     
