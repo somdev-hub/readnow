@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
   posts: Number,
   groups: Array,
   notifications: Array,
-  publishers: Array
+  publishers: Array,
+  otherEmails: Array
 });
 
 const User = mongoose.model("User", userSchema);

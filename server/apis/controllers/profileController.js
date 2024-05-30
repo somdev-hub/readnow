@@ -348,6 +348,59 @@ const getUserFollowersController = async (req, res) => {
   }
 };
 
+const toggleOtherEmails = async (req, res) => {
+  const { otherEmail } = req.body;
+  const { email } = req.params;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      if (user.otherEmails.includes(otherEmail)) {
+        await User.updateOne(
+          { email },
+          { $pull: { otherEmails: otherEmail } },
+          { upsert: true, new: true }
+        );
+      } else {
+        await User.updateOne(
+          { email },
+          { $addToSet: { otherEmails: otherEmail } },
+          { upsert: true, new: true }
+        );
+      }
+      res.status(200).json({ message: "Email toggled successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    res.status(500).send({ message: "Internal server error" });
+  }
+};
+
+const setPrimaryEmail = async (req, res) => {
+  const { otherEmail } = req.body;
+  const { email } = req.params;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      await User.updateOne({ email }, { email: otherEmail });
+      await User.updateOne(
+        { otherEmail },
+        { $addToSet: { otherEmails: email } },
+        { upsert: true, new: true }
+      );
+
+      return res.status(200).send("Primary email set");
+    } else {
+      return res.status(404).send("user not found");
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Internal server error");
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
@@ -358,5 +411,7 @@ module.exports = {
   handleFollowController,
   getProfileGroups,
   getCardProfileInfoController,
-  getUserFollowersController
+  getUserFollowersController,
+  toggleOtherEmails,
+  setPrimaryEmail
 };
