@@ -15,11 +15,11 @@ import {
 } from "@expo-google-fonts/montserrat";
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
-import { login } from "../api/apis";
+import { login } from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
 import { ActivityIndicator } from "react-native-paper";
 import { CommonActions } from "@react-navigation/native";
-import { PRIMARY_COLOR } from "../styles/colors";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
 const Login = () => {
   const [userCredentials, setUserCredentials] = useState({
@@ -107,7 +107,7 @@ const Login = () => {
               }}
             >
               <Image
-                source={require("../assets/logo-removebg.png")}
+                source={require("../../assets/logo-removebg.png")}
                 style={{ width: 70, height: 70 }}
               />
               <Text

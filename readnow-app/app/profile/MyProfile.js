@@ -1,40 +1,107 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable
+} from "react-native";
 import React, { useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+// import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { useRoute } from "@react-navigation/native";
-import { getProfile, handleFollow } from "../api/apis";
-import PostCard from "../components/PostCard";
+import { AntDesign } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import {
+  deletePost,
+  editBackgroundPicture,
+  editProfilePicture,
+  getProfile,
+  submitPost
+} from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
-import { PRIMARY_COLOR } from "../styles/colors";
+import PostCard from "../../components/PostCard";
+import { Snackbar } from "react-native-paper";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
-const PeopleProfile = () => {
-  const route = useRoute();
-  const personData = route.params.item;
-  const [followed, setFollowed] = useState(false);
+const MyProfile = () => {
+  const navigator = useNavigation();
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [backgroundPicture, setBackgroundPicture] = useState(null);
   const [userData, setUserData] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
-  const handleFollowFunc = async () => {
-    const email = await SecureStorage.getItemAsync("email");
-    const response = await handleFollow(email, personData.userEmail);
-    console.log(response);
-    response.status === 200 && setFollowed(!followed);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
+
+  const handleSnackbar = () => {
+    setSnackbarVisible(!snackbarVisible);
   };
+
+  const selectImage = async (setPicture, type) => {
+    const options = {
+      mediaTypes: ImagePicker.MediaTypeOptions.Images
+    };
+    const response = await ImagePicker.launchImageLibraryAsync(options);
+
+    if (!response.canceled) {
+      setPicture(response.assets[0].uri);
+      if (type === "profile") {
+        editProfilePicture({
+          image: response.assets[0].uri,
+          email: userData.email
+        }).then((response) => {
+          console.log(response);
+        });
+      } else {
+        editBackgroundPicture({
+          image: response.assets[0].uri,
+          email: userData.email
+        }).then((response) => {
+          console.log(response);
+        });
+      }
+    }
+  };
+
   const getProfileInfo = async () => {
-    // const email = await SecureStorage.getItemAsync("email");
-    getProfile(personData.userEmail).then((response) => {
-      // console.log(response.data.userData);
+    const email = await SecureStorage.getItemAsync("email");
+    getProfile(email).then((response) => {
       setUserData(response.data.userData);
       setUserPosts(response.data.postData);
+      setProfilePicture(response.data.userData.profilePicture);
+      setBackgroundPicture(response.data.userData.backgroundPicture);
     });
   };
 
   useEffect(() => {
     getProfileInfo();
-    SecureStorage.getItemAsync("email").then((response) => {
-      setFollowed(userData?.followers.includes(response));
-    });
   }, []);
+
+  const optionContents = [
+    {
+      option: "Delete post",
+      function: async (postId) => {
+        deletePost(postId).then((response) => {
+          // console.log(response);
+          setSnackbarVisible(true);
+          getProfileInfo();
+        });
+      }
+    },
+    {
+      option: "Edit post",
+      function: () => {}
+    },
+    {
+      option: "Share post",
+      function: () => {}
+    },
+    {
+      option: "Send",
+      function: () => {}
+    }
+  ];
+
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -49,10 +116,18 @@ const PeopleProfile = () => {
           <View style={{ height: 120, position: "relative" }}>
             <Image
               source={{
-                uri: userData?.backgroundPicture
+                uri: backgroundPicture
+                  ? backgroundPicture
+                  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
               }}
               style={{ width: "100%", height: "100%", resizeMode: "cover" }}
             />
+            <Pressable
+              onPress={() => selectImage(setBackgroundPicture, "background")}
+              style={{ position: "absolute", bottom: 10, right: 20 }}
+            >
+              <FontAwesome name="pencil-square" size={24} color="#fff" />
+            </Pressable>
             <View
               style={{
                 width: 100,
@@ -68,7 +143,9 @@ const PeopleProfile = () => {
             >
               <Image
                 source={{
-                  uri: userData?.profilePicture
+                  uri: profilePicture
+                    ? profilePicture
+                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
                 }}
                 style={{
                   width: "100%",
@@ -77,6 +154,12 @@ const PeopleProfile = () => {
                   borderRadius: 50
                 }}
               />
+              <Pressable
+                onPress={() => selectImage(setProfilePicture, "profile")}
+                style={{ position: "absolute", bottom: 10, left: 75 }}
+              >
+                <AntDesign name="pluscircle" size={24} color={PRIMARY_COLOR} />
+              </Pressable>
             </View>
           </View>
           <View style={{ marginTop: 50 }}>
@@ -88,15 +171,23 @@ const PeopleProfile = () => {
                 style={{
                   marginTop: 5,
                   color: "#A9A9A9",
-                  //   fontWeight: "500",
                   fontSize: 16
                 }}
               >
                 {userData?.header}
               </Text>
-              <Text style={{ marginTop: 10, color: PRIMARY_COLOR }}>
-                {userData?.tags}
-              </Text>
+              <View style={{ flexDirection: "row" }}>
+                {/* {userData?.tags.map((item, index) => {
+                  return (
+                    <Text
+                      style={{ marginTop: 10, color: PRIMARY_COLOR }}
+                      key={index}
+                    >
+                      {item + " "}
+                    </Text>
+                  );
+                })} */}
+              </View>
               <View
                 style={{
                   marginTop: 20,
@@ -116,28 +207,17 @@ const PeopleProfile = () => {
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => {
-                handleFollowFunc();
-              }}
+              onPress={() => navigator.navigate("Add Post")}
               style={{
-                borderColor: PRIMARY_COLOR,
-                borderWidth: 2,
+                backgroundColor: PRIMARY_COLOR,
                 marginHorizontal: 20,
                 padding: 10,
                 borderRadius: 30,
-                marginTop: 20,
-                backgroundColor: followed ? PRIMARY_COLOR : "white"
+                marginTop: 20
               }}
             >
-              <Text
-                style={{
-                  fontSize: 14,
-                  color: followed ? "white" : PRIMARY_COLOR,
-                  textAlign: "center",
-                  fontWeight: "500"
-                }}
-              >
-                {followed ? "Following" : "Follow"}
+              <Text style={{ color: "white", textAlign: "center" }}>
+                Add Post
               </Text>
             </TouchableOpacity>
           </View>
@@ -150,12 +230,12 @@ const PeopleProfile = () => {
             backgroundColor: "white"
           }}
         >
-          <Text style={{ fontWeight: "500", fontSize: 16 }}>About</Text>
+          <Text style={{ fontWeight: "500", fontSize: 16 }}>Description</Text>
           <Text style={{ marginTop: 10, fontSize: 12 }}>
             {userData?.description}
             <Text style={{ fontWeight: "500", fontSize: 14 }}>
               Read more...
-            </Text>
+            </Text>{" "}
           </Text>
         </View>
         <View
@@ -169,7 +249,7 @@ const PeopleProfile = () => {
           <Text
             style={{ fontWeight: "500", fontSize: 16, paddingHorizontal: 20 }}
           >
-            Posts
+            Your posts
           </Text>
           <ScrollView
             horizontal
@@ -180,6 +260,7 @@ const PeopleProfile = () => {
                 padding: 7,
                 paddingHorizontal: 10,
                 borderWidth: 2,
+                // flex:1,
                 width: "auto",
                 marginRight: 10,
                 borderRadius: 50,
@@ -229,20 +310,32 @@ const PeopleProfile = () => {
             return (
               <PostCard
                 key={index}
-                user={userData?.name}
-                header={userData?.header}
+                user={userData.name}
+                header={userData.header}
                 description={item.description || ""}
                 image={item.image}
                 likes={item.likedBy}
                 comments={item.comments}
-                profilePicture={userData?.profilePicture}
-                // optionsContent={optionContents}
+                profilePicture={userData.profilePicture}
+                optionsContent={optionContents}
                 post={item}
               />
             );
           })}
         </View>
       </ScrollView>
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={() => {}}
+        action={{
+          label: "Done",
+          onPress: () => {
+            setSnackbarVisible(false);
+          }
+        }}
+      >
+        Post deleted
+      </Snackbar>
     </View>
   );
 };
@@ -250,9 +343,7 @@ const PeopleProfile = () => {
 const styles = StyleSheet.create({
   textStyle: {
     fontWeight: "500"
-    // fontSize: 18
-    // marginLeft: 20
   }
 });
 
-export default PeopleProfile;
+export default MyProfile;

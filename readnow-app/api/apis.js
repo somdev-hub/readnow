@@ -1,7 +1,7 @@
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const ADDRESS = "http://192.168.25.254:3500";
+const ADDRESS = "http://192.168.159.254:3500";
 
 export const socket = io(ADDRESS, {
   transports: ["websocket"]
@@ -34,6 +34,7 @@ export const signup = async (userCredentials) => {
       `${ADDRESS}/profile/add-user`,
       userCredentials
     );
+    // console.log(response.status);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -64,10 +65,36 @@ export const getUserFollowers = async (email) => {
 };
 
 export const editProfile = async (userCredentials) => {
+  const formData = new FormData();
+  formData.append("profilePicture", {
+    uri: userCredentials.profilePicture,
+    name: "profilePicture.jpg",
+    type: "image/jpg"
+  });
+  formData.append("backgroundPicture", {
+    uri: userCredentials.backgroundPicture,
+    name: "backgroundPicture.jpg",
+    type: "image/jpg"
+  });
+  formData.append("header", userCredentials.header);
+  formData.append("name", userCredentials.name);
+  formData.append("tags", JSON.stringify(userCredentials.tags));
+  formData.append("description", userCredentials.description);
+  formData.append(
+    "isBackgroundPictureSame",
+    userCredentials.isBackgroundPictureSame
+  );
+  formData.append("isProfilePictureSame", userCredentials.isProfilePictureSame);
+  // console.log(formData);
   try {
     const response = await axios.post(
-      `${ADDRESS}/profile/edit-profile`,
-      userCredentials
+      `${ADDRESS}/profile/edit-profile/${userCredentials.email}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
     );
     return response.data;
   } catch (error) {

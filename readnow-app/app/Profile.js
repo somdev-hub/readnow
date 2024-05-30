@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -11,17 +11,26 @@ import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 const Profile = () => {
   const navigator = useNavigation();
   const [userData, setUserData] = useState(null);
+  const [email, setEmail] = useState("");
   const options = [
     {
       name: "Your Account",
       items: [
         {
           name: "Account",
-          icon: "account-circle"
+          icon: "account-circle",
+          route: "AddInfo",
+          param: {
+            userCredentials: { email: email, isEdit: true }
+          }
         },
         {
           name: "Email",
-          icon: "email"
+          icon: "email",
+          route: "EditEmail",
+          param: {
+            email: email
+          }
         },
         {
           name: "Subscription",
@@ -50,7 +59,7 @@ const Profile = () => {
 
   useEffect(() => {
     SecureStorage.getItemAsync("email").then((email) => {
-      // console.log(email);
+      setEmail(email);
       getShortProfileInfo(email).then((response) => {
         // console.log(response.data);
         setUserData(response.data);
@@ -149,7 +158,10 @@ const Profile = () => {
               >
                 {option.items.map((item, index) => {
                   return (
-                    <View
+                    <Pressable
+                      onPress={() => {
+                        navigator.navigate(item.route, item.param);
+                      }}
                       key={index}
                       style={{
                         borderBottomColor: WHITE_COLOR,
@@ -177,7 +189,7 @@ const Profile = () => {
                         </Text>
                       </View>
                       <FontAwesome name="angle-right" size={24} color="black" />
-                    </View>
+                    </Pressable>
                   );
                 })}
               </View>

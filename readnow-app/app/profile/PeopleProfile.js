@@ -1,107 +1,40 @@
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Pressable
-} from "react-native";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import React, { useEffect, useState } from "react";
-// import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
-import { AntDesign } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import * as ImagePicker from "expo-image-picker";
-import {
-  deletePost,
-  editBackgroundPicture,
-  editProfilePicture,
-  getProfile,
-  submitPost
-} from "../api/apis";
+import { useRoute } from "@react-navigation/native";
+import { getProfile, handleFollow } from "../../api/apis";
+import PostCard from "../../components/PostCard";
 import * as SecureStorage from "expo-secure-store";
-import PostCard from "../components/PostCard";
-import { Snackbar } from "react-native-paper";
-import { PRIMARY_COLOR } from "../styles/colors";
+import { PRIMARY_COLOR } from "../../styles/colors";
 
-const MyProfile = () => {
-  const navigator = useNavigation();
-  const [profilePicture, setProfilePicture] = useState(null);
-  const [backgroundPicture, setBackgroundPicture] = useState(null);
+const PeopleProfile = () => {
+  const route = useRoute();
+  const personData = route.params.item;
+  const [followed, setFollowed] = useState(false);
   const [userData, setUserData] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-
-  const handleSnackbar = () => {
-    setSnackbarVisible(!snackbarVisible);
-  };
-
-  const selectImage = async (setPicture, type) => {
-    const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    };
-    const response = await ImagePicker.launchImageLibraryAsync(options);
-
-    if (!response.canceled) {
-      setPicture(response.assets[0].uri);
-      if (type === "profile") {
-        editProfilePicture({
-          image: response.assets[0].uri,
-          email: userData.email
-        }).then((response) => {
-          console.log(response);
-        });
-      } else {
-        editBackgroundPicture({
-          image: response.assets[0].uri,
-          email: userData.email
-        }).then((response) => {
-          console.log(response);
-        });
-      }
-    }
-  };
-
-  const getProfileInfo = async () => {
+  const handleFollowFunc = async () => {
     const email = await SecureStorage.getItemAsync("email");
-    getProfile(email).then((response) => {
+    const response = await handleFollow(email, personData.userEmail);
+    console.log(response);
+    response.status === 200 && setFollowed(!followed);
+  };
+  const getProfileInfo = async () => {
+    // const email = await SecureStorage.getItemAsync("email");
+    getProfile(personData.userEmail).then((response) => {
+      // console.log(response.data.userData);
       setUserData(response.data.userData);
       setUserPosts(response.data.postData);
-      setProfilePicture(response.data.userData.profilePicture);
-      setBackgroundPicture(response.data.userData.backgroundPicture);
     });
   };
 
   useEffect(() => {
     getProfileInfo();
+    SecureStorage.getItemAsync("email").then((response) => {
+      setFollowed(userData?.followers.includes(response));
+    });
   }, []);
-
-  const optionContents = [
-    {
-      option: "Delete post",
-      function: async (postId) => {
-        deletePost(postId).then((response) => {
-          // console.log(response);
-          setSnackbarVisible(true);
-          getProfileInfo();
-        });
-      }
-    },
-    {
-      option: "Edit post",
-      function: () => {}
-    },
-    {
-      option: "Share post",
-      function: () => {}
-    },
-    {
-      option: "Send",
-      function: () => {}
-    }
-  ];
-
   return (
     <View style={{ flex: 1 }}>
       <ScrollView>
@@ -116,18 +49,10 @@ const MyProfile = () => {
           <View style={{ height: 120, position: "relative" }}>
             <Image
               source={{
-                uri: backgroundPicture
-                  ? backgroundPicture
-                  : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
+                uri: userData?.backgroundPicture
               }}
               style={{ width: "100%", height: "100%", resizeMode: "cover" }}
             />
-            <Pressable
-              onPress={() => selectImage(setBackgroundPicture, "background")}
-              style={{ position: "absolute", bottom: 10, right: 20 }}
-            >
-              <FontAwesome name="pencil-square" size={24} color="#fff" />
-            </Pressable>
             <View
               style={{
                 width: 100,
@@ -143,9 +68,7 @@ const MyProfile = () => {
             >
               <Image
                 source={{
-                  uri: profilePicture
-                    ? profilePicture
-                    : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfVTBm4cJI_qbL4IVksKsxQJGaBBrI0Phfvg&usqp=CAU"
+                  uri: userData?.profilePicture
                 }}
                 style={{
                   width: "100%",
@@ -154,12 +77,6 @@ const MyProfile = () => {
                   borderRadius: 50
                 }}
               />
-              <Pressable
-                onPress={() => selectImage(setProfilePicture, "profile")}
-                style={{ position: "absolute", bottom: 10, left: 75 }}
-              >
-                <AntDesign name="pluscircle" size={24} color={PRIMARY_COLOR} />
-              </Pressable>
             </View>
           </View>
           <View style={{ marginTop: 50 }}>
@@ -171,23 +88,15 @@ const MyProfile = () => {
                 style={{
                   marginTop: 5,
                   color: "#A9A9A9",
+                  //   fontWeight: "500",
                   fontSize: 16
                 }}
               >
                 {userData?.header}
               </Text>
-              <View style={{ flexDirection: "row" }}>
-                {/* {userData?.tags.map((item, index) => {
-                  return (
-                    <Text
-                      style={{ marginTop: 10, color: PRIMARY_COLOR }}
-                      key={index}
-                    >
-                      {item + " "}
-                    </Text>
-                  );
-                })} */}
-              </View>
+              <Text style={{ marginTop: 10, color: PRIMARY_COLOR }}>
+                {userData?.tags}
+              </Text>
               <View
                 style={{
                   marginTop: 20,
@@ -207,17 +116,28 @@ const MyProfile = () => {
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => navigator.navigate("Add Post")}
+              onPress={() => {
+                handleFollowFunc();
+              }}
               style={{
-                backgroundColor: PRIMARY_COLOR,
+                borderColor: PRIMARY_COLOR,
+                borderWidth: 2,
                 marginHorizontal: 20,
                 padding: 10,
                 borderRadius: 30,
-                marginTop: 20
+                marginTop: 20,
+                backgroundColor: followed ? PRIMARY_COLOR : "white"
               }}
             >
-              <Text style={{ color: "white", textAlign: "center" }}>
-                Add Post
+              <Text
+                style={{
+                  fontSize: 14,
+                  color: followed ? "white" : PRIMARY_COLOR,
+                  textAlign: "center",
+                  fontWeight: "500"
+                }}
+              >
+                {followed ? "Following" : "Follow"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -230,12 +150,12 @@ const MyProfile = () => {
             backgroundColor: "white"
           }}
         >
-          <Text style={{ fontWeight: "500", fontSize: 16 }}>Description</Text>
+          <Text style={{ fontWeight: "500", fontSize: 16 }}>About</Text>
           <Text style={{ marginTop: 10, fontSize: 12 }}>
             {userData?.description}
             <Text style={{ fontWeight: "500", fontSize: 14 }}>
               Read more...
-            </Text>{" "}
+            </Text>
           </Text>
         </View>
         <View
@@ -249,7 +169,7 @@ const MyProfile = () => {
           <Text
             style={{ fontWeight: "500", fontSize: 16, paddingHorizontal: 20 }}
           >
-            Your posts
+            Posts
           </Text>
           <ScrollView
             horizontal
@@ -260,7 +180,6 @@ const MyProfile = () => {
                 padding: 7,
                 paddingHorizontal: 10,
                 borderWidth: 2,
-                // flex:1,
                 width: "auto",
                 marginRight: 10,
                 borderRadius: 50,
@@ -310,32 +229,20 @@ const MyProfile = () => {
             return (
               <PostCard
                 key={index}
-                user={userData.name}
-                header={userData.header}
+                user={userData?.name}
+                header={userData?.header}
                 description={item.description || ""}
                 image={item.image}
                 likes={item.likedBy}
                 comments={item.comments}
-                profilePicture={userData.profilePicture}
-                optionsContent={optionContents}
+                profilePicture={userData?.profilePicture}
+                // optionsContent={optionContents}
                 post={item}
               />
             );
           })}
         </View>
       </ScrollView>
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => {}}
-        action={{
-          label: "Done",
-          onPress: () => {
-            setSnackbarVisible(false);
-          }
-        }}
-      >
-        Post deleted
-      </Snackbar>
     </View>
   );
 };
@@ -343,7 +250,9 @@ const MyProfile = () => {
 const styles = StyleSheet.create({
   textStyle: {
     fontWeight: "500"
+    // fontSize: 18
+    // marginLeft: 20
   }
 });
 
-export default MyProfile;
+export default PeopleProfile;

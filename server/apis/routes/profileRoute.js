@@ -40,7 +40,14 @@ const router = express.Router();
 // hit this route to add user
 router.post("/add-user", addUserController);
 // hit this route to edit profile
-router.post("/edit-profile", editProfileController);
+router.post(
+  "/edit-profile/:email",
+  upload.fields([
+    { name: "profilePicture", maxCount: 1 },
+    { name: "backgroundPicture", maxCount: 1 }
+  ]),
+  editProfileController
+);
 // hit this route to edit profile picture
 router.post(
   "/edit-profile-picture",

@@ -16,8 +16,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { ActivityIndicator } from "react-native-paper";
-import { PRIMARY_COLOR } from "../styles/colors";
-
+import { PRIMARY_COLOR } from "../../styles/colors";
 
 const SignUp = () => {
   const [userCredentials, setUserCredentials] = useState({
@@ -41,7 +40,9 @@ const SignUp = () => {
       // alert("Password not match");
       return;
     }
-    navigator.navigate("AddInfo", { userCredentials: userCredentials });
+    navigator.navigate("AddInfo", {
+      userCredentials: { ...userCredentials, isEdit: false }
+    });
     // console.log(userCredentials);
   };
   const [fontsLoaded] = useFonts({
@@ -95,7 +96,7 @@ const SignUp = () => {
               }}
             >
               <Image
-                source={require("../assets/logo-removebg.png")}
+                source={require("../../assets/logo-removebg.png")}
                 style={{ width: 70, height: 70 }}
               />
               <Text

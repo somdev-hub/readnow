@@ -18,15 +18,15 @@ import { Menu } from "react-native-paper";
 import { useSelector } from "react-redux";
 import { createStackNavigator } from "@react-navigation/stack";
 import Welcome from "../../app/Welcome";
-import SignUp from "../../app/SignUp";
-import Login from "../../app/Login";
+import SignUp from "../../app/profile/SignUp";
+import Login from "../../app/profile/Login";
 import Story from "../../app/Story";
-import AddInfo from "../../app/AddInfo";
+import AddInfo from "../../app/profile/AddInfo";
 import Groups from "../../app/groups/Groups";
 import AddPost from "../../app/AddPost";
-import MyProfile from "../../app/MyProfile";
+import MyProfile from "../../app/profile/MyProfile";
 import People from "../../app/People";
-import PeopleProfile from "../../app/PeopleProfile";
+import PeopleProfile from "../../app/profile/PeopleProfile";
 import ArticlePage from "../../app/ArticlePage";
 import ViewPost from "../../app/ViewPost";
 import Web from "../../app/Web";
@@ -69,6 +69,7 @@ import NotConnected from "../../app/NotConnected";
 import ManageEditors from "../../app/stories/ManageEditors";
 import ManageJournals from "../../app/stories/ManageJournals";
 import ManageSubscribers from "../../app/stories/ManageSubscribers";
+import EditEmail from "../../app/profile/EditEmail";
 
 const Stack = createStackNavigator();
 
@@ -176,7 +177,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="Stories"
+      initialRouteName="EditEmail"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="NotConnected" component={NotConnected} />
@@ -488,8 +489,22 @@ const StackNavigator = () => {
       <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="Signup" component={SignUp} />
       <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen
+        name="EditEmail"
+        component={EditEmail}
+        options={{
+          headerShown: true,
+          headerTitle: "Edit Email"
+        }}
+      />
       <Stack.Screen name="Story" component={Story} />
-      <Stack.Screen name="AddInfo" component={AddInfo} />
+      <Stack.Screen
+        name="AddInfo"
+        component={AddInfo}
+        options={{
+          headerShown: true
+        }}
+      />
       <Stack.Screen
         name="GroupsPage"
         component={GroupTopNavigator}

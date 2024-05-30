@@ -3,23 +3,20 @@ const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const client = require("../sanity");
+const uploadImage = require("../utils/uploadImage");
 
 const addUserController = async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
   if (!email || !password) {
-    return res.send({
-      status: 400,
-      message: "Please enter all the fields"
+    return res.status(400).json({
+      message: "Please enter all fields"
     });
   }
   bcrypt.hash(password, 10, async (error, hash) => {
     if (error) {
       console.log(error);
-      return res.send({
-        status: 500,
-        message: "Server error"
-      });
+      return res.json({ status: 400, message: "Server error" });
     }
     const user = new User({
       email: email,
@@ -34,12 +31,9 @@ const addUserController = async (req, res) => {
         (err, token) => {
           if (err) {
             console.log(err);
-            return res.send({
-              status: 500,
-              message: "Server error"
-            });
+            return res.json({ status: 500, message: "Server error" });
           } else {
-            return res.send({
+            return res.json({
               status: 200,
               message: "User added successfully",
               token: token
@@ -49,7 +43,7 @@ const addUserController = async (req, res) => {
       );
     } catch (error) {
       console.log(error);
-      return res.send({
+      return res.json({
         status: 500,
         message: "Server error"
       });
@@ -58,24 +52,88 @@ const addUserController = async (req, res) => {
 };
 
 const editProfileController = async (req, res) => {
-  const { name, header, description, tags } = req.body;
-  // console.log(req.body);
+  // log
+  const {
+    name,
+    header,
+    description,
+    tags,
+    isBackgroundPictureSame,
+    isProfilePictureSame
+  } = req.body;
+  // console.log(tags);
+  const profilePicture = req?.files?.profilePicture[0];
+  // console.log(profilePicture);
+  const backgroundPicture = req?.files?.backgroundPicture[0];
+  const email = req.params.email;
+  try {
+    let profilePictureUrl = "";
+    let backgroundPictureUrl = "";
+    if (profilePicture && isProfilePictureSame === "false") {
+      profilePictureUrl = await uploadImage(profilePicture);
+    }
+
+    // console.log(backgroundPictureUrl);
+    if (backgroundPicture && isBackgroundPictureSame === "false") {
+      backgroundPictureUrl = await uploadImage(backgroundPicture);
+    }
+
+    const data = {
+      name: name,
+      header: header,
+      description: description,
+      tags: JSON.parse(tags),
+      followers: 0,
+      following: 0,
+      posts: 0
+    };
+
+    if (isProfilePictureSame === "false") {
+      data.profilePicture = profilePictureUrl;
+    }
+
+    if (isBackgroundPictureSame === "false") {
+      data.backgroundPicture = backgroundPictureUrl;
+    }
+
+    const updatedUser = await User.findOneAndUpdate({ email: email }, data, {
+      upsert: true,
+      new: true
+    });
+    if (!updatedUser) {
+      return res.json({
+        status: 404,
+        message: "User not found"
+      });
+    } else {
+      res.json({
+        status: 200,
+        message: "User updated successfully"
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.json({
+      status: 500,
+      message: "Server error"
+    });
+  }
+};
+
+const editProfilePictureController = async (req, res) => {
+  const profilePicture = req.file;
+  console.log(profilePicture);
   const email = req.body.email;
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { email: email },
+    const profilePictureUrl = await uploadImage(profilePicture);
+    const updatesData = await User.findOneAndUpdate(
+      { email },
       {
-        name: name,
-        header: header,
-        description: description,
-        tags: tags,
-        followers: 0,
-        following: 0,
-        posts: 0
+        profilePicture: profilePictureUrl
       },
       { upsert: true, new: true }
     );
-    if (!updatedUser) {
+    if (!updatesData) {
       return res.send({
         status: 404,
         message: "User not found"
@@ -95,63 +153,29 @@ const editProfileController = async (req, res) => {
   }
 };
 
-const editProfilePictureController = async (req, res) => {
-  const profilePicture = req.file;
-  console.log(profilePicture);
-  const email = req.body.email;
-  try {
-    client.assets
-      .upload("image", profilePicture.buffer)
-      .then(async (imageAsset) => {
-        console.log(imageAsset.url);
-        await User.findOneAndUpdate(
-          { email: email },
-          {
-            profilePicture: imageAsset.url
-          },
-          { upsert: true, new: true }
-        );
-        res.send({
-          status: 200,
-          message: "User updated successfully"
-        });
-      });
-  } catch (error) {
-    console.log(error);
-    res.send({
-      status: 500,
-      message: "Server error"
-    });
-  }
-};
-
 const editBackgroundPictureController = async (req, res) => {
   const backgroundPicture = req.file;
   const email = req.body.email;
   try {
-    client.assets
-      .upload("image", backgroundPicture.buffer)
-      .then(async (imageAsset) => {
-        console.log(imageAsset.url);
-        const updatesData = await User.findOneAndUpdate(
-          { email: email },
-          {
-            backgroundPicture: imageAsset.url
-          },
-          { upsert: true, new: true }
-        );
-        if (!updatesData) {
-          return res.send({
-            status: 404,
-            message: "User not found"
-          });
-        } else {
-          res.send({
-            status: 200,
-            message: "User updated successfully"
-          });
-        }
+    const backgroundPictureUrl = await uploadImage(backgroundPicture);
+    const updatesData = await User.findOneAndUpdate(
+      { email },
+      {
+        backgroundPicture: backgroundPictureUrl
+      },
+      { upsert: true, new: true }
+    );
+    if (!updatesData) {
+      return res.send({
+        status: 404,
+        message: "User not found"
       });
+    } else {
+      res.send({
+        status: 200,
+        message: "User updated successfully"
+      });
+    }
   } catch (error) {
     console.log(error);
     res.send({
