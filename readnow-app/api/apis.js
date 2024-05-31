@@ -130,6 +130,22 @@ export const addAsPrimaryEmail = async (email, primaryEmail) => {
   }
 };
 
+export const changePassword = async (email, password, newPassword) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/profile/change-password/${email}`,
+      {
+        password,
+        newPassword
+      }
+    );
+    console.log(response.data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const editProfilePicture = async (data) => {
   const formData = new FormData();
   console.log(data);

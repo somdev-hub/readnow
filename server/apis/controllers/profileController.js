@@ -354,7 +354,7 @@ const getUserFollowersController = async (req, res) => {
   }
 };
 
-const toggleOtherEmails = async (req, res) => {
+const toggleOtherEmailsController = async (req, res) => {
   const { otherEmail } = req.body;
   const { email } = req.params;
 
@@ -389,7 +389,7 @@ const toggleOtherEmails = async (req, res) => {
   }
 };
 
-const setPrimaryEmail = async (req, res) => {
+const setPrimaryEmailController = async (req, res) => {
   const { otherEmail } = req.body;
   const { email } = req.params;
 
@@ -421,6 +421,38 @@ const setPrimaryEmail = async (req, res) => {
   }
 };
 
+const changePasswordController = async (req, res) => {
+  const { password, newPassword } = req.body;
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      bcrypt.compare(password, user.password, async (error, result) => {
+        if (result) {
+          bcrypt.hash(newPassword, 10, async (error, hash) => {
+            if (error) {
+              console.log(error);
+              return res.json({ message: "Server error" });
+            }
+            await User.updateOne({ email }, { password: hash });
+            return res.json({
+              status: 200,
+              message: "Password changed successfully"
+            });
+          });
+        } else {
+          return res.json({ status: 400, message: "Incorrect password" });
+        }
+      });
+    } else {
+      return res.json({ status: 404, message: "User not found" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.json({ status: 500, message: "Server error" });
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
@@ -432,6 +464,7 @@ module.exports = {
   getProfileGroups,
   getCardProfileInfoController,
   getUserFollowersController,
-  toggleOtherEmails,
-  setPrimaryEmail
+  toggleOtherEmailsController,
+  setPrimaryEmailController,
+  changePasswordController
 };

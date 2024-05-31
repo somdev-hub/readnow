@@ -33,6 +33,14 @@ const Profile = () => {
           }
         },
         {
+          name: "Password",
+          icon: "lock",
+          route: "ChangePassword",
+          param: {
+            email: email
+          }
+        },
+        {
           name: "Subscription",
           icon: "subscriptions"
         }
@@ -43,7 +51,11 @@ const Profile = () => {
       items: [
         {
           name: "News Feed",
-          icon: "rss-feed"
+          icon: "rss-feed",
+          route: "NewsFeedSelection",
+          param: {
+            email: email
+          }
         },
         {
           name: "Language",

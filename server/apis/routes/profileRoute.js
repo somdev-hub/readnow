@@ -28,8 +28,9 @@ const {
   getProfileGroups,
   getCardProfileInfoController,
   getUserFollowersController,
-  toggleOtherEmails,
-  setPrimaryEmail
+  toggleOtherEmailsController,
+  setPrimaryEmailController,
+  changePasswordController
 } = require("../controllers/profileController");
 
 // multer is used for uploading files
@@ -75,8 +76,10 @@ router.get("/get-card-profile-info/:email", getCardProfileInfoController);
 
 router.get("/get-user-followers/:email", getUserFollowersController);
 
-router.post("/toggle-other-email/:email", toggleOtherEmails);
+router.post("/toggle-other-email/:email", toggleOtherEmailsController);
 
-router.post("/set-primary-email/:email", setPrimaryEmail);
+router.post("/set-primary-email/:email", setPrimaryEmailController);
+
+router.post("/change-password/:email", changePasswordController);
 
 module.exports = router;

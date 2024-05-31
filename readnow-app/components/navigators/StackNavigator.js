@@ -70,6 +70,8 @@ import ManageEditors from "../../app/stories/ManageEditors";
 import ManageJournals from "../../app/stories/ManageJournals";
 import ManageSubscribers from "../../app/stories/ManageSubscribers";
 import EditEmail from "../../app/profile/EditEmail";
+import ChangePassword from "../../app/profile/ChangePassword";
+import NewsFeed from "../../app/profile/NewsFeed";
 
 const Stack = createStackNavigator();
 
@@ -495,6 +497,22 @@ const StackNavigator = () => {
         options={{
           headerShown: true,
           headerTitle: "Edit Email"
+        }}
+      />
+      <Stack.Screen
+        name="ChangePassword"
+        component={ChangePassword}
+        options={{
+          headerShown: true,
+          headerTitle: "Change Password"
+        }}
+      />
+      <Stack.Screen
+        name="NewsFeedSelection"
+        component={NewsFeed}
+        options={{
+          headerShown: true,
+          headerTitle: "Select news feed"
         }}
       />
       <Stack.Screen name="Story" component={Story} />
