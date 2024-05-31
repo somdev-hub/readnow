@@ -17,7 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { AntDesign } from "@expo/vector-icons";
 import { login } from "../../api/apis";
 import * as SecureStorage from "expo-secure-store";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, Snackbar } from "react-native-paper";
 import { CommonActions } from "@react-navigation/native";
 import { PRIMARY_COLOR } from "../../styles/colors";
 
@@ -30,6 +30,10 @@ const Login = () => {
   const setFormData = (key, value) => {
     setUserCredentials({ ...userCredentials, [key]: value });
   };
+  const [snackbarVisible, setSnackbarVisible] = useState({
+    visible: false,
+    message: ""
+  });
   const navigator = useNavigation();
   const handleSubmit = () => {
     console.log(userCredentials);
@@ -53,6 +57,12 @@ const Login = () => {
             })
           );
         });
+      } else {
+        setLoading(false);
+        setSnackbarVisible({
+          visible: true,
+          message: "Invalid credentials"
+        });
       }
     });
   };
@@ -65,7 +75,11 @@ const Login = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView
+      style={{
+        flex: 1
+      }}
+    >
       <ScrollView>
         <TouchableOpacity
           onPress={() => navigator.navigate("Signup")}
@@ -256,6 +270,12 @@ const Login = () => {
           </View>
         </View>
       </ScrollView>
+      <Snackbar
+        visible={snackbarVisible.visible}
+        onDismiss={() => setSnackbarVisible({ visible: false, message: "" })}
+      >
+        {snackbarVisible.message}
+      </Snackbar>
     </SafeAreaView>
   );
 };

@@ -102,6 +102,34 @@ export const editProfile = async (userCredentials) => {
   }
 };
 
+export const toggleOtherEmail = async (email, otherEmail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/profile/toggle-other-email/${email}`,
+      {
+        otherEmail
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addAsPrimaryEmail = async (email, primaryEmail) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/profile/set-primary-email/${email}`,
+      {
+        primaryEmail
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const editProfilePicture = async (data) => {
   const formData = new FormData();
   console.log(data);

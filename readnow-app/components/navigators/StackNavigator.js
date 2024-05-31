@@ -177,7 +177,7 @@ const StackNavigator = () => {
   return (
     <Stack.Navigator
       screenOptions={{ headerShown: false }}
-      initialRouteName="EditEmail"
+      initialRouteName="HomeScreen"
     >
       <Stack.Screen name="HomeScreen" component={DrawerNavigator} />
       <Stack.Screen name="NotConnected" component={NotConnected} />

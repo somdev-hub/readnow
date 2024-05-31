@@ -85,7 +85,13 @@ const editProfileController = async (req, res) => {
       tags: JSON.parse(tags),
       followers: 0,
       following: 0,
-      posts: 0
+      posts: 0,
+      otherEmails: [
+        {
+          email: email,
+          isPrimary: true
+        }
+      ]
     };
 
     if (isProfilePictureSame === "false") {
@@ -355,16 +361,22 @@ const toggleOtherEmails = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      if (user.otherEmails.includes(otherEmail)) {
+      if (user.otherEmails.some((e) => e.email === otherEmail)) {
         await User.updateOne(
           { email },
-          { $pull: { otherEmails: otherEmail } },
-          { upsert: true, new: true }
+          { $pull: { otherEmails: { email: otherEmail } } }
         );
       } else {
         await User.updateOne(
           { email },
-          { $addToSet: { otherEmails: otherEmail } },
+          {
+            $addToSet: {
+              otherEmails: {
+                email: otherEmail,
+                isPrimary: false
+              }
+            }
+          },
           { upsert: true, new: true }
         );
       }
@@ -384,20 +396,28 @@ const setPrimaryEmail = async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      await User.updateOne({ email }, { email: otherEmail });
       await User.updateOne(
-        { otherEmail },
-        { $addToSet: { otherEmails: email } },
+        { email },
+        { $set: { "otherEmails.$[elem].isPrimary": true } },
+        { arrayFilters: [{ "elem.email": otherEmail }] }
+      );
+      await User.updateOne(
+        { email },
+        { email: otherEmail },
         { upsert: true, new: true }
       );
-
-      return res.status(200).send("Primary email set");
+      await User.updateOne(
+        { email: otherEmail },
+        { $set: { "otherEmails.$[elem].isPrimary": false } },
+        { arrayFilters: [{ "elem.email": { $ne: otherEmail } }] }
+      );
+      res.status(200).json({ message: "Primary email set successfully" });
     } else {
-      return res.status(404).send("user not found");
+      res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).send("Internal server error");
+    res.status(500).send({ message: "Internal server error" });
   }
 };
 
