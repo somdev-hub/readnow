@@ -29,10 +29,11 @@ const Feeds = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
-  const [myStories, setMyStories] = useState([]);
+  const [myStories, setMyStories] = useState({});
 
   const onRefresh = React.useCallback(() => {
     fetchData();
+    fetchMyStories();
   }, []);
 
   const stories = [
@@ -208,57 +209,52 @@ const Feeds = () => {
               Add Story
             </Text>
           </Pressable>
-          {myStories?.map((item, index) => {
-            return (
-              <Pressable
-                onPress={() => {
-                  navigator.navigate("Story", {
-                    user: item?.name,
-                    image: item?.url,
-                    email: item?.email,
-                    dateTime: item?.dateTime,
-                    profilePicture: item?.profilePicture
-                  });
-                }}
-                style={{
-                  justifyContent: "center",
-                  marginLeft: 10,
-                  alignItems: "center"
-                }}
-                key={index}
-              >
-                <View style={{ width: 65, height: 65 }}>
-                  <Image
-                    source={{
-                      uri: item?.url
-                    }}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: 50,
-                      borderColor: PRIMARY_COLOR,
-                      borderWidth: 2
-                    }}
-                    resizeMode="cover"
-                  />
-                </View>
-                <Text
-                  style={{
-                    fontWeight: "500",
-                    marginTop: 2,
-                    fontSize: 12,
-                    textAlign: "center"
-                  }}
-                >
-                  {item.name.length > 8
-                    ? item.name.slice(0, 8) + "..."
-                    : item.name}
-                </Text>
-              </Pressable>
-            );
-          })}
 
-          {stories.map((item, index) => {
+          {myStories && (
+            <Pressable
+              onPress={() => {
+                navigator.navigate("Story", {
+                  stories: myStories
+                });
+              }}
+              style={{
+                justifyContent: "center",
+                marginLeft: 10,
+                alignItems: "center"
+              }}
+              // key={index}
+            >
+              <View style={{ width: 65, height: 65 }}>
+                <Image
+                  source={{
+                    uri: myStories?.stories[0]?.url
+                  }}
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 50,
+                    borderColor: PRIMARY_COLOR,
+                    borderWidth: 2
+                  }}
+                  resizeMode="cover"
+                />
+              </View>
+              <Text
+                style={{
+                  fontWeight: "500",
+                  marginTop: 2,
+                  fontSize: 12,
+                  textAlign: "center"
+                }}
+              >
+                {myStories?.name?.length > 8
+                  ? myStories?.name?.slice(0, 8) + "..."
+                  : myStories?.name}
+              </Text>
+            </Pressable>
+          )}
+
+          {/* {stories.map((item, index) => {
             return (
               <Pressable
                 onPress={() => {
@@ -303,7 +299,7 @@ const Feeds = () => {
                 </Text>
               </Pressable>
             );
-          })}
+          })} */}
         </ScrollView>
       </View>
       <View>

@@ -488,16 +488,19 @@ const getMyStoriesController = async (req, res) => {
     const user = await User.findOne({ email }).populate("stories");
     if (user) {
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const responseStories = {
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture
+      };
       const latestStories = user.stories
         .filter((story) => story.dateTime > twentyFourHoursAgo)
         .map(({ url, dateTime }) => ({
           url,
-          dateTime,
-          name: user.name,
-          email: user.email,
-          profilePicture: user.profilePicture
+          dateTime
         }));
-      res.status(200).json({ stories: latestStories });
+      responseStories.stories = latestStories;
+      res.status(200).json({ stories: responseStories });
     } else {
       res.status(404).json({ message: "User not found" });
     }

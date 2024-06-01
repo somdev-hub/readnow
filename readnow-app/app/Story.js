@@ -10,20 +10,44 @@ const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
 
 const Story = () => {
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState({
+    progressTimer: 0,
+    progressStory: 0
+  });
   const navigator = useNavigation();
   const route = useRoute();
+  const [currentStory, setCurrentStory] = useState(0);
 
-  const { image, user, email, dateTime, profilePicture } = route.params;
+  const { stories } = route.params;
+  const [currentStoryDateTime, setCurrentStoryDateTime] = useState(
+    new Date(stories?.stories[0]?.dateTime)
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((oldProgress) => {
-        if (oldProgress < 1) {
-          return oldProgress + 0.01; // Increase progress by 1% every 100ms
+        if (oldProgress.progressTimer < 1) {
+          return {
+            progressTimer: oldProgress.progressTimer + 0.01,
+            progressStory: oldProgress.progressStory
+          };
         } else {
-          clearInterval(timer);
-          return 1;
+          if (oldProgress.progressStory < stories?.stories.length - 1) {
+            setCurrentStory(currentStory + 1);
+            setCurrentStoryDateTime(
+              stories?.stories[currentStory + 1]?.dateTime
+            );
+            return {
+              progressTimer: 0,
+              progressStory: oldProgress.progressStory + 1
+            };
+          } else {
+            clearInterval(timer);
+            return {
+              progressTimer: 1,
+              progressStory: oldProgress.progressStory
+            };
+          }
         }
       });
     }, 100);
@@ -32,23 +56,33 @@ const Story = () => {
   }, []);
 
   useEffect(() => {
-    if (progress >= 1) {
+    if (
+      progress.progressTimer >= 1 &&
+      progress.progressStory >= stories?.stories?.length - 1
+    ) {
       navigator.goBack();
     }
   }, [progress]);
   return (
     <SafeAreaView style={{ flex: 1, position: "relative" }}>
-      <Bar
-        progress={progress}
-        width={width}
-        height={5}
-        color="#39A7FF"
-        unfilledColor="#ffffff"
-        borderWidth={0}
-      />
+      <View style={{ flexDirection: "row", gap: 2 }}>
+        {stories?.stories.map((_, index) => {
+          return (
+            <Bar
+              key={index}
+              progress={index === currentStory ? progress.progressTimer : 1}
+              width={width / stories?.stories.length}
+              height={5}
+              color="#39A7FF"
+              unfilledColor="#ffffff"
+              borderWidth={0}
+            />
+          );
+        })}
+      </View>
       <Image
         source={{
-          uri: image
+          uri: stories?.stories[currentStory]?.url
         }}
         height={height}
         width={width}
@@ -82,7 +116,7 @@ const Story = () => {
             >
               <Image
                 source={{
-                  uri: profilePicture
+                  uri: stories?.profilePicture
                 }}
                 style={{
                   width: "100%",
@@ -93,10 +127,10 @@ const Story = () => {
             </View>
             <View>
               <Text style={{ fontWeight: "500", fontSize: 16, color: "white" }}>
-                {route.params.user}
+                {stories?.name}
               </Text>
               <Text style={{ color: "white", marginTop: 1 }}>
-                {new Date(dateTime).toLocaleTimeString()}
+                {new Date(currentStoryDateTime).toLocaleTimeString()}
               </Text>
             </View>
           </View>
