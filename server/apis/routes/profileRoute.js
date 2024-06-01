@@ -30,7 +30,9 @@ const {
   getUserFollowersController,
   toggleOtherEmailsController,
   setPrimaryEmailController,
-  changePasswordController
+  changePasswordController,
+  addStoryController,
+  getMyStoriesController
 } = require("../controllers/profileController");
 
 // multer is used for uploading files
@@ -81,5 +83,9 @@ router.post("/toggle-other-email/:email", toggleOtherEmailsController);
 router.post("/set-primary-email/:email", setPrimaryEmailController);
 
 router.post("/change-password/:email", changePasswordController);
+
+router.post("/add-story/:email", upload.single("story"), addStoryController);
+
+router.get("/get-my-stories/:email", getMyStoriesController);
 
 module.exports = router;

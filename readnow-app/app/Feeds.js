@@ -14,6 +14,7 @@ import { Entypo } from "@expo/vector-icons";
 import {
   addBookmark,
   getFeeds,
+  getMyStories,
   getProfile,
   getShortProfileInfo
 } from "../api/apis";
@@ -28,47 +29,12 @@ const Feeds = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
-
-  const onToggleSnackBar = () => setVisible(!visible);
-
-  const onDismissSnackBar = () => setVisible(true);
+  const [myStories, setMyStories] = useState([]);
 
   const onRefresh = React.useCallback(() => {
     fetchData();
   }, []);
 
-  const posts = [
-    {
-      user: "John Doe",
-      header: "Content writer",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam voluptatum, quod, quae quia voluptates, quibusdam voluptas voluptate doloribus quos officiis natus? Quisquam, quod, quae quia voluptates, quibusdam voluptas voluptate doloribus quos officiis natus?",
-      image:
-        "https://images.pexels.com/photos/2850290/pexels-photo-2850290.jpeg?cs=srgb&dl=pexels-brett-sayles-2850290.jpg&fm=jpg",
-      likes: 110,
-      comments: 30
-    },
-    {
-      user: "John Doe",
-      header: "Content writer",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam voluptatum, quod, quae quia voluptates, quibusdam voluptas voluptate doloribus quos officiis natus? Quisquam, quod, quae quia voluptates, quibusdam voluptas voluptate doloribus quos officiis natus?",
-      image:
-        "https://images.pexels.com/photos/2850290/pexels-photo-2850290.jpeg?cs=srgb&dl=pexels-brett-sayles-2850290.jpg&fm=jpg",
-      likes: 110,
-      comments: 30
-    },
-    {
-      user: "John Doe",
-      header: "Content writer",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam voluptatum, quod, quae quia voluptates, quibusdam voluptas voluptate doloribus quos officiis natus? Quisquam, quod, quae quia voluptates, quibusdam voluptas voluptate doloribus quos officiis natus?",
-      image:
-        "https://images.pexels.com/photos/2850290/pexels-photo-2850290.jpeg?cs=srgb&dl=pexels-brett-sayles-2850290.jpg&fm=jpg",
-      likes: 110,
-      comments: 30
-    }
-  ];
   const stories = [
     {
       user: "John Doe",
@@ -118,11 +84,11 @@ const Feeds = () => {
       console.log(data);
     });
     dispatch({
-      type:"notify/addBookmark",
-      payload:{
-        addToBookmark:true
+      type: "notify/addBookmark",
+      payload: {
+        addToBookmark: true
       }
-    })
+    });
   };
 
   const optionsContent = [
@@ -175,8 +141,16 @@ const Feeds = () => {
     setFeeds(feedsWithProfile);
     setRefreshing(false);
   };
+
+  const fetchMyStories = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    const response = await getMyStories(email);
+    setMyStories(response?.stories);
+  };
+
   useEffect(() => {
     fetchData();
+    fetchMyStories();
   }, []);
   return (
     <ScrollView
@@ -205,10 +179,7 @@ const Feeds = () => {
         >
           <Pressable
             onPress={() => {
-              navigator.navigate("Story", {
-                user: item.user,
-                image: item.image
-              });
+              navigator.navigate("AddStory");
             }}
             style={{ justifyContent: "center", marginLeft: 10 }}
           >
@@ -237,6 +208,55 @@ const Feeds = () => {
               Add Story
             </Text>
           </Pressable>
+          {myStories?.map((item, index) => {
+            return (
+              <Pressable
+                onPress={() => {
+                  navigator.navigate("Story", {
+                    user: item?.name,
+                    image: item?.url,
+                    email: item?.email,
+                    dateTime: item?.dateTime,
+                    profilePicture: item?.profilePicture
+                  });
+                }}
+                style={{
+                  justifyContent: "center",
+                  marginLeft: 10,
+                  alignItems: "center"
+                }}
+                key={index}
+              >
+                <View style={{ width: 65, height: 65 }}>
+                  <Image
+                    source={{
+                      uri: item?.url
+                    }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: 50,
+                      borderColor: PRIMARY_COLOR,
+                      borderWidth: 2
+                    }}
+                    resizeMode="cover"
+                  />
+                </View>
+                <Text
+                  style={{
+                    fontWeight: "500",
+                    marginTop: 2,
+                    fontSize: 12,
+                    textAlign: "center"
+                  }}
+                >
+                  {item.name.length > 8
+                    ? item.name.slice(0, 8) + "..."
+                    : item.name}
+                </Text>
+              </Pressable>
+            );
+          })}
 
           {stories.map((item, index) => {
             return (

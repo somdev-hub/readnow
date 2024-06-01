@@ -15,7 +15,8 @@ const userSchema = new mongoose.Schema({
   groups: Array,
   notifications: Array,
   publishers: Array,
-  otherEmails: Array
+  otherEmails: Array,
+  stories: Array,
 });
 
 const User = mongoose.model("User", userSchema);

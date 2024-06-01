@@ -72,6 +72,10 @@ import ManageSubscribers from "../../app/stories/ManageSubscribers";
 import EditEmail from "../../app/profile/EditEmail";
 import ChangePassword from "../../app/profile/ChangePassword";
 import NewsFeed from "../../app/profile/NewsFeed";
+import SelectLanguage from "../../app/profile/SelectLanguage";
+import AddStory from "../../app/AddStory";
+import AddCameraStory from "../../app/AddCameraStory";
+import EditStory from "../../app/EditStory";
 
 const Stack = createStackNavigator();
 
@@ -515,12 +519,42 @@ const StackNavigator = () => {
           headerTitle: "Select news feed"
         }}
       />
+      <Stack.Screen
+        name="SelectLanguage"
+        component={SelectLanguage}
+        options={{
+          headerShown: true,
+          headerTitle: "Select language"
+        }}
+      />
       <Stack.Screen name="Story" component={Story} />
       <Stack.Screen
         name="AddInfo"
         component={AddInfo}
         options={{
           headerShown: true
+        }}
+      />
+      <Stack.Screen
+        name="AddStory"
+        component={AddStory}
+        options={{
+          headerShown: true,
+          headerTitle: "Add Story"
+        }}
+      />
+      <Stack.Screen
+        name="AddCameraStory"
+        component={AddCameraStory}
+        options={{
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="EditStory"
+        component={EditStory}
+        options={{
+          headerShown: false
         }}
       />
       <Stack.Screen

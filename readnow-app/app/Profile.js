@@ -59,7 +59,11 @@ const Profile = () => {
         },
         {
           name: "Language",
-          icon: "language"
+          icon: "language",
+          route: "SelectLanguage",
+          param: {
+            email: email
+          }
         },
         {
           name: "Country",

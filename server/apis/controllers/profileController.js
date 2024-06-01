@@ -453,6 +453,60 @@ const changePasswordController = async (req, res) => {
   }
 };
 
+const addStoryController = async (req, res) => {
+  const { email } = req.params;
+  const story = req?.file;
+  // console.log(story);
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      const storyUrl = await uploadImage(story);
+      await User.updateOne(
+        { email },
+        {
+          $push: {
+            stories: {
+              url: storyUrl,
+              dateTime: new Date()
+            }
+          }
+        }
+      );
+      res.status(200).json({ message: "Story added successfully" });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+const getMyStoriesController = async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email }).populate("stories");
+    if (user) {
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const latestStories = user.stories
+        .filter((story) => story.dateTime > twentyFourHoursAgo)
+        .map(({ url, dateTime }) => ({
+          url,
+          dateTime,
+          name: user.name,
+          email: user.email,
+          profilePicture: user.profilePicture
+        }));
+      res.status(200).json({ stories: latestStories });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
@@ -466,5 +520,7 @@ module.exports = {
   getUserFollowersController,
   toggleOtherEmailsController,
   setPrimaryEmailController,
-  changePasswordController
+  changePasswordController,
+  addStoryController,
+  getMyStoriesController
 };

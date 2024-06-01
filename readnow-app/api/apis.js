@@ -1088,3 +1088,37 @@ export const deletePublisher = async (publisherId) => {
     console.log(error);
   }
 };
+
+export const addStory = async (email, story) => {
+  const formData = new FormData();
+  formData.append("story", {
+    uri: story,
+    name: "story.jpg",
+    type: "image/jpg"
+  });
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/profile/add-story/${email}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getMyStories = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/profile/get-my-stories/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

@@ -2,17 +2,20 @@ import { View, Text, Image, Dimensions } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
-// import { ProgressView } from "@react-native-community/progress-view";
 import { Bar } from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
+
 const Story = () => {
   const [progress, setProgress] = useState(0);
   const navigator = useNavigation();
   const route = useRoute();
+
+  const { image, user, email, dateTime, profilePicture } = route.params;
+
   useEffect(() => {
     const timer = setInterval(() => {
       setProgress((oldProgress) => {
@@ -45,7 +48,7 @@ const Story = () => {
       />
       <Image
         source={{
-          uri: route.params.image
+          uri: image
         }}
         height={height}
         width={width}
@@ -77,14 +80,23 @@ const Story = () => {
                 backgroundColor: "#eeeeee"
               }}
             >
-              <Image />
+              <Image
+                source={{
+                  uri: profilePicture
+                }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: 50
+                }}
+              />
             </View>
             <View>
               <Text style={{ fontWeight: "500", fontSize: 16, color: "white" }}>
                 {route.params.user}
               </Text>
               <Text style={{ color: "white", marginTop: 1 }}>
-                23 minutes ago
+                {new Date(dateTime).toLocaleTimeString()}
               </Text>
             </View>
           </View>
