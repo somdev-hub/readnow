@@ -32,7 +32,9 @@ const {
   setPrimaryEmailController,
   changePasswordController,
   addStoryController,
-  getMyStoriesController
+  getMyStoriesController,
+  getFollowingStoriesController,
+  addStoryViewCountController
 } = require("../controllers/profileController");
 
 // multer is used for uploading files
@@ -87,5 +89,9 @@ router.post("/change-password/:email", changePasswordController);
 router.post("/add-story/:email", upload.single("story"), addStoryController);
 
 router.get("/get-my-stories/:email", getMyStoriesController);
+
+router.get("/get-following-stories/:email", getFollowingStoriesController);
+
+router.post("/add-story-view/:email", addStoryViewCountController);
 
 module.exports = router;

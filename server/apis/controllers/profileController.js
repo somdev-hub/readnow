@@ -467,7 +467,10 @@ const addStoryController = async (req, res) => {
           $push: {
             stories: {
               url: storyUrl,
-              dateTime: new Date()
+              dateTime: new Date(),
+              id: user.stories.length + 1,
+              views: 0,
+              viewedBy: []
             }
           }
         }
@@ -488,19 +491,107 @@ const getMyStoriesController = async (req, res) => {
     const user = await User.findOne({ email }).populate("stories");
     if (user) {
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const latestStories = user.stories
+        .filter((story) => story.dateTime > twentyFourHoursAgo)
+        .map(async ({ id, url, dateTime, views, viewedBy }) => {
+          const viewedByUsers = await User.find({ email: { $in: viewedBy } });
+          const viewedByData = viewedByUsers.map(
+            ({ name, profilePicture }) => ({
+              name,
+              profilePicture
+            })
+          );
+          return {
+            id,
+            url,
+            dateTime,
+            views,
+            viewedBy: viewedByData
+          };
+        });
+      if (latestStories.length === 0) {
+        return res.status(404).json({ message: "No stories found" });
+      }
       const responseStories = {
         name: user.name,
         email: user.email,
-        profilePicture: user.profilePicture
+        profilePicture: user.profilePicture,
+        stories: await Promise.all(latestStories)
       };
-      const latestStories = user.stories
-        .filter((story) => story.dateTime > twentyFourHoursAgo)
-        .map(({ url, dateTime }) => ({
-          url,
-          dateTime
-        }));
-      responseStories.stories = latestStories;
-      res.status(200).json({ stories: responseStories });
+      return res.status(200).json({ stories: responseStories });
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal Server Error");
+  }
+};
+
+const getFollowingStoriesController = async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email }).populate("following");
+    if (user) {
+      const followingStories = await Promise.all(
+        user.following.map(async (following) => {
+          const followingUser = await User.findOne({ email: following });
+          const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+          const storiesWithin24Hours = followingUser?.stories.filter(
+            (story) => story.dateTime > twentyFourHoursAgo
+          );
+          if (storiesWithin24Hours.length !== 0) {
+            return {
+              name: followingUser.name,
+              email: followingUser.email,
+              profilePicture: followingUser.profilePicture,
+              stories: storiesWithin24Hours
+            };
+          } else {
+            return null;
+          }
+        })
+      );
+
+      const filteredStories = followingStories.filter(
+        (story) => story !== null
+      );
+      const sortedStories = filteredStories.sort(
+        (a, b) => b.dateTime - a.dateTime
+      );
+      res.status(200).json({ stories: sortedStories });
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
+const addStoryViewCountController = async (req, res) => {
+  const { storyUserEmail, storyId } = req.body;
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({ email: storyUserEmail });
+    if (user) {
+      const story = user.stories.find((story) => story.id === storyId);
+      if (story) {
+        if (!story.viewedBy.includes(email)) {
+          await User.updateOne(
+            { email: storyUserEmail, "stories.id": storyId },
+            {
+              $inc: { "stories.$.views": 1 },
+              $push: { "stories.$.viewedBy": email }
+            }
+          );
+          res.status(200).json({ message: "View count updated successfully" });
+        } else {
+          res.status(200).json({ message: "View count already updated" });
+        }
+      } else {
+        res.status(404).json({ message: "Story not found" });
+      }
     } else {
       res.status(404).json({ message: "User not found" });
     }
@@ -525,5 +616,7 @@ module.exports = {
   setPrimaryEmailController,
   changePasswordController,
   addStoryController,
-  getMyStoriesController
+  getMyStoriesController,
+  getFollowingStoriesController,
+  addStoryViewCountController
 };

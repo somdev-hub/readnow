@@ -14,6 +14,7 @@ import { Entypo } from "@expo/vector-icons";
 import {
   addBookmark,
   getFeeds,
+  getFollowingStories,
   getMyStories,
   getProfile,
   getShortProfileInfo
@@ -29,55 +30,14 @@ const Feeds = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
-  const [myStories, setMyStories] = useState({});
+  const [myStories, setMyStories] = useState(null);
+  const [followingStories, setFollowingStories] = useState([]);
 
   const onRefresh = React.useCallback(() => {
     fetchData();
     fetchMyStories();
   }, []);
 
-  const stories = [
-    {
-      user: "John Doe",
-      image:
-        "https://media.istockphoto.com/id/1392896428/photo/inspirational-quote.jpg?s=612x612&w=0&k=20&c=CbqPLlx65768zd6QQpJqo55MZIAhA_o68cS0nLIfjw0="
-    },
-    {
-      user: "Jessica Jones",
-      image:
-        "https://hips.hearstapps.com/hmg-prod/images/inspirational-quote-booker-washington-1658173567.png?crop=1xw:1xh;center,top&resize=980:*"
-    },
-    {
-      user: "Mark Smith",
-      image:
-        "https://i.pinimg.com/736x/44/c5/45/44c545eb4f49d3f81377fe5df7c422fd.jpg"
-    },
-    {
-      user: "Rahul Kumar",
-      image:
-        "https://img.picturequotes.com/2/112/111846/you-cant-get-a-job-without-experience-and-you-cant-get-experience-until-you-have-a-job-once-you-quote-1.jpg"
-    },
-    {
-      user: "Riya Sharma",
-      image:
-        "https://images.unsplash.com/photo-1606607291535-b0adfbf7424f?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cXVvdGVzfGVufDB8fDB8fHww"
-    },
-    {
-      user: "Jonny Roi",
-      image:
-        "https://ih1.redbubble.net/image.2111257042.4771/gbra,8x10,1000x1000-c,0,0,675,900.jpg"
-    },
-    {
-      user: "Alice Lee",
-      image:
-        "https://hips.hearstapps.com/hmg-prod/images/best-friend-quotes5-1658714864.jpg"
-    },
-    {
-      user: "Bob Marley",
-      image:
-        "https://i.pinimg.com/736x/24/54/01/2454011963c028872ef467f41257aeb9.jpg"
-    }
-  ];
   const addToBookmark = async (feedId) => {
     const userMail = await SecureStorage.getItemAsync("email");
     console.log(feedId);
@@ -145,13 +105,24 @@ const Feeds = () => {
 
   const fetchMyStories = async () => {
     const email = await SecureStorage.getItemAsync("email");
-    const response = await getMyStories(email);
-    setMyStories(response?.stories);
+    if (email) {
+      const response = await getMyStories(email);
+      setMyStories(response?.stories);
+    }
+  };
+
+  const fetchFollowingStories = async () => {
+    const email = await SecureStorage.getItemAsync("email");
+    if (email) {
+      const response = await getFollowingStories(email);
+      setFollowingStories(response?.stories);
+    }
   };
 
   useEffect(() => {
     fetchData();
     fetchMyStories();
+    fetchFollowingStories();
   }, []);
   return (
     <ScrollView
@@ -214,7 +185,8 @@ const Feeds = () => {
             <Pressable
               onPress={() => {
                 navigator.navigate("Story", {
-                  stories: myStories
+                  stories: myStories,
+                  admin: true
                 });
               }}
               style={{
@@ -222,7 +194,6 @@ const Feeds = () => {
                 marginLeft: 10,
                 alignItems: "center"
               }}
-              // key={index}
             >
               <View style={{ width: 65, height: 65 }}>
                 <Image
@@ -254,13 +225,13 @@ const Feeds = () => {
             </Pressable>
           )}
 
-          {/* {stories.map((item, index) => {
+          {followingStories?.map((item, index) => {
             return (
               <Pressable
                 onPress={() => {
                   navigator.navigate("Story", {
-                    user: item.user,
-                    image: item.image
+                    stories: item,
+                    admin: false
                   });
                 }}
                 style={{
@@ -273,7 +244,7 @@ const Feeds = () => {
                 <View style={{ width: 65, height: 65 }}>
                   <Image
                     source={{
-                      uri: item.image
+                      uri: item?.stories[0]?.url
                     }}
                     style={{
                       width: "100%",
@@ -293,13 +264,14 @@ const Feeds = () => {
                     textAlign: "center"
                   }}
                 >
-                  {item.user.length > 8
-                    ? item.user.slice(0, 8) + "..."
-                    : item.user}
+                  {item?.name?.length > 8
+                    ? item?.name?.slice(0, 8) + "..."
+                    : item?.name}
                 </Text>
               </Pressable>
             );
-          })} */}
+          })}
+
         </ScrollView>
       </View>
       <View>

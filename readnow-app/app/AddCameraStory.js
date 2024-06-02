@@ -27,7 +27,7 @@ const AddCameraStory = () => {
     if (this.camera) {
       const photo = await this.camera.takePictureAsync();
       setCapturedImage(photo);
-      navigator.navigate("EditStory", { story: photo });
+      navigator.navigate("EditStory", { story: photo?.uri });
     }
   };
   return (

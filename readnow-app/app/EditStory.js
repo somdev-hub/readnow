@@ -14,7 +14,7 @@ const EditStory = () => {
 
   const postStory = async () => {
     const email = await SecureStorage.getItemAsync("email");
-    const response = await addStory(email, story?.uri);
+    const response = await addStory(email, story);
     if (response.status === 200) {
       navigator.navigate("HomeScreen");
     }
@@ -65,7 +65,7 @@ const EditStory = () => {
         </Pressable>
       </View>
       <Image
-        source={{ uri: story?.uri }}
+        source={{ uri: story }}
         style={{ width: "100%", height: "100%" }}
       />
       {/* <SketchCanvas style={{ flex: 1 }} strokeColor={"red"} strokeWidth={7} /> */}

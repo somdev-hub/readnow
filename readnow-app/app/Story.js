@@ -1,10 +1,14 @@
-import { View, Text, Image, Dimensions } from "react-native";
+import { View, Text, Image, Dimensions, Pressable } from "react-native";
 import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Entypo } from "@expo/vector-icons";
 import { Bar } from "react-native-progress";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
+import { WHITE_COLOR } from "../styles/colors";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { addStoryView } from "../api/apis";
+import * as SecureStorage from "expo-secure-store";
 
 const height = Dimensions.get("window").height;
 const width = Dimensions.get("window").width;
@@ -18,10 +22,12 @@ const Story = () => {
   const route = useRoute();
   const [currentStory, setCurrentStory] = useState(0);
 
-  const { stories } = route.params;
+  const { stories, admin } = route.params;
   const [currentStoryDateTime, setCurrentStoryDateTime] = useState(
     new Date(stories?.stories[0]?.dateTime)
   );
+  const bottomSheetRef = React.useRef(null);
+  const open = React.useCallback(() => bottomSheetRef.current?.expand(), []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -33,10 +39,10 @@ const Story = () => {
           };
         } else {
           if (oldProgress.progressStory < stories?.stories.length - 1) {
-            setCurrentStory(currentStory + 1);
             setCurrentStoryDateTime(
-              stories?.stories[currentStory + 1]?.dateTime
+              stories?.stories[oldProgress.progressStory + 1]?.dateTime
             );
+            setCurrentStory(oldProgress.progressStory + 1);
             return {
               progressTimer: 0,
               progressStory: oldProgress.progressStory + 1
@@ -56,6 +62,22 @@ const Story = () => {
   }, []);
 
   useEffect(() => {
+    const makeViewed = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      const response = await addStoryView(
+        email,
+        stories?.email,
+        stories?.stories[currentStory]?.id
+      );
+      console.log(response);
+    };
+
+    {
+      !admin && makeViewed();
+    }
+  }, [currentStory]);
+
+  useEffect(() => {
     if (
       progress.progressTimer >= 1 &&
       progress.progressStory >= stories?.stories?.length - 1
@@ -63,6 +85,7 @@ const Story = () => {
       navigator.goBack();
     }
   }, [progress]);
+
   return (
     <SafeAreaView style={{ flex: 1, position: "relative" }}>
       <View style={{ flexDirection: "row", gap: 2 }}>
@@ -139,6 +162,109 @@ const Story = () => {
           </View>
         </View>
       </View>
+
+      {admin && (
+        <>
+          <View
+            style={{
+              position: "absolute",
+              bottom: 20,
+              left: 20
+            }}
+          >
+            <Pressable
+              onPress={() => {
+                open();
+              }}
+              style={{
+                backgroundColor: WHITE_COLOR,
+                // width: 80,
+                height: 40,
+                borderRadius: 50,
+                flexDirection: "row",
+                gap: 7,
+                paddingHorizontal: 10,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "500",
+                  fontSize: 12
+                }}
+              >
+                {stories?.stories[currentStory]?.views} Views
+              </Text>
+              <Entypo name="chevron-up" size={18} color="black" />
+            </Pressable>
+          </View>
+
+          <BottomSheet
+            enableContentPanningGesture={false}
+            ref={bottomSheetRef}
+            index={-1}
+            snapPoints={[height * 0.5, height * 0.7]}
+            enablePanDownToClose={true}
+            style={{
+              backgroundColor: WHITE_COLOR,
+              borderTopLeftRadius: 50,
+              borderTopRightRadius: 50,
+              elevation: 15
+            }}
+          >
+            <View
+              style={{
+                paddingHorizontal: 20,
+                paddingVertical: 20
+              }}
+            >
+              <Text
+                style={{
+                  fontWeight: "500"
+                }}
+              >
+                People who viewed your story
+              </Text>
+              <View
+                style={{
+                  marginTop: 20
+                }}
+              >
+                {stories?.stories[currentStory]?.viewedBy?.map(
+                  (view, index) => {
+                    return (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          gap: 15,
+                          alignItems: "center",
+                          marginBottom: 10
+                        }}
+                        key={index}
+                      >
+                        <Image
+                          source={{
+                            uri: view?.profilePicture
+                          }}
+                          style={{ width: 40, height: 40, borderRadius: 50 }}
+                        />
+                        <Text
+                          style={{
+                            fontWeight: "500"
+                          }}
+                        >
+                          {view?.name}
+                        </Text>
+                      </View>
+                    );
+                  }
+                )}
+              </View>
+            </View>
+          </BottomSheet>
+        </>
+      )}
     </SafeAreaView>
   );
 };

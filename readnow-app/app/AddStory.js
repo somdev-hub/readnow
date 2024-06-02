@@ -88,14 +88,19 @@ const AddStory = () => {
           </View>
           {assets?.map((link, index) => {
             return (
-              <View key={index}>
+              <Pressable
+                onPress={() => {
+                  navigator.navigate("EditStory", { story: link?.uri });
+                }}
+                key={index}
+              >
                 <Image
                   source={{
                     uri: link?.uri
                   }}
                   style={{ width: width / 3, height: 220 }}
                 />
-              </View>
+              </Pressable>
             );
           })}
         </View>

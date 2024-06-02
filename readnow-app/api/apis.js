@@ -1122,3 +1122,29 @@ export const getMyStories = async (email) => {
     console.log(error);
   }
 };
+
+export const getFollowingStories = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/profile/get-following-stories/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addStoryView = async (email, storyUserEmail, storyId) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/profile/add-story-view/${email}`,
+      {
+        storyUserEmail,
+        storyId
+      }
+    );
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};

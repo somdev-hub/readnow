@@ -416,7 +416,6 @@ const ViewGroupInfo = () => {
         index={-1}
         snapPoints={[height * 0.5, height * 0.9]}
         enablePanDownToClose={true}
-        // onChange={handleSheetChanges}
         style={{
           backgroundColor: WHITE_COLOR,
           borderTopLeftRadius: 50,

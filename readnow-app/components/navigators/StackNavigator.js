@@ -117,7 +117,7 @@ const StackNavigator = () => {
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
       if (!state.isConnected) {
-        navigator.dispatch(
+        navigator?.dispatch(
           CommonActions.reset({
             index: 0,
             routes: [{ name: "NotConnected" }]
@@ -135,7 +135,7 @@ const StackNavigator = () => {
                 if (response.status != 200) {
                   SecureStorage.deleteItemAsync("token");
                   SecureStorage.deleteItemAsync("email");
-                  navigator.dispatch(
+                  navigator?.dispatch(
                     CommonActions.reset({
                       index: 0,
                       routes: [{ name: "Welcome" }]
@@ -147,7 +147,7 @@ const StackNavigator = () => {
                 console.log(error);
               });
           } else {
-            navigator.dispatch(
+            navigator?.dispatch(
               CommonActions.reset({
                 index: 0,
                 routes: [{ name: "Welcome" }]
