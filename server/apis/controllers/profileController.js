@@ -192,8 +192,8 @@ const editBackgroundPictureController = async (req, res) => {
 };
 
 const getProfileController = async (req, res) => {
-  const { email } = req.body;
-  console.log(req.body);
+  const { email } = req.params;
+  // console.log(req.body);
   try {
     const userData = await User.findOne({ email: email });
     const response = await axios.get(
@@ -207,20 +207,60 @@ const getProfileController = async (req, res) => {
       };
     });
 
+    const storiesDataDateWise = await userData.stories.reduce(
+      async (accPromise, story) => {
+        const acc = await accPromise;
+        const date = new Date(story.dateTime).toDateString();
+        const viewedBy = await Promise.all(
+          story.viewedBy.map(async (email) => {
+            const user = await User.findOne({ email });
+            return {
+              name: user.name,
+              profilePicture: user.profilePicture
+            };
+          })
+        );
+
+        if (acc[date]) {
+          acc[date].push({ ...story, viewedBy });
+        } else {
+          acc[date] = [{ ...story, viewedBy }];
+        }
+
+        return acc;
+      },
+      Promise.resolve({})
+    );
+
+    const responseObj = {
+      data: {
+        userData: {
+          name: userData.name,
+          email: userData.email,
+          profilePicture: userData.profilePicture,
+          description: userData.description,
+          header: userData.header,
+          backgroundPicture: userData.backgroundPicture,
+          tags: userData.tags,
+          followers: userData.followers,
+          following: userData.following,
+          otherEmails: userData.otherEmails,
+          notifications: userData.Notifications,
+          groups: userData.groups,
+          publishers: userData.publishers
+        },
+        postData: posts,
+        storiesData: storiesDataDateWise
+      }
+    };
+
     if (!userData) {
       return res.send({
         status: 404,
         message: "User not found"
       });
     } else {
-      res.send({
-        status: 200,
-        message: "User found",
-        data: {
-          userData: userData,
-          postData: posts
-        }
-      });
+      res.status(200).send(responseObj);
       // console.log(userData);
     }
   } catch (error) {
@@ -601,6 +641,23 @@ const addStoryViewCountController = async (req, res) => {
   }
 };
 
+const getAllStroiesController = async (req, res) => {
+  const { email } = req.params;
+  try {
+    const user = await User.findOne({
+      email
+    }).populate("stories");
+    if (user) {
+      return res.status(200).json({ stories: user.stories });
+    } else {
+      return res.status(404).json({ message: "User not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   addUserController,
   editProfileController,
@@ -618,5 +675,6 @@ module.exports = {
   addStoryController,
   getMyStoriesController,
   getFollowingStoriesController,
-  addStoryViewCountController
+  addStoryViewCountController,
+  getAllStroiesController
 };

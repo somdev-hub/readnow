@@ -34,7 +34,8 @@ const {
   addStoryController,
   getMyStoriesController,
   getFollowingStoriesController,
-  addStoryViewCountController
+  addStoryViewCountController,
+  getAllStroiesController
 } = require("../controllers/profileController");
 
 // multer is used for uploading files
@@ -68,7 +69,7 @@ router.post(
   editBackgroundPictureController
 );
 // hit this route to get profile
-router.post("/get-profile", getProfileController);
+router.get("/get-profile/:email", getProfileController);
 // hit this route to get short profile info
 router.post("/get-short-profile-info", getShortProfileInfoController);
 // hit this route to follow
@@ -93,5 +94,7 @@ router.get("/get-my-stories/:email", getMyStoriesController);
 router.get("/get-following-stories/:email", getFollowingStoriesController);
 
 router.post("/add-story-view/:email", addStoryViewCountController);
+
+router.get("/get-all-stories/:email", getAllStroiesController);
 
 module.exports = router;

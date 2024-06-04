@@ -197,10 +197,8 @@ export const decodeUser = async (token) => {
 };
 
 export const getProfile = async (email) => {
-  console.log(email);
-  const response = await axios.post(`${ADDRESS}/profile/get-profile`, {
-    email: email
-  });
+  // console.log(email);
+  const response = await axios.get(`${ADDRESS}/profile/get-profile/${email}`);
   return response.data;
 };
 
@@ -1144,6 +1142,17 @@ export const addStoryView = async (email, storyUserEmail, storyId) => {
       }
     );
     return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getAllStories = async (email) => {
+  try {
+    const response = await axios.get(
+      `${ADDRESS}/profile/get-all-stories/${email}`
+    );
+    return response.data;
   } catch (error) {
     console.log(error);
   }
