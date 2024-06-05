@@ -26,9 +26,9 @@ const DrawerContent = () => {
       route: "Events"
     },
     {
-      name: "Stories",
+      name: "Editorials",
       icon: "bulb1",
-      route: "Stories"
+      route: "Editorials"
     }
   ];
   const navigator = useNavigation();
@@ -50,43 +50,43 @@ const DrawerContent = () => {
               console.log("pressed");
             }}
           > */}
+          <View
+            style={{
+              backgroundColor: PRIMARY_COLOR,
+              padding: 15,
+              borderRadius: 20,
+              flexDirection: "row",
+              // gap: 10,
+              justifyContent: "space-between",
+              alignItems: "center"
+            }}
+          >
             <View
               style={{
-                backgroundColor: PRIMARY_COLOR,
-                padding: 15,
-                borderRadius: 20,
                 flexDirection: "row",
-                // gap: 10,
-                justifyContent: "space-between",
-                alignItems: "center"
+                alignItems: "center",
+                gap: 10
               }}
             >
               <View
                 style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 10
+                  width: 50,
+                  height: 50,
+                  borderRadius: 10,
+                  backgroundColor: "#eeeeee"
                 }}
               >
-                <View
-                  style={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: 10,
-                    backgroundColor: "#eeeeee"
-                  }}
-                >
-                  <Image />
-                </View>
-                <View style={{ gap: 5 }}>
-                  <Text style={{ color: "white", fontWeight: "bold" }}>
-                    Upgrade Now
-                  </Text>
-                  <Text style={{ color: "white" }}>Just at Rs. 499/-</Text>
-                </View>
+                <Image />
               </View>
-              <FontAwesome name="angle-right" size={24} color="white" />
+              <View style={{ gap: 5 }}>
+                <Text style={{ color: "white", fontWeight: "bold" }}>
+                  Upgrade Now
+                </Text>
+                <Text style={{ color: "white" }}>Just at Rs. 499/-</Text>
+              </View>
             </View>
+            <FontAwesome name="angle-right" size={24} color="white" />
+          </View>
           {/* </TouchableRipple> */}
           <View style={{ marginTop: 30, gap: 30, marginHorizontal: 10 }}>
             <Pressable

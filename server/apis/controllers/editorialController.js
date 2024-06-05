@@ -789,6 +789,35 @@ const deletePublisherController = async (req, res) => {
   }
 };
 
+const searchPublishersController = async (req, res) => {
+  const { query } = req.body;
+  const { email } = req.params;
+  try {
+    const publishers = await Publisher.find({
+      publisherName: { $regex: query, $options: "i" }
+    }).select(
+      "publisherName publisherImage publisherCoverImage publisherCategory publisherManager publisherTags publisherSubscribers"
+    );
+
+    if (publishers.length === 0)
+      return res.status(404).json("No publishers found");
+
+    const publishersWithSubscriptionStatus = publishers.map((publisher) => {
+      const { publisherSubscribers, ...otherProps } = publisher._doc;
+      return {
+        ...otherProps,
+        subscribed: publisherSubscribers.includes(email)
+      };
+    });
+
+    return res
+      .status(200)
+      .json({ publishers: publishersWithSubscriptionStatus });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 module.exports = {
   addPublisherController,
   getPublishersController,
@@ -809,5 +838,6 @@ module.exports = {
   editJournalController,
   deleteJournalController,
   removeSubscriberController,
-  deletePublisherController
+  deletePublisherController,
+  searchPublishersController
 };

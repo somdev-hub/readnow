@@ -495,6 +495,21 @@ const removeMemberController = async (req, res) => {
     res.status(500).send("An error occurred while updating the group");
   }
 };
+
+const handleSearchGroupController = async (req, res) => {
+  const { query } = req.body;
+  try {
+    const groups = await Group.find({
+      groupName: { $regex: query, $options: "i" }
+    }).select("groupImage groupCoverImage groupName groupMembers");
+    if (!groups) return res.status(404).send("No groups found");
+    res.status(200).json(groups);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("An error occurred while fetching the groups");
+  }
+};
+
 module.exports = {
   createGroupController,
   editGroupInfoController,
@@ -512,5 +527,6 @@ module.exports = {
   commentGroupPostController,
   addGroupAdminController,
   removeAdminController,
-  removeMemberController
+  removeMemberController,
+  handleSearchGroupController
 };

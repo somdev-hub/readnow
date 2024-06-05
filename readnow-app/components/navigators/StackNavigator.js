@@ -52,23 +52,23 @@ import GroupAdminPage from "../../app/groups/GroupAdminPage";
 import ManageGroupAdmins from "../../app/groups/ManageGroupAdmins";
 import ManageGroupMembers from "../../app/groups/ManageGroupMembers";
 import StoriesTopNavigator from "./StoriesTopNavigator";
-import PublisherInfo from "../../app/stories/PublisherInfo";
-import Journal from "../../app/stories/Journal";
-import JournalComments from "../../app/stories/JournalComments";
-import ManagePublisher from "../../app/stories/ManagePublisher";
-import CreatePublisher from "../../app/stories/CreatePublisher";
-import PublisherAdmin from "../../app/stories/PublisherAdmin";
-import CreateJournal from "../../app/stories/CreateJournal";
-import JournalEditor from "../../app/stories/JournalEditor";
+import PublisherInfo from "../../app/editorials/PublisherInfo";
+import Journal from "../../app/editorials/Journal";
+import JournalComments from "../../app/editorials/JournalComments";
+import ManagePublisher from "../../app/editorials/ManagePublisher";
+import CreatePublisher from "../../app/editorials/CreatePublisher";
+import PublisherAdmin from "../../app/editorials/PublisherAdmin";
+import CreateJournal from "../../app/editorials/CreateJournal";
+import JournalEditor from "../../app/editorials/JournalEditor";
 import {
   editPublisherData,
   postPublisherData
 } from "../../redux/publisherSlice";
-import PublishersAdminOptions from "../../app/stories/PublishersAdminOptions";
+import PublishersAdminOptions from "../../app/editorials/PublishersAdminOptions";
 import NotConnected from "../../app/NotConnected";
-import ManageEditors from "../../app/stories/ManageEditors";
-import ManageJournals from "../../app/stories/ManageJournals";
-import ManageSubscribers from "../../app/stories/ManageSubscribers";
+import ManageEditors from "../../app/editorials/ManageEditors";
+import ManageJournals from "../../app/editorials/ManageJournals";
+import ManageSubscribers from "../../app/editorials/ManageSubscribers";
 import EditEmail from "../../app/profile/EditEmail";
 import ChangePassword from "../../app/profile/ChangePassword";
 import NewsFeed from "../../app/profile/NewsFeed";
@@ -729,7 +729,7 @@ const StackNavigator = () => {
       />
 
       <Stack.Screen
-        name="Stories"
+        name="Editorials"
         component={StoriesTopNavigator}
         options={{
           headerShown: true,
@@ -743,7 +743,9 @@ const StackNavigator = () => {
                   width: "100%"
                 }}
               >
-                <Text style={{ fontSize: 20, fontWeight: "500" }}>Stories</Text>
+                <Text style={{ fontSize: 20, fontWeight: "500" }}>
+                  Editorials
+                </Text>
                 <TouchableOpacity
                   onPress={() => {
                     navigator.navigate("ManagePublisher");

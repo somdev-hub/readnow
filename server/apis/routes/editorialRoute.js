@@ -20,7 +20,8 @@ const {
   editJournalController,
   deleteJournalController,
   removeSubscriberController,
-  deletePublisherController
+  deletePublisherController,
+  searchPublishersController
 } = require("../controllers/editorialController");
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage });
@@ -96,5 +97,7 @@ router.post("/add-editor/:publisherId", addEditorController);
 router.post("/remove-subscriber/:publisherId", removeSubscriberController);
 
 router.post("/delete-publisher/:publisherId", deletePublisherController);
+
+router.post("/search-publishers/:email", searchPublishersController);
 
 module.exports = router;

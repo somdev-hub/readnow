@@ -1,7 +1,9 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import Publishers from "../../app/stories/Publishers";
-import YourPublishers from "../../app/stories/YourPublishers";
+
+import Publishers from "../../app/editorials/Publishers";
+import YourPublishers from "../../app/editorials/YourPublishers";
+
 
 const TopTab = createMaterialTopTabNavigator();
 

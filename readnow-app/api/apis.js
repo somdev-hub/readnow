@@ -1,7 +1,7 @@
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const ADDRESS = "http://192.168.159.254:3500";
+const ADDRESS = "http://192.168.191.254:3500";
 
 export const socket = io(ADDRESS, {
   transports: ["websocket"]
@@ -617,6 +617,17 @@ export const removeGroupMember = async (groupId, memberMail) => {
   }
 };
 
+export const searchGroups = async (query) => {
+  try {
+    const response = await axios.post(`${ADDRESS}/group/search-groups`, {
+      query
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createEvent = async (data) => {
   const formData = new FormData();
   formData.append("eventCover", {
@@ -1151,6 +1162,20 @@ export const getAllStories = async (email) => {
   try {
     const response = await axios.get(
       `${ADDRESS}/profile/get-all-stories/${email}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const searchPublishers = async (query, email) => {
+  try {
+    const response = await axios.post(
+      `${ADDRESS}/editorial/search-publishers/:${email}`,
+      {
+        query
+      }
     );
     return response.data;
   } catch (error) {

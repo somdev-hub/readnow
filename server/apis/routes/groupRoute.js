@@ -20,7 +20,8 @@ const {
   editGroupInfoController,
   addGroupAdminController,
   removeAdminController,
-  removeMemberController
+  removeMemberController,
+  handleSearchGroupController
 } = require("../controllers/groupController");
 
 router.post(
@@ -79,5 +80,7 @@ router.post("/add-admin/:groupId", addGroupAdminController);
 router.post("/remove-admin/:groupId", removeAdminController);
 
 router.post("/remove-member/:groupId", removeMemberController);
+
+router.post("/search-groups", handleSearchGroupController);
 
 module.exports = router;
