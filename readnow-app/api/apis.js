@@ -1,7 +1,49 @@
 import axios from "axios";
 import { io } from "socket.io-client";
+import * as SecureStorage from "expo-secure-store";
 
 const ADDRESS = "http://192.168.191.254:3500";
+
+const api = axios.create({
+  baseURL: ADDRESS
+});
+
+api.interceptors.request.use(
+  async (config) => {
+    const token = await SecureStorage.getItemAsync("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      return api
+        .post("/refresh")
+        .then(({ data }) => {
+          SecureStorage.setItemAsync("token", data.token);
+          api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
+          return api(originalRequest);
+        })
+        .catch(async (error) => {
+          console.log(error);
+          await SecureStorage.deleteItemAsync("token");
+          await SecureStorage.deleteItemAsync("email");
+          return Promise.reject(error);
+        });
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const socket = io(ADDRESS, {
   transports: ["websocket"]
@@ -9,7 +51,7 @@ export const socket = io(ADDRESS, {
 
 export const getHeadlines = async () => {
   try {
-    const response = await axios.get(`${ADDRESS}/news/get-headlines`);
+    const response = await api.get("/news/get-headlines");
     return response.data;
   } catch (error) {
     console.log(error);

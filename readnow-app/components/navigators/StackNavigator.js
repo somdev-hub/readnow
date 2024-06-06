@@ -79,6 +79,19 @@ import EditStory from "../../app/EditStory";
 
 const Stack = createStackNavigator();
 
+// const AuthStack = () => {
+//   return (
+//     <Stack.Navigator
+//       screenOptions={{ headerShown: false }}
+//       initialRouteName="Welcome"
+//     >
+//       <Stack.Screen name="Welcome" component={Welcome} />
+//       <Stack.Screen name="Signup" component={SignUp} />
+//       <Stack.Screen name="Login" component={Login} />
+//     </Stack.Navigator>
+//   );
+// };
+
 const StackNavigator = () => {
   const [token, setToken] = useState(null);
   const navigator = useNavigation();

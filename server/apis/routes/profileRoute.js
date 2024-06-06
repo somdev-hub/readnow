@@ -37,6 +37,7 @@ const {
   addStoryViewCountController,
   getAllStroiesController
 } = require("../controllers/profileController");
+const authenticateToken = require("../middlewares/authenticateToken");
 
 // multer is used for uploading files
 const storage = multer.memoryStorage();
@@ -69,7 +70,7 @@ router.post(
   editBackgroundPictureController
 );
 // hit this route to get profile
-router.get("/get-profile/:email", getProfileController);
+router.get("/get-profile/:email", authenticateToken, getProfileController);
 // hit this route to get short profile info
 router.post("/get-short-profile-info", getShortProfileInfoController);
 // hit this route to follow

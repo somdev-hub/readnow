@@ -34,6 +34,7 @@ const mongoose = require("mongoose");
 const { Server } = require("socket.io");
 const { createServer } = require("node:http");
 const axios = require("axios");
+const cookieParser = require('cookie-parser');
 
 const getAIRouter = require("./routes/getAI");
 const postRouter = require("./routes/postRoute");
@@ -60,6 +61,7 @@ app.use(cors());
 // initialize body-parser for both json and urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // database connection establishment
 mongoose

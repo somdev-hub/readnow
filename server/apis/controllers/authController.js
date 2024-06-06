@@ -17,6 +17,7 @@ const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * @function authenticationController
@@ -38,52 +39,41 @@ require("dotenv").config();
  * @throws {401} If the credentials are invalid.
  * @throws {404} If the user is not found.
  */
+
 const authenticationController = async (req, res) => {
   const { email, password } = req.body;
   console.log(req.body);
   try {
-    // the user object is searched in the database using the email provided by the user with case insensitivity
     const user = await User.findOne({
       email: { $regex: new RegExp(email, "i") }
     });
-    // if the user is not found, return 404 status code
     if (!user) {
       return res.send({
         status: 404,
         message: "User not found"
       });
     }
-    // if the user is found, compare the password provided by the user with the password stored in the database
     const isMatch = await bcrypt.compare(password, user.password);
-    // if the passwords do not match, return 401 status code
     if (!isMatch) {
       return res.send({
         status: 401,
         message: "Invalid credentials"
       });
     }
-    // if the passwords match, sign a jwt token and return it to the user
-    jwt.sign(
+    const accessToken = jwt.sign({ user: user }, process.env.JWT_SECRET, {
+      expiresIn: "1h"
+    });
+    const refreshToken = jwt.sign(
       { user: user },
-      process.env.JWT_SECRET,
-      // the token expires in 1 hour
-      { expiresIn: "1h" },
-      (err, token) => {
-        if (err) {
-          console.log(err);
-          return res.send({
-            status: 500,
-            message: "Server error"
-          });
-        } else {
-          return res.send({
-            status: 200,
-            message: "User authenticated successfully",
-            token: token
-          });
-        }
-      }
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
     );
+    res.cookie("refreshToken", refreshToken, { httpOnly: true });
+    return res.send({
+      status: 200,
+      message: "User authenticated successfully",
+      token: accessToken
+    });
   } catch (error) {
     console.log(error);
     res.send({
@@ -91,6 +81,33 @@ const authenticationController = async (req, res) => {
       message: "Server error"
     });
   }
+};
+
+const refreshAuthenticationController = (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    return res.send({
+      status: 403,
+      message: "Access denied"
+    });
+  }
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+    if (!err) {
+      const accessToken = jwt.sign({ user: user }, process.env.JWT_SECRET, {
+        expiresIn: "1h"
+      });
+      return res.send({
+        status: 200,
+        token: accessToken
+      });
+    } else {
+      console.log(err);
+      return res.send({
+        status: 403,
+        message: "Invalid refresh token"
+      });
+    }
+  });
 };
 
 /**
@@ -123,7 +140,7 @@ const decodeUserController = async (req, res) => {
           status: 401,
           message: err
         });
-      } 
+      }
       // if the token is valid, return 200 status code with decoded user
       else {
         res.send({
@@ -143,5 +160,6 @@ const decodeUserController = async (req, res) => {
 
 module.exports = {
   authenticationController,
+  refreshAuthenticationController,
   decodeUserController
 };

@@ -12,7 +12,8 @@
 const express = require("express");
 const {
   authenticationController,
-  decodeUserController
+  decodeUserController,
+  refreshAuthenticationController
 } = require("../controllers/authController");
 
 const router = express.Router();
@@ -21,6 +22,7 @@ const router = express.Router();
 // hit this route to authenticate user while login
 router.post("/authenticate", authenticationController);
 // hit this route to decode user every time user visits the app
+router.post("/refresh", refreshAuthenticationController);
 router.post("/decode", decodeUserController);
 
 module.exports = router;
