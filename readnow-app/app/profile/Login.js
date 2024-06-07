@@ -20,12 +20,17 @@ import * as SecureStorage from "expo-secure-store";
 import { ActivityIndicator, Snackbar } from "react-native-paper";
 import { CommonActions } from "@react-navigation/native";
 import { PRIMARY_COLOR } from "../../styles/colors";
+import { useAuth } from "../../contexts/AuthContext";
+import { useDispatch } from "react-redux";
+import { updateIsLoggedIn } from "../../redux/authSlice";
 
 const Login = () => {
+  const { user, signIn, signOut } = useAuth();
   const [userCredentials, setUserCredentials] = useState({
     email: "",
     password: ""
   });
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false); // [1
   const setFormData = (key, value) => {
     setUserCredentials({ ...userCredentials, [key]: value });
@@ -35,36 +40,54 @@ const Login = () => {
     message: ""
   });
   const navigator = useNavigation();
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log(userCredentials);
     setLoading(true);
-    login(userCredentials).then((Response) => {
-      console.log(Response);
-      if (Response.status === 200) {
-        console.log("token saved");
-        SecureStorage.deleteItemAsync("email");
-        SecureStorage.setItemAsync(
-          "email",
-          userCredentials.email.toLowerCase()
-        );
-        setLoading(false);
-        SecureStorage.setItemAsync("token", Response.token).then(() => {
-          console.log("token saved");
-          navigator.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "HomeScreen" }]
-            })
-          );
-        });
-      } else {
-        setLoading(false);
-        setSnackbarVisible({
-          visible: true,
-          message: "Invalid credentials"
-        });
-      }
-    });
+    // login(userCredentials).then((Response) => {
+    //   console.log(Response);
+    //   if (Response.status === 200) {
+    //     console.log("token saved");
+    //     SecureStorage.deleteItemAsync("email");
+    //     SecureStorage.setItemAsync(
+    //       "email",
+    //       userCredentials.email.toLowerCase()
+    //     );
+    //     setLoading(false);
+    //     SecureStorage.setItemAsync("token", Response.token).then(() => {
+    //       console.log("token saved");
+    //       navigator.dispatch(
+    //         CommonActions.reset({
+    //           index: 0,
+    //           routes: [{ name: "HomeScreen" }]
+    //         })
+    //       );
+    //     });
+    //   } else {
+    //     setLoading(false);
+    //     setSnackbarVisible({
+    //       visible: true,
+    //       message: "Invalid credentials"
+    //     });
+    //   }
+    // });
+
+    const loginUser = await signIn(userCredentials);
+    if (loginUser.login) {
+      setLoading(false);
+      // navigator.dispatch(
+      //   CommonActions.reset({
+      //     index: 0,
+      //     routes: [{ name: "HomeScreen" }]
+      //   })
+      // );
+      dispatch(updateIsLoggedIn(true))
+    } else {
+      setLoading(false);
+      setSnackbarVisible({
+        visible: true,
+        message: "Invalid credentials"
+      });
+    }
   };
   const [fontsLoaded] = useFonts({
     Montserrat_500Medium,

@@ -3,12 +3,16 @@ import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 import * as SecureStorage from "expo-secure-store";
 import { PRIMARY_COLOR } from "../styles/colors";
 import { TouchableRipple } from "react-native-paper";
+import { useAuth } from "../contexts/AuthContext";
+import { useDispatch } from "react-redux";
+import { updateIsLoggedIn } from "../redux/authSlice";
 
 const DrawerContent = () => {
+  const dispatch = useDispatch();
   const drawerItems = [
     {
       name: "following",
@@ -33,6 +37,7 @@ const DrawerContent = () => {
   ];
   const navigator = useNavigation();
   const { height } = Dimensions.get("window");
+  const { user, signIn, signOut } = useAuth();
   return (
     <SafeAreaView>
       <View
@@ -142,9 +147,8 @@ const DrawerContent = () => {
           >
             <Pressable
               onPress={() => {
-                SecureStorage.deleteItemAsync("token");
-                SecureStorage.deleteItemAsync("email");
-                navigator.navigate("Login");
+                signOut();
+                dispatch(updateIsLoggedIn(false));
               }}
               style={{ flexDirection: "row", gap: 10 }}
             >

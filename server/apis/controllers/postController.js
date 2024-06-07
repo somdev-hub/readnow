@@ -1,33 +1,24 @@
 require("dotenv").config();
 const axios = require("axios");
 const FormData = require("form-data");
+const uploadImageAndGetId = require("../utils/uploadImageAndGetId");
 
 const addPostController = async (req, res) => {
   const { description, postedBy } = req.body;
-  const image = req.file;
-
-  const formData = new FormData();
-  formData.append("files", Buffer.from(image.buffer), {
-    filename: image.originalname,
-    contentType: image.mimetype
-  });
+  console.log(description);
+  const image = req?.file;
 
   try {
-    const imageResponse = await axios.post(
-      `${process.env.STRAPI_API}/api/upload`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
-      }
-    );
+    let imageId = null;
+    if (image) {
+      imageId = await uploadImageAndGetId(image, "posts");
+    }
 
     const data = {
       data: {
         description,
         postedOn: new Date().toISOString(),
-        image: imageResponse.data[0].id,
+        image: imageId,
         likedBy: [],
         comments: [],
         postedBy
@@ -60,7 +51,9 @@ const getFeedsController = async (req, res) => {
       return {
         ...post.attributes,
         id: post.id,
-        image: `${process.env.STRAPI_API}${post.attributes.image.data.attributes?.url}`
+        image:
+          post?.attributes?.image?.data?.attributes?.url &&
+          `${process.env.STRAPI_API}${post?.attributes?.image?.data?.attributes?.url}`
       };
     });
     if (posts.length > 0) {

@@ -1,7 +1,7 @@
 import "react-native-gesture-handler";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Entypo } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import * as SecureStorage from "expo-secure-store";
 import NetInfo from "@react-native-community/netinfo";
 import { useNavigation, CommonActions } from "@react-navigation/native";
@@ -76,6 +76,7 @@ import SelectLanguage from "../../app/profile/SelectLanguage";
 import AddStory from "../../app/AddStory";
 import AddCameraStory from "../../app/AddCameraStory";
 import EditStory from "../../app/EditStory";
+import { updateIsLoggedIn } from "../../redux/authSlice";
 
 const Stack = createStackNavigator();
 
@@ -115,6 +116,7 @@ const StackNavigator = () => {
     (state) => state.publisher.isEditedPublisher
   );
   const publisherData = useSelector((state) => state.publisher.publisherData);
+  const reRouteToLogin = useSelector((state) => state.auth.reRouteToLogin);
   // console.log("isEditedGroup " + idEditedGroup);
   const getUser = async () => {
     const email = await SecureStorage.getItemAsync("email");
@@ -136,47 +138,54 @@ const StackNavigator = () => {
             routes: [{ name: "NotConnected" }]
           })
         );
-      } else {
-        const decodeToken = async () => {
-          const token = await SecureStorage.getItemAsync("token");
-
-          if (token) {
-            setToken(token);
-            decodeUser(token)
-              .then((response) => {
-                console.log(response);
-                if (response.status != 200) {
-                  SecureStorage.deleteItemAsync("token");
-                  SecureStorage.deleteItemAsync("email");
-                  navigator?.dispatch(
-                    CommonActions.reset({
-                      index: 0,
-                      routes: [{ name: "Welcome" }]
-                    })
-                  );
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          } else {
-            navigator?.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "Welcome" }]
-              })
-            );
-          }
-        };
-        decodeToken();
-        getUser();
       }
+      // } else {
+      //   const decodeToken = async () => {
+      //     const token = await SecureStorage.getItemAsync("token");
+
+      //     if (token) {
+      //       setToken(token);
+      //       decodeUser(token)
+      //         .then((response) => {
+      //           console.log(response);
+      //           if (response.status != 200) {
+      //             SecureStorage.deleteItemAsync("token");
+      //             SecureStorage.deleteItemAsync("email");
+      //             navigator?.dispatch(
+      //               CommonActions.reset({
+      //                 index: 0,
+      //                 routes: [{ name: "Welcome" }]
+      //               })
+      //             );
+      //           }
+      //         })
+      //         .catch((error) => {
+      //           console.log(error);
+      //         });
+      //     } else {
+      //       navigator?.dispatch(
+      //         CommonActions.reset({
+      //           index: 0,
+      //           routes: [{ name: "Welcome" }]
+      //         })
+      //       );
+      //     }
+      //   };
+      //   decodeToken();
+      //   getUser();
+      // }
     });
 
     return () => {
       unsubscribe();
     };
   }, [token]);
+
+  useEffect(() => {
+    if (reRouteToLogin) {
+      dispatch(updateIsLoggedIn(false));
+    }
+  }, [reRouteToLogin]);
 
   const socketConnection = useSelector((state) => state.event.eventSocket);
 
@@ -505,9 +514,9 @@ const StackNavigator = () => {
           }
         }}
       />
-      <Stack.Screen name="Welcome" component={Welcome} />
+      {/* <Stack.Screen name="Welcome" component={Welcome} />
       <Stack.Screen name="Signup" component={SignUp} />
-      <Stack.Screen name="Login" component={Login} />
+      <Stack.Screen name="Login" component={Login} /> */}
       <Stack.Screen
         name="EditEmail"
         component={EditEmail}
@@ -668,18 +677,20 @@ const StackNavigator = () => {
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    // console.log(postData);
-                    console.log(selectedGroupId);
-                    {
-                      postVisibility.anyone
-                        ? dispatch(postFormData(postData))
-                        : dispatch(
-                            postGroupFormData({
-                              ...postData,
-                              group: selectedGroupId
-                            })
-                          );
-                    }
+                    console.log(postData);
+                    // console.log(selectedGroupId);
+                    // {
+                    // postVisibility.anyone
+                    //   ? dispatch(postFormData(postData))
+                    //   : dispatch(
+                    //       postGroupFormData({
+                    //         ...postData,
+                    //         group: selectedGroupId
+                    //       })
+                    //     );
+
+                    dispatch(postFormData(postData));
+                    // }
                   }}
                 >
                   <Text

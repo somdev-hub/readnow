@@ -105,10 +105,12 @@ const Feeds = () => {
 
   const fetchMyStories = async () => {
     const email = await SecureStorage.getItemAsync("email");
-    if (email) {
-      const response = await getMyStories(email);
-      setMyStories(response?.stories);
-    }
+    // if (email) {
+    console.log("email");
+    const response = await getMyStories(email);
+
+    setMyStories(response?.stories);
+    // }
   };
 
   const fetchFollowingStories = async () => {
@@ -271,37 +273,38 @@ const Feeds = () => {
               </Pressable>
             );
           })}
-
         </ScrollView>
       </View>
       <View>
-        {feeds.length === 0 && (
+        {feeds?.length === 0 && (
           <Text style={{ marginTop: 20, textAlign: "center" }}>
             No Posts found
           </Text>
         )}
-        {feeds.map((item, index) => {
-          const { user, profilePicture, header, ...rest } = item;
-          return (
-            <PostCard
-              key={index}
-              user={item.user}
-              header={item.header}
-              description={item.description}
-              image={item.image}
-              likes={item.likedBy}
-              comments={item.comments}
-              profilePicture={item.profilePicture}
-              onPressBookmark={() => {
-                addToBookmark(rest);
-                console.log(rest);
-              }}
-              post={rest}
-              fetchData={fetchData}
-              optionsContent={optionsContent}
-            />
-          );
-        })}
+        <View style={{ marginTop: 5 }}>
+          {feeds?.map((item, index) => {
+            const { user, profilePicture, header, ...rest } = item;
+            return (
+              <PostCard
+                key={index}
+                user={item.user}
+                header={item.header}
+                description={item.description}
+                image={item.image}
+                likes={item.likedBy}
+                comments={item.comments}
+                profilePicture={item.profilePicture}
+                onPressBookmark={() => {
+                  addToBookmark(rest);
+                  console.log(rest);
+                }}
+                post={rest}
+                fetchData={fetchData}
+                optionsContent={optionsContent}
+              />
+            );
+          })}
+        </View>
       </View>
     </ScrollView>
   );

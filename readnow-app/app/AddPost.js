@@ -29,6 +29,7 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
+import { pickImage } from "../services/PickImage";
 
 const screenHeights = Dimensions.get("window").height;
 const screenWidth = Dimensions.get("window").width;
@@ -145,23 +146,16 @@ const AddPost = () => {
   };
 
   const selectImage = async () => {
-    const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      base64: true
-    };
-    const response = await ImagePicker.launchImageLibraryAsync(options);
-
-    if (!response.canceled) {
-      setPostImage(response.assets[0].uri);
-      dispatch({
-        type: "post/updatePostData",
-        payload: {
-          image: response.assets[0].uri,
-          postedBy: postData.postedBy,
-          description: postData.description
-        }
-      });
-    }
+    const imageUri = await pickImage();
+    setPostImage(imageUri);
+    dispatch({
+      type: "post/updatePostData",
+      payload: {
+        image: imageUri,
+        postedBy: postData.postedBy,
+        description: postData.description
+      }
+    });
   };
 
   useEffect(() => {

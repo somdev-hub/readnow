@@ -28,6 +28,7 @@ const {
   commentPostController,
   deletePostController
 } = require("../controllers/postController");
+const authenticateToken = require("../middlewares/authenticateToken");
 
 const router = express.Router();
 // multer is used for uploading files
@@ -37,14 +38,19 @@ const upload = multer({ storage: storage });
 // -------------------------- Routes -------------------------- //
 
 // hit this route to add post
-router.post("/add-post", upload.single("image"), addPostController);
+router.post(
+  "/add-post",
+  authenticateToken,
+  upload.single("image"),
+  addPostController
+);
 // hit this route to get feeds
-router.get("/get-feeds", getFeedsController);
+router.get("/get-feeds", authenticateToken, getFeedsController);
 // hit this route to like post
-router.post("/like-post", likePostController);
+router.post("/like-post", authenticateToken, likePostController);
 // hit this route to comment post
-router.post("/comment-post", commentPostController);
+router.post("/comment-post", authenticateToken, commentPostController);
 // hit this route to delete post
-router.delete("/delete-post/:postId", deletePostController);
+router.delete("/delete-post/:postId", authenticateToken, deletePostController);
 
 module.exports = router;

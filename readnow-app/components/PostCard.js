@@ -57,7 +57,7 @@ const PostCard = ({
   }, []);
   return (
     <View
-      style={{ backgroundColor: "#ffffff", marginVertical: 10, elevation: 1 }}
+      style={{ backgroundColor: "#ffffff", marginVertical: 5, elevation: 1 }}
     >
       <View
         style={{
@@ -136,17 +136,19 @@ const PostCard = ({
             </Text>
           </TouchableOpacity>
         )}
-        <Image
-          source={{
-            uri: image
-          }}
-          style={{
-            width: size.width,
-            height: size.height * 0.35,
-            marginVertical: 10
-          }}
-          resizeMode="contain"
-        />
+        {image && (
+          <Image
+            source={{
+              uri: image
+            }}
+            style={{
+              width: size.width,
+              height: size.height * 0.35,
+              marginVertical: 10
+            }}
+            resizeMode="contain"
+          />
+        )}
 
         <View
           style={{

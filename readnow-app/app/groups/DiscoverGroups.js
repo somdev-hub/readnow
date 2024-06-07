@@ -71,7 +71,7 @@ const DiscoverGroups = () => {
             </View>
           </View>
         )}
-        {searchGroups?.length === 0 && (
+        {/* {searchGroups?.length === 0 && ( */}
           <View style={{ marginTop: 20, marginHorizontal: 10, flex: 1 }}>
             <Text style={{ fontWeight: "500", fontSize: 16 }}>
               Discover Groups
@@ -99,7 +99,7 @@ const DiscoverGroups = () => {
               })}
             </View>
           </View>
-        )}
+       {/* // )}*/}
       </ScrollView>
     </View>
   );

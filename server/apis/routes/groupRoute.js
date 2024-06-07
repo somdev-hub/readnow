@@ -23,9 +23,11 @@ const {
   removeMemberController,
   handleSearchGroupController
 } = require("../controllers/groupController");
+const authenticateToken = require("../middlewares/authenticateToken");
 
 router.post(
   "/create-group",
+  authenticateToken,
   uploadMiddleware.fields([
     { name: "groupImage", maxCount: 1 },
     { name: "groupCoverImage", maxCount: 1 }
@@ -40,6 +42,7 @@ router.post(
 
 router.post(
   "/edit-group/:groupId",
+  authenticateToken,
   uploadMiddleware.fields([
     { name: "groupImage", maxCount: 1 },
     { name: "groupCoverImage", maxCount: 1 }
@@ -47,40 +50,69 @@ router.post(
   editGroupInfoController
 );
 
-router.get("/get-groups", getGroupController);
+router.get("/get-groups", authenticateToken, getGroupController);
 
-router.get("/get-my-groups/:email", getMyGroupsController);
+router.get("/get-my-groups/:email", authenticateToken, getMyGroupsController);
 
-router.get("/get-specific-group/:id", getSpecificGroupController);
+router.get(
+  "/get-specific-group/:id",
+  authenticateToken,
+  getSpecificGroupController
+);
 
-router.get("/join-group/:id/:email", joinGroupController);
+router.get("/join-group/:id/:email", authenticateToken, joinGroupController);
 
-router.get("/exit-group/:id/:email", exitGroupController);
+router.get("/exit-group/:id/:email", authenticateToken, exitGroupController);
 
-router.get("/get-followed-groups/:email", getFollowedGroupsController);
+router.get(
+  "/get-followed-groups/:email",
+  authenticateToken,
+  getFollowedGroupsController
+);
 
-router.get("/get-managed-groups/:email", getManagedGroupsController);
+router.get(
+  "/get-managed-groups/:email",
+  authenticateToken,
+  getManagedGroupsController
+);
 
 router.post(
   "/add-group-post",
+  authenticateToken,
   uploadMiddleware.single("image"),
   addGroupPostController
 );
 
-router.get("/get-group-feeds/:groupId", getGroupFeedsController);
+router.get(
+  "/get-group-feeds/:groupId",
+  authenticateToken,
+  getGroupFeedsController
+);
 
-router.get("/get-short-group-info/:id", getShortGroupInfoController);
+router.get(
+  "/get-short-group-info/:id",
+  authenticateToken,
+  getShortGroupInfoController
+);
 
-router.post("/like-group-post", likeGroupPostController);
+router.post("/like-group-post", authenticateToken, likeGroupPostController);
 
-router.post("/comment-group-post", commentGroupPostController);
+router.post(
+  "/comment-group-post",
+  authenticateToken,
+  commentGroupPostController
+);
 
-router.post("/add-admin/:groupId", addGroupAdminController);
+router.post("/add-admin/:groupId", authenticateToken, addGroupAdminController);
 
-router.post("/remove-admin/:groupId", removeAdminController);
+router.post("/remove-admin/:groupId", authenticateToken, removeAdminController);
 
-router.post("/remove-member/:groupId", removeMemberController);
+router.post(
+  "/remove-member/:groupId",
+  authenticateToken,
+  removeMemberController
+);
 
-router.post("/search-groups", handleSearchGroupController);
+router.post("/search-groups", authenticateToken, handleSearchGroupController);
 
 module.exports = router;

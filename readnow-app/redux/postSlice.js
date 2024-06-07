@@ -3,20 +3,28 @@ import * as SecureStorage from "expo-secure-store";
 import { addGroupPost, getHeadlines, submitPost } from "../api/apis";
 import axios from "axios";
 
-const ADDRESS = "http://192.168.33.115:3500";
+const ADDRESS = "http://192.168.191.254:3500";
 
 export const postFormData = createAsyncThunk(
   "post/postFormData",
   async (postData) => {
+    const token = await SecureStorage.getItemAsync("token");
+    console.log("herllo");
     const formData = new FormData();
     formData.append("description", postData.description);
     formData.append("postedBy", postData.postedBy);
 
-    const res = await fetch(postData.image);
+    // const res = await fetch(postData.image);
     formData.append("image", postData.image);
     const response = await submitPost(postData);
-    console.log(formData);
-    console.log(response);
+    // const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
+    //   headers: {
+    //     "Content-Type": "multipart/form-data",
+    //     Authorization: `Bearer ${token}`
+    //   }
+    // });
+    // console.log(formData);
+    // console.log(response);
     return response;
   }
 );

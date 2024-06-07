@@ -203,7 +203,9 @@ const getProfileController = async (req, res) => {
       return {
         ...post.attributes,
         id: post.id,
-        image: `${process.env.STRAPI_API}${post.attributes.image.data.attributes?.url}`
+        image:
+          post?.attributes?.image?.data?.attributes?.url &&
+          `${process.env.STRAPI_API}${post?.attributes?.image?.data?.attributes?.url}`
       };
     });
 
@@ -550,7 +552,7 @@ const getMyStoriesController = async (req, res) => {
           };
         });
       if (latestStories.length === 0) {
-        return res.status(404).json({ message: "No stories found" });
+        return res.status(404).json({ stories: null });
       }
       const responseStories = {
         name: user.name,
@@ -573,6 +575,9 @@ const getFollowingStoriesController = async (req, res) => {
   try {
     const user = await User.findOne({ email }).populate("following");
     if (user) {
+      if (user.following.length === 0) {
+        return res.status(200).json({ stories: [] });
+      }
       const followingStories = await Promise.all(
         user.following.map(async (following) => {
           const followingUser = await User.findOne({ email: following });
@@ -580,15 +585,20 @@ const getFollowingStoriesController = async (req, res) => {
           const storiesWithin24Hours = followingUser?.stories.filter(
             (story) => story.dateTime > twentyFourHoursAgo
           );
-          if (storiesWithin24Hours.length !== 0) {
+          if (storiesWithin24Hours?.length !== 0) {
+            return {
+              name: followingUser.name,
+              email: followingUser.email,
+              profilePicture: followingUser?.profilePicture,
+              stories: storiesWithin24Hours
+            };
+          } else {
             return {
               name: followingUser.name,
               email: followingUser.email,
               profilePicture: followingUser.profilePicture,
-              stories: storiesWithin24Hours
+              stories: []
             };
-          } else {
-            return null;
           }
         })
       );

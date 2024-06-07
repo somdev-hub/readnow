@@ -17,6 +17,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import { PRIMARY_COLOR } from "../../styles/colors";
 import { getSpecificGroup } from "../../api/apis";
+// import RNFetchBlob from 'react-native-fetch-blob';
+// import RNFS from 'react-native-fs';
+import * as FileSystem from "expo-file-system";
+import * as DocumentPicker from "expo-document-picker";
+import { pickImage } from "../../services/PickImage";
 
 const CreateGroup = () => {
   const ref = React.useRef(true);
@@ -46,24 +51,19 @@ const CreateGroup = () => {
   });
 
   const selectImage = async (type) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    });
-
-    if (!result.canceled) {
-      if (type === "groupImage") {
-        setGroupCreationData({
-          ...groupCreationData,
-          groupImage: result.assets[0].uri,
-          isGroupImageSame: false
-        });
-      } else {
-        setGroupCreationData({
-          ...groupCreationData,
-          groupCoverImage: result.assets[0].uri,
-          isGroupCoverImageSame: false
-        });
-      }
+    const imageUri = await pickImage();
+    if (type === "groupCoverImage") {
+      setGroupCreationData({
+        ...groupCreationData,
+        groupCoverImage: imageUri,
+        isGroupCoverImageSame: false
+      });
+    } else {
+      setGroupCreationData({
+        ...groupCreationData,
+        groupImage: imageUri,
+        isGroupImageSame: false
+      });
     }
   };
 

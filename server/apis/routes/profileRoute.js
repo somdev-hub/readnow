@@ -51,6 +51,7 @@ router.post("/add-user", addUserController);
 // hit this route to edit profile
 router.post(
   "/edit-profile/:email",
+  authenticateToken,
   upload.fields([
     { name: "profilePicture", maxCount: 1 },
     { name: "backgroundPicture", maxCount: 1 }
@@ -60,42 +61,85 @@ router.post(
 // hit this route to edit profile picture
 router.post(
   "/edit-profile-picture",
+  authenticateToken,
   upload.single("profilePicture"),
   editProfilePictureController
 );
 // hit this route to edit background picture
 router.post(
   "/edit-background-picture",
+  authenticateToken,
   upload.single("backgroundPicture"),
   editBackgroundPictureController
 );
 // hit this route to get profile
 router.get("/get-profile/:email", authenticateToken, getProfileController);
 // hit this route to get short profile info
-router.post("/get-short-profile-info", getShortProfileInfoController);
+router.post(
+  "/get-short-profile-info",
+  authenticateToken,
+  getShortProfileInfoController
+);
 // hit this route to follow
-router.post("/follow", handleFollowController);
+router.post("/follow", authenticateToken, handleFollowController);
 
-router.get("/get-profile-groups/:email", getProfileGroups);
+router.get("/get-profile-groups/:email", authenticateToken, getProfileGroups);
 
-router.get("/get-card-profile-info/:email", getCardProfileInfoController);
+router.get(
+  "/get-card-profile-info/:email",
+  authenticateToken,
+  getCardProfileInfoController
+);
 
-router.get("/get-user-followers/:email", getUserFollowersController);
+router.get(
+  "/get-user-followers/:email",
+  authenticateToken,
+  getUserFollowersController
+);
 
-router.post("/toggle-other-email/:email", toggleOtherEmailsController);
+router.post(
+  "/toggle-other-email/:email",
+  authenticateToken,
+  toggleOtherEmailsController
+);
 
-router.post("/set-primary-email/:email", setPrimaryEmailController);
+router.post(
+  "/set-primary-email/:email",
+  authenticateToken,
+  setPrimaryEmailController
+);
 
-router.post("/change-password/:email", changePasswordController);
+router.post(
+  "/change-password/:email",
+  authenticateToken,
+  changePasswordController
+);
 
-router.post("/add-story/:email", upload.single("story"), addStoryController);
+router.post(
+  "/add-story/:email",
+  authenticateToken,
+  upload.single("story"),
+  addStoryController
+);
 
-router.get("/get-my-stories/:email", getMyStoriesController);
+router.get("/get-my-stories/:email", authenticateToken, getMyStoriesController);
 
-router.get("/get-following-stories/:email", getFollowingStoriesController);
+router.get(
+  "/get-following-stories/:email",
+  authenticateToken,
+  getFollowingStoriesController
+);
 
-router.post("/add-story-view/:email", addStoryViewCountController);
+router.post(
+  "/add-story-view/:email",
+  authenticateToken,
+  addStoryViewCountController
+);
 
-router.get("/get-all-stories/:email", getAllStroiesController);
+router.get(
+  "/get-all-stories/:email",
+  authenticateToken,
+  getAllStroiesController
+);
 
 module.exports = router;

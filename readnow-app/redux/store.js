@@ -6,6 +6,7 @@ import groupReducer from "./groupSlice";
 import eventReducer from "./eventSlice";
 import journalReducer from "./journalSlice";
 import publisherReducer from "./publisherSlice";
+import authReducer from "./authSlice";
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +16,8 @@ export const store = configureStore({
     group: groupReducer,
     event: eventReducer,
     journal: journalReducer,
-    publisher: publisherReducer
+    publisher: publisherReducer,
+    auth: authReducer
   },
   middleware: (getDefaultMiddleware) => {
     return getDefaultMiddleware({

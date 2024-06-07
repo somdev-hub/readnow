@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import * as SecureStorage from "expo-secure-store";
 import { login } from "../api/apis";
+// import { useAuth } from "../contexts/AuthContext";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({
+    token: null,
+    login: false
+  });
 
   useEffect(() => {
     SecureStorage.getItemAsync("token").then((token) => {
@@ -16,17 +20,43 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signIn = async (userCredentials) => {
-    const { data } = await login(userCredentials);
-    await SecureStorage.setItemAsync("token", data.token);
-    // await SecureStorage.setItemAsync("email", userCredentials.email);
-    setUser({
-      token: data.token
-    });
+    const response = await login(userCredentials);
+    if (response.status === 200) {
+      console.log(response.token);
+      await Promise.all([
+        SecureStorage.deleteItemAsync("email"),
+        SecureStorage.deleteItemAsync("token")
+      ]);
+      await Promise.all([
+        SecureStorage.setItemAsync(
+          "email",
+          userCredentials.email.toLowerCase()
+        ),
+        SecureStorage.setItemAsync("token", response.token)
+      ]);
+      const user = {
+        token: response.token,
+        login: true
+      };
+      setUser(user);
+      return user;
+    } else {
+      const user = {
+        token: null,
+        login: false
+      };
+      setUser(user);
+      return user;
+    }
   };
 
   const signOut = async () => {
     await SecureStorage.deleteItemAsync("token");
-    setUser(null);
+    await SecureStorage.deleteItemAsync("email");
+    setUser({
+      token: null,
+      login: false
+    });
   };
 
   return (
