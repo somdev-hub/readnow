@@ -19,6 +19,7 @@ import { Snackbar } from "react-native-paper";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getSpecificEvent } from "../../api/apis";
 import { PRIMARY_COLOR } from "../../styles/colors";
+import { pickImage } from "../../services/PickImage";
 
 const RadioButtonOption = ({ value, currentMode, setMode }) => (
   <View
@@ -65,18 +66,29 @@ const CreateEvent = () => {
   const currentEventId = useSelector((state) => state.event.currentEventId);
 
   const selectImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    });
-
-    if (!result.canceled) {
+    const result = await pickImage();
+    if (!result.cancelled) {
       setEventCreationData({
         ...eventCreationData,
-        eventCover: result.assets[0].uri,
+        eventCover: result,
         isEventCoverSame: false
       });
     }
   };
+
+  // const selectImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images
+  //   });
+
+  //   if (!result.canceled) {
+  //     setEventCreationData({
+  //       ...eventCreationData,
+  //       eventCover: result.assets[0].uri,
+  //       isEventCoverSame: false
+  //     });
+  //   }
+  // };
   useEffect(() => {
     const getEmail = async () => {
       const email = await SecureStorage.getItemAsync("email");

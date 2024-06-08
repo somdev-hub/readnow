@@ -112,7 +112,11 @@ const PublisherAdmin = () => {
             }}
           >
             <Image
-              source={{ uri: publisherData?.publisherImage }}
+              source={{
+                uri: publisherData?.publisherImage
+                  ? publisherData?.publisherImage
+                  : "https://www.kindpng.com/picc/m/78-785827_user-profile-avatar-login"
+              }}
               style={{
                 width: 100,
                 height: 100,

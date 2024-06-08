@@ -30,7 +30,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
       return api
         .post("auth/refresh")
@@ -282,33 +286,58 @@ export const getProfile = async (email) => {
 };
 
 export const submitPost = async (data) => {
+  const formData = new FormData();
+  formData.append("description", data.description);
+  formData.append("postedBy", data.postedBy);
+  formData.append("image", {
+    uri: data.image,
+    name: "postImage.jpg",
+    type: "image/jpg"
+  });
+  console.log("api hello");
+  console.log(formData);
   try {
-    const formData = new FormData();
-    formData.append("description", data.description);
-    formData.append("postedBy", data.postedBy);
-    formData.append("image", {
-      uri: data.image,
-      name: "postImage.jpg",
-      type: "image/jpg"
-    });
-    console.log("api hello");
-    // console.log(formData);
-    // const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
+    const response = await axios.post(
+      `http://192.168.191.254:3500/post/add-post`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+    // const response = await api.post("/post/add-post", formData, {
     //   headers: {
     //     "Content-Type": "multipart/form-data"
     //   }
     // });
-    const response = await api.post("/post/add-post", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    });
     console.log(response.data);
     return response.data;
   } catch (error) {
     console.log(error);
   }
 };
+
+export async function addIndividualPost(postData) {
+  const token = await SecureStorage.getItemAsync("token");
+  const formData = new FormData();
+  formData.append("description", postData.description);
+  formData.append("postedBy", postData.postedBy);
+  formData.append("postImage", {
+    uri: postData.image,
+    name: "postImage.jpg",
+    type: "image/jpg"
+  });
+
+  const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      // Authorization: `Bearer ${token}`
+    }
+  });
+
+  return response;
+}
 
 export const getFeeds = async () => {
   try {
@@ -486,7 +515,7 @@ export const createGroup = async (data) => {
   formData.append("groupDescription", data.groupDescription);
   formData.append("groupAdmins", JSON.stringify(data.groupAdmins));
   formData.append("groupRules", data.groupRules);
-  formData.append("groupTags", data.groupTags);
+  formData.append("groupTags", JSON.stringify(data.groupTags));
   formData.append("groupDetails", JSON.stringify(data.groupDetails));
   // console.log(data.groupDetails);
   console.log("====================================");
@@ -613,7 +642,9 @@ export const getFollowedGroups = async (email) => {
     // const response = await axios.get(
     //   `${ADDRESS}/group/get-followed-groups/${email}`
     // );
+    console.log(email);
     const response = await api.get(`/group/get-followed-groups/${email}`);
+    console.log(response.status);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -804,15 +835,20 @@ export const createEvent = async (data) => {
   console.log(formData);
   console.log("====================================");
   try {
-    const response = await axios.post(
-      `${ADDRESS}/event/create-event`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+    // const response = await axios.post(
+    //   `${ADDRESS}/event/create-event`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post("/event/create-event", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
       }
-    );
+    });
     console.log(response.data);
     return response;
   } catch (error) {
@@ -836,8 +872,17 @@ export const editEvent = async (data) => {
   formData.append("eventDescription", data.eventDescription);
   formData.append("isEventCoverSame", data.isEventCoverSame);
   try {
-    const response = await axios.post(
-      `${ADDRESS}/event/edit-event/${data.eventId}`,
+    // const response = await axios.post(
+    //   `${ADDRESS}/event/edit-event/${data.eventId}`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post(
+      `/event/edit-event/${data.eventId}`,
       formData,
       {
         headers: {
@@ -860,15 +905,20 @@ export const addEventMedia = async (eventMedia, eventId) => {
   });
   formData.append("eventId", eventId);
   try {
-    const response = await axios.post(
-      `${ADDRESS}/event/upload-media`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+    // const response = await axios.post(
+    //   `${ADDRESS}/event/upload-media`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post("/event/upload-media", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
       }
-    );
+    });
     return response.data;
   } catch (error) {
     console.log(error);
@@ -877,9 +927,10 @@ export const addEventMedia = async (eventMedia, eventId) => {
 
 export const getSpecificEvent = async (eventId) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/event/get-specific-event/${eventId}`
-    );
+    // const response = await axios.get(
+    //   `${ADDRESS}/event/get-specific-event/${eventId}`
+    // );
+    const response = await api.get(`/event/get-specific-event/${eventId}`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -888,9 +939,10 @@ export const getSpecificEvent = async (eventId) => {
 
 export const getAllEventShortInfo = async () => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/event/get-all-short-event-info`
-    );
+    // const response = await axios.get(
+    //   `${ADDRESS}/event/get-all-short-event-info`
+    // );
+    const response = await api.get("/event/get-all-short-event-info");
     return response.data;
   } catch (error) {
     console.log(error);
@@ -899,13 +951,17 @@ export const getAllEventShortInfo = async () => {
 
 export const toggleEventAttendence = async (eventId, email) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/event/toggle-event-attendence`,
-      {
-        eventId,
-        email
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/event/toggle-event-attendence`,
+    //   {
+    //     eventId,
+    //     email
+    //   }
+    // );
+    const response = await api.post("/event/toggle-event-attendence", {
+      eventId,
+      email
+    });
     return response;
   } catch (error) {
     console.log(error);
@@ -934,15 +990,20 @@ export const addPublisher = async (data) => {
   // formData
 
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/add-publisher`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/add-publisher`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post("/editorial/add-publisher", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
       }
-    );
+    });
 
     return response;
   } catch (error) {
@@ -952,9 +1013,10 @@ export const addPublisher = async (data) => {
 
 export const getPublishers = async (email) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/editorial/get-publishers/${email}`
-    );
+    // const response = await axios.get(
+    //   `${ADDRESS}/editorial/get-publishers/${email}`
+    // );
+    const response = await api.get(`/editorial/get-publishers/${email}`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -963,8 +1025,11 @@ export const getPublishers = async (email) => {
 
 export const getManagedPublishers = async (email) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/editorial/get-managed-publishers/${email}`
+    // const response = await axios.get(
+    //   `${ADDRESS}/editorial/get-managed-publishers/${email}`
+    // );
+    const response = await api.get(
+      `/editorial/get-managed-publishers/${email}`
     );
     return response.data;
   } catch (error) {
@@ -974,8 +1039,11 @@ export const getManagedPublishers = async (email) => {
 
 export const getSpecificPublisher = async (publisherId) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/editorial/get-specific-publisher/${publisherId}`
+    // const response = await axios.get(
+    //   `${ADDRESS}/editorial/get-specific-publisher/${publisherId}`
+    // );
+    const response = await api.get(
+      `/editorial/get-specific-publisher/${publisherId}`
     );
     return response.data;
   } catch (error) {
@@ -985,13 +1053,17 @@ export const getSpecificPublisher = async (publisherId) => {
 
 export const toggleSubscriber = async (publisherId, email) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/toggle-subscriber`,
-      {
-        publisherId,
-        email
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/toggle-subscriber`,
+    //   {
+    //     publisherId,
+    //     email
+    //   }
+    // );
+    const response = await api.post("/editorial/toggle-subscriber", {
+      publisherId,
+      email
+    });
     return response.data;
   } catch (error) {
     console.log(error);
@@ -1017,15 +1089,20 @@ export const addJournal = async (data) => {
 
   // console.log(data.journalPublishingDate.toISOString());
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/add-journal`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data"
-        }
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/add-journal`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post("/editorial/add-journal", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
       }
-    );
+    });
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -1035,7 +1112,8 @@ export const addJournal = async (data) => {
 
 export const addChapter = async (data) => {
   try {
-    const response = await axios.post(`${ADDRESS}/editorial/add-chapter`, data);
+    // const response = await axios.post(`${ADDRESS}/editorial/add-chapter`, data);
+    const response = await api.post("/editorial/add-chapter", data);
     console.log(response.data);
     return response.data;
   } catch (error) {
@@ -1045,8 +1123,11 @@ export const addChapter = async (data) => {
 
 export const getSpecificJournal = async (journalId) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/editorial/get-specific-journal/${journalId}`
+    // const response = await axios.get(
+    //   `${ADDRESS}/editorial/get-specific-journal/${journalId}`
+    // );
+    const response = await api.get(
+      `/editorial/get-specific-journal/${journalId}`
     );
     return response.data;
   } catch (error) {
@@ -1056,8 +1137,11 @@ export const getSpecificJournal = async (journalId) => {
 
 export const getJournalComments = async (journalId) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/editorial/get-journal-comments/${journalId}`
+    // const response = await axios.get(
+    //   `${ADDRESS}/editorial/get-journal-comments/${journalId}`
+    // );
+    const response = await api.get(
+      `/editorial/get-journal-comments/${journalId}`
     );
 
     return response.data;
@@ -1068,10 +1152,11 @@ export const getJournalComments = async (journalId) => {
 
 export const addJournalComment = async (data) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/add-journal-comment`,
-      data
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/add-journal-comment`,
+    //   data
+    // );
+    const response = await api.post("/editorial/add-journal-comment", data);
     return response;
   } catch (error) {
     console.log(error);
@@ -1080,13 +1165,17 @@ export const addJournalComment = async (data) => {
 
 export const toggleJournalLike = async (journalId, email) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/toggle-journal-like`,
-      {
-        journalId,
-        email
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/toggle-journal-like`,
+    //   {
+    //     journalId,
+    //     email
+    //   }
+    // );
+    const response = await api.post("/editorial/toggle-journal-like", {
+      journalId,
+      email
+    });
     return response;
   } catch (error) {
     console.log(error);
@@ -1095,14 +1184,19 @@ export const toggleJournalLike = async (journalId, email) => {
 
 export const toggleCommentLike = async (commentId, journalId, email) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/toggle-comment-like`,
-      {
-        journalId,
-        commentId,
-        email
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/toggle-comment-like`,
+    //   {
+    //     journalId,
+    //     commentId,
+    //     email
+    //   }
+    // );
+    const response = await api.post("/editorial/toggle-comment-like", {
+      journalId,
+      commentId,
+      email
+    });
     return response;
   } catch (error) {
     console.log(error);
@@ -1111,8 +1205,12 @@ export const toggleCommentLike = async (commentId, journalId, email) => {
 
 export const getSubscribedJournals = async (email) => {
   try {
-    const response = await axios.get(
-      `${ADDRESS}/editorial/get-subscribed-publisher-journals/${email}`
+    // const response = await axios.get(
+    //   `${ADDRESS}/editorial/get-subscribed-publisher-journals/${email}`
+    // );
+
+    const response = await api.get(
+      `/editorial/get-subscribed-publisher-journals/${email}`
     );
 
     return response.data;
@@ -1144,8 +1242,17 @@ export const editPublisher = async (data) => {
   formData.append("isPublisherImageSame", data.isPublisherImageSame);
   formData.append("isPublisherCoverImageSame", data.isPublisherCoverImageSame);
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/edit-publisher/${data.publisherId}`,
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/edit-publisher/${data.publisherId}`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post(
+      `/editorial/edit-publisher/${data.publisherId}`,
       formData,
       {
         headers: {
@@ -1161,12 +1268,15 @@ export const editPublisher = async (data) => {
 
 export const removeEditor = async (publisherId, editorEmail) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/remove-editor/${publisherId}`,
-      {
-        editorEmail
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/remove-editor/${publisherId}`,
+    //   {
+    //     editorEmail
+    //   }
+    // );
+    const response = await api.post(`/editorial/remove-editor/${publisherId}`, {
+      editorEmail
+    });
     return response;
   } catch (error) {
     console.log(error);
@@ -1175,12 +1285,15 @@ export const removeEditor = async (publisherId, editorEmail) => {
 
 export const addEditor = async (publisherId, editorEmail) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/add-editor/${publisherId}`,
-      {
-        editorEmail
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/add-editor/${publisherId}`,
+    //   {
+    //     editorEmail
+    //   }
+    // );
+    const response = await api.post(`/editorial/add-editor/${publisherId}`, {
+      editorEmail
+    });
     return response;
   } catch (error) {
     console.log(error);
@@ -1205,8 +1318,17 @@ export const editJournal = async (data) => {
   formData.append("journalId", data.journalId);
   formData.append("isJournalCoverImageSame", data.isJournalCoverImageSame);
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/edit-journal/${data.journalId}`,
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/edit-journal/${data.journalId}`,
+    //   formData,
+    //   {
+    //     headers: {
+    //       "Content-Type": "multipart/form-data"
+    //     }
+    //   }
+    // );
+    const response = await api.post(
+      `/editorial/edit-journal/${data.journalId}`,
       formData,
       {
         headers: {
@@ -1222,9 +1344,10 @@ export const editJournal = async (data) => {
 
 export const deleteJournal = async (journalId) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/delete-journal/${journalId}`
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/delete-journal/${journalId}`
+    // );
+    const response = await api.post(`/editorial/delete-journal/${journalId}`);
     return response;
   } catch (error) {
     console.log(error);
@@ -1233,8 +1356,14 @@ export const deleteJournal = async (journalId) => {
 
 export const removeSubscriber = async (publisherId, subscriberEmail) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/remove-subscriber/${publisherId}`,
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/remove-subscriber/${publisherId}`,
+    //   {
+    //     subscriberEmail
+    //   }
+    // );
+    const response = await api.post(
+      `/editorial/remove-subscriber/${publisherId}`,
       {
         subscriberEmail
       }
@@ -1247,8 +1376,11 @@ export const removeSubscriber = async (publisherId, subscriberEmail) => {
 
 export const deletePublisher = async (publisherId) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/delete-publisher/${publisherId}`
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/delete-publisher/${publisherId}`
+    // );
+    const response = await api.post(
+      `/editorial/delete-publisher/${publisherId}`
     );
     return response;
   } catch (error) {
@@ -1341,12 +1473,15 @@ export const getAllStories = async (email) => {
 
 export const searchPublishers = async (query, email) => {
   try {
-    const response = await axios.post(
-      `${ADDRESS}/editorial/search-publishers/:${email}`,
-      {
-        query
-      }
-    );
+    // const response = await axios.post(
+    //   `${ADDRESS}/editorial/search-publishers/:${email}`,
+    //   {
+    //     query
+    //   }
+    // );
+    const response = await api.post(`/editorial/search-publishers/:${email}`, {
+      query
+    });
     return response.data;
   } catch (error) {
     console.log(error);

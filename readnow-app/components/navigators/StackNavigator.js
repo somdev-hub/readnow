@@ -176,6 +176,8 @@ const StackNavigator = () => {
       // }
     });
 
+    getUser();
+
     return () => {
       unsubscribe();
     };
@@ -301,11 +303,13 @@ const StackNavigator = () => {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
+                    console.log("hello");
                     if (idEditedGroup) {
                       dispatch(editGroupData(groupData));
                     } else {
                       dispatch(postGroupData(groupData));
                     }
+                    navigator.navigate("GroupsPage");
                   }}
                 >
                   <Text
@@ -921,7 +925,10 @@ const StackNavigator = () => {
                 <Text style={{ fontSize: 20, fontWeight: "500" }}>Manage</Text>
                 <TouchableOpacity
                   onPress={() => {
-                    navigator.navigate("CreatePublisher");
+                    navigator.navigate("CreatePublisher", {
+                      isEdit: false,
+                      publisherId: null
+                    });
                   }}
                 >
                   <Text

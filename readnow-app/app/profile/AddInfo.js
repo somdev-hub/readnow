@@ -25,6 +25,7 @@ import { CommonActions } from "@react-navigation/native";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
 import { EvilIcons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { pickImage } from "../../services/PickImage";
 
 const AddInfo = () => {
   const route = useRoute();
@@ -48,28 +49,49 @@ const AddInfo = () => {
   };
 
   const selectImage = async (type) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    });
-
-    if (!result.canceled) {
+    let result = await pickImage();
+    if (result) {
       if (type === "backgroundPicture") {
         setUserData({
           ...userData,
           isBackgroundPictureSame: true,
-          backgroundPicture: result.assets[0].uri,
+          backgroundPicture: result,
           isBackgroundPictureSame: false
         });
       } else {
         setUserData({
           ...userData,
           isProfilePictureSame: true,
-          profilePicture: result.assets[0].uri,
+          profilePicture: result,
           isProfilePictureSame: false
         });
       }
     }
   };
+
+  // const selectImage = async (type) => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images
+  //   });
+
+  //   if (!result.canceled) {
+  //     if (type === "backgroundPicture") {
+  //       setUserData({
+  //         ...userData,
+  //         isBackgroundPictureSame: true,
+  //         backgroundPicture: result.assets[0].uri,
+  //         isBackgroundPictureSame: false
+  //       });
+  //     } else {
+  //       setUserData({
+  //         ...userData,
+  //         isProfilePictureSame: true,
+  //         profilePicture: result.assets[0].uri,
+  //         isProfilePictureSame: false
+  //       });
+  //     }
+  //   }
+  // };
 
   const navigator = useNavigation();
   const handleSubmit = async () => {

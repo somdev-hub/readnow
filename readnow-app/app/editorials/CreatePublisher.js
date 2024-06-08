@@ -15,6 +15,7 @@ import * as SecureStorage from "expo-secure-store";
 import { Snackbar } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import { getSpecificPublisher } from "../../api/apis";
+import { pickImage } from "../../services/PickImage";
 
 const CreatePublisher = () => {
   const route = useRoute();
@@ -46,27 +47,47 @@ const CreatePublisher = () => {
   const publisherSnackbarMessage = useSelector(
     (state) => state.publisher.publisherSnackbarMessage
   );
-  const selectImage = async (type) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    });
 
-    if (!result.canceled) {
+  const selectImage = async (type) => {
+    const result = await pickImage();
+    if (result) {
       if (type === "publisherCoverImage") {
         setPublisherData({
           ...publisherData,
-          publisherCoverImage: result.assets[0].uri,
+          publisherCoverImage: result,
           isPublisherCoverImageSame: false
         });
       } else {
         setPublisherData({
           ...publisherData,
-          publisherImage: result.assets[0].uri,
+          publisherImage: result,
           isPublisherImageSame: false
         });
       }
     }
   };
+
+  // const selectImage = async (type) => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images
+  //   });
+
+  //   if (!result.canceled) {
+  //     if (type === "publisherCoverImage") {
+  //       setPublisherData({
+  //         ...publisherData,
+  //         publisherCoverImage: result.assets[0].uri,
+  //         isPublisherCoverImageSame: false
+  //       });
+  //     } else {
+  //       setPublisherData({
+  //         ...publisherData,
+  //         publisherImage: result.assets[0].uri,
+  //         isPublisherImageSame: false
+  //       });
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     dispatch({

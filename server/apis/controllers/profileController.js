@@ -161,6 +161,7 @@ const editProfilePictureController = async (req, res) => {
 
 const editBackgroundPictureController = async (req, res) => {
   const backgroundPicture = req.file;
+  console.log("hello");
   const email = req.body.email;
   try {
     const backgroundPictureUrl = await uploadImage(backgroundPicture);
@@ -388,7 +389,7 @@ const getUserFollowersController = async (req, res) => {
     if (user) {
       res.status(200).json({ followers: user.followers });
     } else {
-      res.status(404).message("User not found");
+      res.status(404).json("User not found");
     }
   } catch (error) {
     console.log(error);

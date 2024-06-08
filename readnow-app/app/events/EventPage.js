@@ -130,8 +130,8 @@ const EventPage = () => {
   }, []);
 
   return (
-    <View>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+    <View style={{ flex: 1 }}>
+      <ScrollView>
         <View style={{ position: "relative" }}>
           {eventData?.eventMedia && playEventMedia ? (
             <Video

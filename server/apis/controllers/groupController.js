@@ -205,11 +205,11 @@ const getFollowedGroupsController = async (req, res) => {
     }).select("groupImage groupName groupMembers");
 
     if (!groups || groups.length === 0)
-      return res.status(404).send("No groups found");
-    res.status(200).json(groups);
+      return res.status(200).json([]);
+    return res.status(200).json(groups);
   } catch (error) {
     console.log(error);
-    res.status(500).send("An error occurred while fetching the groups");
+    return res.status(500).send("An error occurred while fetching the groups");
   }
 };
 

@@ -137,7 +137,11 @@ const PublisherInfo = () => {
             }}
           >
             <Image
-              source={{ uri: publisherData?.publisherImage }}
+              source={{
+                uri: publisherData?.publisherImage
+                  ? publisherData?.publisherImage
+                  : "https://via.placeholder.com/150"
+              }}
               style={{
                 width: 100,
                 height: 100,

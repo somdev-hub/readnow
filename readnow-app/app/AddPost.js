@@ -15,7 +15,7 @@ import { Entypo } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEmail } from "../redux/postSlice";
+// import { fetchEmail } from "../redux/postSlice";
 import {
   FAB,
   Surface,
@@ -95,7 +95,11 @@ const AddPost = () => {
   const { visibility } = route.params;
   const [postImage, setPostImage] = useState(null);
   const dispatch = useDispatch();
-  const postData = useSelector((state) => state.post.postData);
+  const [postData, setPostData] = useState({
+    description: "",
+    postedBy: "",
+    image: ""
+  });
   const [surfaceVisible, setSurfaceVisible] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
   const [isAILoading, setIsAILoading] = useState(false);
@@ -108,6 +112,8 @@ const AddPost = () => {
   // const [selectedGroup, setSelectedGroup] = useState("");
   const selectedGroup = useSelector((state) => state.post.selectedGroup);
 
+  // console.log(userGroups);
+
   const firstRender = useRef(true);
 
   const hideModal = () => {
@@ -116,16 +122,16 @@ const AddPost = () => {
       payload: false
     });
   };
-  const handleInputChanges = (text) => {
-    dispatch({
-      type: "post/updatePostData",
-      payload: {
-        description: text,
-        postedBy: postData.postedBy,
-        image: postData.image
-      }
-    });
-  };
+  // const handleInputChanges = (text) => {
+  //   dispatch({
+  //     type: "post/updatePostData",
+  //     payload: {
+  //       description: text,
+  //       postedBy: postData.postedBy,
+  //       image: postData.image
+  //     }
+  //   });
+  // };
   const aiPromptHandler = (text) => {
     setAiPrompt(text);
   };
@@ -171,21 +177,43 @@ const AddPost = () => {
       });
     }
 
+    // const getEmail = async () => {
+    //   const email = await SecureStorage.getItemAsync("email");
+    //   const groups = await getFollowedGroups(email);
+    //   // console.log("group "+groups);
+    //   setUserGroups(groups);
+    //   // getFollowedGroups(email).then((res) => {
+    //   //   setUserGroups(res);
+    //   // });
+    // };
+
+    // getEmail();
+    // dispatch(fetchEmail());
+
     const getEmail = async () => {
       const email = await SecureStorage.getItemAsync("email");
-      getFollowedGroups(email).then((res) => {
-        setUserGroups(res);
+      const groups = await getFollowedGroups(email);
+      setUserGroups(groups);
+      setPostData({
+        ...postData,
+        postedBy: email
       });
     };
 
     getEmail();
-    dispatch(fetchEmail());
 
     dispatch({
       type: "post/updatePostVisibilityOption",
       payload: visibility ? visibility : "anyone"
     });
   }, []);
+
+  useEffect(() => {
+    dispatch({
+      type: "post/updatePostData",
+      payload: postData
+    });
+  }, [postData]);
 
   return (
     <View>
@@ -203,7 +231,13 @@ const AddPost = () => {
             textAlignVertical="top"
             placeholder="Enter your thoughts..."
             style={{ fontSize: 16, height: "100%", padding: 10 }}
-            onChangeText={(text) => handleInputChanges(text)}
+            onChangeText={(text) =>
+              setPostData({
+                description: text,
+                postedBy: postData.postedBy,
+                image: postData.image
+              })
+            }
             value={postData.description}
           />
         </ScrollView>
@@ -424,6 +458,11 @@ const AddPost = () => {
             Select the group
           </Text>
           <View style={{ flexDirection: "column", gap: 20 }}>
+            {userGroups?.length === 0 && (
+              <Text style={{ textAlign: "center" }}>
+                You are not a member of any group
+              </Text>
+            )}
             {userGroups?.map((group, index) => {
               return (
                 <Option

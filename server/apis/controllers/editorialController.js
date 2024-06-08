@@ -118,10 +118,13 @@ const getManagedPublishersController = async (req, res) => {
       "publisherName publisherImage publisherCoverImage publisherCategory publisherManager publisherTags "
     );
 
-    if (publishers.length === 0) res.status(404).json("No publishers found");
-    res.status(200).json({ publishers });
+    if (publishers?.length === 0)
+      return res.status(200).json({
+        publishers: []
+      });
+    return res.status(200).json({ publishers });
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

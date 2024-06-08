@@ -25,6 +25,7 @@ import * as SecureStorage from "expo-secure-store";
 import PostCard from "../../components/PostCard";
 import { Snackbar, Chip } from "react-native-paper";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../../styles/colors";
+import { pickImage } from "../../services/PickImage";
 
 const width = Dimensions.get("window").width;
 
@@ -144,23 +145,19 @@ const MyProfile = () => {
   ];
 
   const selectImage = async (setPicture, type) => {
-    const options = {
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    };
-    const response = await ImagePicker.launchImageLibraryAsync(options);
-
-    if (!response.canceled) {
-      setPicture(response.assets[0].uri);
+    let result = await pickImage();
+    if (result) {
+      setPicture(result);
       if (type === "profile") {
         editProfilePicture({
-          image: response.assets[0].uri,
+          image: result,
           email: userData.email
         }).then((response) => {
           console.log(response);
         });
       } else {
         editBackgroundPicture({
-          image: response.assets[0].uri,
+          image: result,
           email: userData.email
         }).then((response) => {
           console.log(response);
@@ -168,6 +165,32 @@ const MyProfile = () => {
       }
     }
   };
+
+  // const selectImage = async (setPicture, type) => {
+  //   const options = {
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images
+  //   };
+  //   const response = await ImagePicker.launchImageLibraryAsync(options);
+
+  //   if (!response.canceled) {
+  //     setPicture(response.assets[0].uri);
+  //     if (type === "profile") {
+  //       editProfilePicture({
+  //         image: response.assets[0].uri,
+  //         email: userData.email
+  //       }).then((response) => {
+  //         console.log(response);
+  //       });
+  //     } else {
+  //       editBackgroundPicture({
+  //         image: response.assets[0].uri,
+  //         email: userData.email
+  //       }).then((response) => {
+  //         console.log(response);
+  //       });
+  //     }
+  //   }
+  // };
 
   const getProfileInfo = async () => {
     const email = await SecureStorage.getItemAsync("email");

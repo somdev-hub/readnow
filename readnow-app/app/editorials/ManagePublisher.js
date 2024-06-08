@@ -11,15 +11,19 @@ const ManagePublisher = () => {
     const fetchPublishers = async () => {
       const email = await SecureStorage.getItemAsync("email");
       const response = await getManagedPublishers(email);
-      const responseWithManagerInfo = await Promise.all(
-        response?.publishers?.map(async (publisher) => {
-          const managerInfo = await getShortProfileInfo(
-            publisher?.publisherManager
-          );
-          return { ...publisher, managerInfo: managerInfo.data };
-        })
-      );
-      setPublisherData(responseWithManagerInfo);
+      if (response && response?.publishers?.length != 0) {
+        const responseWithManagerInfo = await Promise.all(
+          response?.publishers?.map(async (publisher) => {
+            const managerInfo = await getShortProfileInfo(
+              publisher?.publisherManager
+            );
+            return { ...publisher, managerInfo: managerInfo?.data };
+          })
+        );
+        setPublisherData(responseWithManagerInfo);
+      } else {
+        setPublisherData([]);
+      }
     };
     fetchPublishers();
   }, []);

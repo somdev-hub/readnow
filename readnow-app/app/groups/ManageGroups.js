@@ -119,13 +119,15 @@ const ManageGroups = () => {
                       >
                         {item.groupMembers.length} members
                       </Text>
-                      {item.groupTags.map((item, index) => {
-                        return (
-                          <Text style={{ color: PRIMARY_COLOR }} key={index}>
-                            {item}
-                          </Text>
-                        );
-                      })}
+                      <View style={{ flexDirection: "row" }}>
+                        {item.groupTags.map((item, index) => {
+                          return (
+                            <Text style={{ color: PRIMARY_COLOR }} key={index}>
+                              {item},{" "}
+                            </Text>
+                          );
+                        })}
+                      </View>
                     </View>
                   </View>
                 </Pressable>

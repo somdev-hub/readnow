@@ -89,7 +89,7 @@ const Feeds = () => {
     setRefreshing(true);
     const response = await getFeeds();
     const feedsWithProfile = await Promise.all(
-      response.posts.map(async (feed) => {
+      response?.posts?.map(async (feed) => {
         const profileResponse = await getShortProfileInfo(feed.postedBy);
         return {
           ...feed,

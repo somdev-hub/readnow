@@ -1,6 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as SecureStorage from "expo-secure-store";
-import { addGroupPost, getHeadlines, submitPost } from "../api/apis";
+import {
+  addGroupPost,
+  addIndividualPost,
+  getHeadlines,
+  submitPost
+} from "../api/apis";
 import axios from "axios";
 
 const ADDRESS = "http://192.168.191.254:3500";
@@ -13,14 +18,13 @@ export const postFormData = createAsyncThunk(
     const formData = new FormData();
     formData.append("description", postData.description);
     formData.append("postedBy", postData.postedBy);
-
-    // const res = await fetch(postData.image);
     formData.append("image", postData.image);
-    const response = await submitPost(postData);
+    // const response = await submitPost(postData);
+    const response = await addIndividualPost(postData);
     // const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
     //   headers: {
     //     "Content-Type": "multipart/form-data",
-    //     Authorization: `Bearer ${token}`
+    //     // Authorization: `Bearer ${token}`
     //   }
     // });
     // console.log(formData);
@@ -39,10 +43,10 @@ export const postGroupFormData = createAsyncThunk(
   }
 );
 
-export const fetchEmail = createAsyncThunk("post/fetchEmail", async () => {
-  const email = await SecureStorage.getItemAsync("email");
-  return email;
-});
+// export const fetchEmail = createAsyncThunk("post/fetchEmail", async () => {
+//   const email = await SecureStorage.getItemAsync("email");
+//   return email;
+// });
 
 const postSlice = createSlice({
   name: "post",
@@ -67,6 +71,7 @@ const postSlice = createSlice({
     updatePostData: (state, action) => {
       state.postData.description = action.payload.description;
       state.postData.image = action.payload.image;
+      state.postData.postedBy = action.payload.postedBy;
     },
     updateSwitch: (state, action) => {
       state.switch = action.payload;
@@ -97,9 +102,9 @@ const postSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(fetchEmail.fulfilled, (state, action) => {
-        state.postData.postedBy = action.payload;
-      })
+      // .addCase(fetchEmail.fulfilled, (state, action) => {
+      //   state.postData.postedBy = action.payload;
+      // })
       .addCase(postGroupFormData.pending, (state, action) => {
         state.loading = true;
         state.error = null;

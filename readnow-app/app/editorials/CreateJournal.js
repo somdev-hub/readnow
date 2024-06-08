@@ -16,6 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
 import { addJournal, editJournal, getSpecificJournal } from "../../api/apis";
 import { ActivityIndicator, Dialog, Portal } from "react-native-paper";
+import { pickImage } from "../../services/PickImage";
 
 const CreateJournal = () => {
   const [open, setOpen] = useState(false);
@@ -40,18 +41,29 @@ const CreateJournal = () => {
   });
 
   const selectImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images
-    });
-
-    if (!result.canceled) {
+    const result = await pickImage();
+    if (result) {
       setJournalData({
         ...journalData,
-        journalCoverImage: result.assets[0].uri,
+        journalCoverImage: result,
         isJournalCoverImageSame: false
       });
     }
   };
+
+  // const selectImage = async () => {
+  //   let result = await ImagePicker.launchImageLibraryAsync({
+  //     mediaTypes: ImagePicker.MediaTypeOptions.Images
+  //   });
+
+  //   if (!result.canceled) {
+  //     setJournalData({
+  //       ...journalData,
+  //       journalCoverImage: result.assets[0].uri,
+  //       isJournalCoverImageSame: false
+  //     });
+  //   }
+  // };
 
   const postJournal = async () => {
     setLoading(true);
@@ -363,7 +375,7 @@ const CreateJournal = () => {
           <Dialog.Actions>
             <Pressable
               onPress={() => {
-                navigator.goBack();
+                navigator.navigate("ManageJournal");
                 setShowDialog({ visible: false, message: "" });
               }}
             >

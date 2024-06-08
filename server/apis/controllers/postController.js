@@ -6,12 +6,12 @@ const uploadImageAndGetId = require("../utils/uploadImageAndGetId");
 const addPostController = async (req, res) => {
   const { description, postedBy } = req.body;
   console.log(description);
-  const image = req?.file;
+  const postImage = req?.file;
 
   try {
     let imageId = null;
-    if (image) {
-      imageId = await uploadImageAndGetId(image, "posts");
+    if (postImage) {
+      imageId = await uploadImageAndGetId(postImage, "posts");
     }
 
     const data = {

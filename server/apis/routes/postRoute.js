@@ -20,7 +20,7 @@
  */
 
 const express = require("express");
-const multer = require("multer");
+// const multer = require("multer");
 const {
   addPostController,
   getFeedsController,
@@ -31,17 +31,17 @@ const {
 const authenticateToken = require("../middlewares/authenticateToken");
 
 const router = express.Router();
-// multer is used for uploading files
+const multer = require("multer");
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const uploadMiddleware = multer({ storage });
 
 // -------------------------- Routes -------------------------- //
 
 // hit this route to add post
 router.post(
   "/add-post",
-  authenticateToken,
-  upload.single("image"),
+  // authenticateToken,
+  uploadMiddleware.single("postImage"),
   addPostController
 );
 // hit this route to get feeds
