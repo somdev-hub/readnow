@@ -1,0 +1,22 @@
+# Logs
+logs
+*.log
+
+# Dependency directories
+# node_modules/
+# .expo
+
+# Build files
+dist/
+build/
+
+# Environment variables
+# .env
+
+# IDE files
+.vscode/
+.idea/
+
+# Miscellaneous
+.DS_Store
+Thumbs.db

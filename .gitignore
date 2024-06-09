@@ -1,0 +1,27 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+.env
+.expo
+
+# /node_modules
+# /server/apis/node_modules/
+# /server/apis/.env
+# /server/apis/.expo
+
+# React Native
+ios/Pods/
+ios/build/
+android/.gradle/
+android/build/
+android/app/build/
+android/gradle/
+android/local.properties
+android/gradlew
+android/gradlew.bat
+android/app/src/main/assets/index.android.bundle
+android/app/src/main/assets/index.android.bundle.meta
+android/app/src/main/assets/index.android.bundle.data
+android/app/src/main/assets/index.android.bundle.meta.data
