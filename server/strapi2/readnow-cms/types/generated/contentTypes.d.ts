@@ -866,6 +866,7 @@ export interface ApiGroupPostGroupPost extends Schema.CollectionType {
     singularName: 'group-post';
     pluralName: 'group-posts';
     displayName: 'GroupPost';
+    description: '';
   };
   options: {
     draftAndPublish: true;
@@ -877,7 +878,7 @@ export interface ApiGroupPostGroupPost extends Schema.CollectionType {
     likedBy: Attribute.JSON;
     comments: Attribute.JSON;
     postedBy: Attribute.Email;
-    group: Attribute.String;
+    group: Attribute.String & Attribute.Required;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

@@ -156,7 +156,7 @@ const Home = () => {
                 justifyContent: "center"
               }}
             >
-              {newsData.map((item, index) => {
+              {newsData?.map((item, index) => {
                 return (
                   <Pressable
                     key={index}

@@ -6,7 +6,7 @@ import { updateReRouteToLogin } from "../redux/authSlice";
 // import store from "../redux/store";
 // import { dispatch } from "./dispatch";
 
-const ADDRESS = "http://192.168.191.254:3500";
+const ADDRESS = "http://192.168.205.254:3500";
 
 const api = axios.create({
   baseURL: ADDRESS

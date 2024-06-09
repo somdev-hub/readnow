@@ -553,7 +553,7 @@ const getMyStoriesController = async (req, res) => {
           };
         });
       if (latestStories.length === 0) {
-        return res.status(404).json({ stories: null });
+        return res.status(404).json({ stories: [] });
       }
       const responseStories = {
         name: user.name,
@@ -579,37 +579,27 @@ const getFollowingStoriesController = async (req, res) => {
       if (user.following.length === 0) {
         return res.status(200).json({ stories: [] });
       }
+      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const followingUsers = await User.find({
+        email: { $in: user.following }
+      });
       const followingStories = await Promise.all(
-        user.following.map(async (following) => {
-          const followingUser = await User.findOne({ email: following });
-          const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-          const storiesWithin24Hours = followingUser?.stories.filter(
+        followingUsers.map(async (followingUser) => {
+          const storiesWithin24Hours = followingUser.stories.filter(
             (story) => story.dateTime > twentyFourHoursAgo
           );
-          if (storiesWithin24Hours?.length !== 0) {
-            return {
-              name: followingUser.name,
-              email: followingUser.email,
-              profilePicture: followingUser?.profilePicture,
-              stories: storiesWithin24Hours
-            };
-          } else {
-            return {
-              name: followingUser.name,
-              email: followingUser.email,
-              profilePicture: followingUser.profilePicture,
-              stories: []
-            };
-          }
+          if (storiesWithin24Hours.length === 0) return null;
+          return {
+            name: followingUser.name,
+            email: followingUser.email,
+            profilePicture: followingUser.profilePicture,
+            stories: storiesWithin24Hours || []
+          };
         })
       );
-
-      const filteredStories = followingStories.filter(
-        (story) => story !== null
-      );
-      const sortedStories = filteredStories.sort(
-        (a, b) => b.dateTime - a.dateTime
-      );
+      const sortedStories = followingStories
+        .filter((story) => story !== null)
+        .sort((a, b) => b.dateTime - a.dateTime);
       res.status(200).json({ stories: sortedStories });
     } else {
       res.status(404).json({ message: "User not found" });

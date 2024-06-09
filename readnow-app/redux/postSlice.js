@@ -62,6 +62,11 @@ const postSlice = createSlice({
       followersOnly: false,
       groups: false
     },
+    alertModel: {
+      visible: false,
+      title: "",
+      message: ""
+    },
     selectedGroup: "",
     loading: false,
     error: "",
@@ -87,6 +92,11 @@ const postSlice = createSlice({
     },
     updateSelectedGroup: (state, action) => {
       state.selectedGroup = action.payload;
+    },
+    updateAlertModel: (state, action) => {
+      state.alertModel.visible = action.payload.visible;
+      state.alertModel.title = action.payload.title;
+      state.alertModel.message = action.payload.message;
     }
   },
   extraReducers: (builder) => {

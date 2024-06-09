@@ -12,7 +12,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
 import * as SecureStorage from "expo-secure-store";
 import { useDispatch, useSelector } from "react-redux";
 // import { fetchEmail } from "../redux/postSlice";
@@ -22,7 +21,8 @@ import {
   ActivityIndicator,
   Modal,
   Portal,
-  RadioButton
+  RadioButton,
+  Dialog
 } from "react-native-paper";
 import { getAIResponse, getFollowedGroups, getUserGroups } from "../api/apis";
 import AntDesign from "react-native-vector-icons/AntDesign";
@@ -110,6 +110,7 @@ const AddPost = () => {
   const postVisibility = useSelector((state) => state.post.postVisibility);
   const [userGroups, setUserGroups] = useState([]); // ["React Native Developers", "Plant Lovers"
   // const [selectedGroup, setSelectedGroup] = useState("");
+  const alertModel = useSelector((state) => state.post.alertModel);
   const selectedGroup = useSelector((state) => state.post.selectedGroup);
 
   // console.log(userGroups);
@@ -122,16 +123,7 @@ const AddPost = () => {
       payload: false
     });
   };
-  // const handleInputChanges = (text) => {
-  //   dispatch({
-  //     type: "post/updatePostData",
-  //     payload: {
-  //       description: text,
-  //       postedBy: postData.postedBy,
-  //       image: postData.image
-  //     }
-  //   });
-  // };
+
   const aiPromptHandler = (text) => {
     setAiPrompt(text);
   };
@@ -139,14 +131,12 @@ const AddPost = () => {
     setIsAILoading(true);
     const response = await getAIResponse(aiPrompt);
 
-    dispatch({
-      type: "post/updatePostData",
-      payload: {
-        description: response.data,
-        postedBy: postData.postedBy,
-        image: postData.image
-      }
-    });
+    if (response) {
+      setPostData({
+        ...postData,
+        description: response?.data
+      });
+    }
     setIsAILoading(false);
     setSurfaceVisible(false);
   };
@@ -176,19 +166,6 @@ const AddPost = () => {
         }
       });
     }
-
-    // const getEmail = async () => {
-    //   const email = await SecureStorage.getItemAsync("email");
-    //   const groups = await getFollowedGroups(email);
-    //   // console.log("group "+groups);
-    //   setUserGroups(groups);
-    //   // getFollowedGroups(email).then((res) => {
-    //   //   setUserGroups(res);
-    //   // });
-    // };
-
-    // getEmail();
-    // dispatch(fetchEmail());
 
     const getEmail = async () => {
       const email = await SecureStorage.getItemAsync("email");
@@ -487,6 +464,52 @@ const AddPost = () => {
             })}
           </View>
         </Modal>
+      </Portal>
+      <Portal>
+        <Dialog
+          visible={alertModel.visible}
+          onDismiss={() =>
+            dispatch({
+              type: "post/updateAlertModel",
+              payload: {
+                visible: false,
+                title: "",
+                message: ""
+              }
+            })
+          }
+          style={{
+            backgroundColor: "white"
+          }}
+        >
+          <Dialog.Title>{alertModel.title}</Dialog.Title>
+          <Dialog.Content>
+            <Text>{alertModel.message}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Pressable
+              onPress={() =>
+                dispatch({
+                  type: "post/updateAlertModel",
+                  payload: {
+                    visible: false,
+                    title: "",
+                    message: ""
+                  }
+                })
+              }
+            >
+              <Text
+                style={{
+                  fontWeight: "500",
+                  color: PRIMARY_COLOR
+                }}
+              >
+                Ok
+              </Text>
+            </Pressable>
+          </Dialog.Actions>
+        </Dialog>
       </Portal>
     </View>
   );

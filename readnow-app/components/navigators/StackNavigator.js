@@ -103,6 +103,9 @@ const StackNavigator = () => {
   const postVisibilityModal = useSelector(
     (state) => state.post.selectVisibility
   );
+  const alertPostVisibilityModal = useSelector(
+    (state) => state.post.alertModel
+  );
   const [visible, setVisible] = useState(false);
   const [userData, setUserData] = useState({});
   const postVisibility = useSelector((state) => state.post.postVisibility);
@@ -681,20 +684,27 @@ const StackNavigator = () => {
                 </View>
                 <TouchableOpacity
                   onPress={() => {
-                    console.log(postData);
-                    // console.log(selectedGroupId);
-                    // {
-                    // postVisibility.anyone
-                    //   ? dispatch(postFormData(postData))
-                    //   : dispatch(
-                    //       postGroupFormData({
-                    //         ...postData,
-                    //         group: selectedGroupId
-                    //       })
-                    //     );
-
-                    dispatch(postFormData(postData));
-                    // }
+                    const dispatchPostData = () => {
+                      if (postData.description) {
+                        const data = postVisibility.anyone
+                          ? postData
+                          : { ...postData, group: selectedGroupId };
+                        const action = postVisibility.anyone
+                          ? postFormData
+                          : postGroupFormData;
+                        dispatch(action(data));
+                      } else {
+                        dispatch({
+                          type: "post/updateAlertModel",
+                          payload: {
+                            visible: true,
+                            title: "Alert",
+                            message: "Please write something before posting"
+                          }
+                        });
+                      }
+                    };
+                    dispatchPostData();
                   }}
                 >
                   <Text
