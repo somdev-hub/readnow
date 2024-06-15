@@ -15,20 +15,36 @@ import * as SecureStore from "expo-secure-store";
 import {
   commentGroupPost,
   commentPost,
+  getPost,
   getShortProfileInfo
 } from "../api/apis";
 import GroupPostCard from "../components/GroupPostCard";
 import { PRIMARY_COLOR } from "../styles/colors";
+import { useSelector, useDispatch } from "react-redux";
+import { Snackbar } from "react-native-paper";
 
 const ViewPost = () => {
   const route = useRoute();
-  const item = route.params.item;
+  const id = route.params.id;
+  const type = route.params.type;
   const [refreshing, setRefreshing] = useState(false);
-  const [profilePic, setProfilePic] = useState(null);
+  const [postData, setPostData] = useState({
+    user: "",
+    header: "",
+    profilePicture: "",
+    description: "",
+    image: "",
+    likes: [],
+    comments: [],
+    id: ""
+  });
   const [userComment, setUserComment] = useState("");
+  const bookmarkNotification = useSelector(
+    (state) => state.notify.addedToBookmark
+  );
+  const dispatch = useDispatch();
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    // item.fetchData();
     setRefreshing(false);
   }, []);
   const handleComment = async () => {
@@ -36,24 +52,69 @@ const ViewPost = () => {
     setRefreshing(true);
     const email = await SecureStore.getItemAsync("email");
     if (item.type === "group-post") {
-      const res = await commentGroupPost(item.id, email, userComment);
+      const res = await commentGroupPost(id, email, userComment);
       console.log(res);
     } else {
-      const res = await commentPost(item.id, email, userComment);
+      const res = await commentPost(id, email, userComment);
       console.log(res);
     }
     setUserComment("");
     item.fetchData();
     setRefreshing(false);
-    // console.log(item.id);
   };
+
+  const optionsContent = [
+    {
+      option: "Add to Bookmark",
+      function: (feedId) => {
+        addToBookmark(feedId);
+      }
+    },
+    {
+      option: "Add to Story",
+      function: () => {
+        console.log("Add to Story");
+      }
+    },
+    {
+      option: "Share",
+      function: () => {
+        console.log("Share");
+      }
+    },
+    {
+      option: "Send",
+      function: () => {
+        console.log("Send");
+      }
+    },
+    {
+      option: "Report",
+      function: () => {
+        console.log("Report");
+      }
+    }
+  ];
+
   useEffect(() => {
-    const fetchProfilePic = async () => {
-      const email = await SecureStore.getItemAsync("email");
-      const res = await getShortProfileInfo(email);
-      setProfilePic(res.data.profilePicture);
+    const fetchPost = async () => {
+      console.log(id);
+      const response = await getPost(id);
+      console.log(response);
+      const responseWithProfileInfo = await getShortProfileInfo(
+        response?.post?.postedBy
+      );
+
+      setPostData({
+        ...response.post,
+        user: responseWithProfileInfo.data.name,
+        profilePicture: responseWithProfileInfo.data.profilePicture,
+        header: responseWithProfileInfo.data.header,
+        likes: response.post.likedBy
+      });
     };
-    fetchProfilePic();
+
+    fetchPost();
   }, []);
   return (
     <View style={{ flex: 1 }}>
@@ -63,18 +124,20 @@ const ViewPost = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View>
-          {item.type === "group-post" ? (
-            <GroupPostCard {...item} />
-          ) : (
-            <PostCard {...item} />
-          )}
-        </View>
+        {postData && (
+          <View>
+            {type === "group-post" ? (
+              <GroupPostCard {...postData} />
+            ) : (
+              <PostCard {...postData} />
+            )}
+          </View>
+        )}
         <View style={{ marginHorizontal: 10, marginBottom: 5, gap: 10 }}>
-          {item.comments?.reverse().map((comment, index) => {
+          {postData?.comments?.reverse().map((comment, index) => {
             return (
               <CommentCard
-                optionsContent={item.optionsContent}
+                optionsContent={optionsContent}
                 key={index}
                 comment={comment}
               />
@@ -84,7 +147,6 @@ const ViewPost = () => {
       </ScrollView>
       <View
         style={{
-          // height: 70,
           width: "100%",
           backgroundColor: "#fff",
           position: "absolute",
@@ -94,7 +156,6 @@ const ViewPost = () => {
           borderTopColor: "#ddd",
           justifyContent: "center",
           padding: 15
-          // paddingHorizontal: 10
         }}
       >
         <View style={{ flexDirection: "row", gap: 10, alignItems: "center" }}>
@@ -107,7 +168,11 @@ const ViewPost = () => {
             }}
           >
             <Image
-              source={{ uri: profilePic }}
+              source={{
+                uri: postData?.profilePicture
+                  ? postData?.profilePicture
+                  : "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
+              }}
               style={{
                 height: "100%",
                 width: "100%",
@@ -141,7 +206,11 @@ const ViewPost = () => {
             />
             <Pressable onPress={handleComment}>
               <Text
-                style={{ fontWeight: "bold", fontSize: 16, color: PRIMARY_COLOR }}
+                style={{
+                  fontWeight: "bold",
+                  fontSize: 16,
+                  color: PRIMARY_COLOR
+                }}
               >
                 Post
               </Text>
@@ -149,6 +218,24 @@ const ViewPost = () => {
           </View>
         </View>
       </View>
+      <Snackbar
+        visible={bookmarkNotification.addToBookmark}
+        style={{ position: "absolute", bottom: 70 }}
+        onDismiss={() => {}}
+        action={{
+          label: "Done",
+          onPress: () => {
+            dispatch({
+              type: "notify/addBookmark",
+              payload: {
+                addToBookmark: false
+              }
+            });
+          }
+        }}
+      >
+        Added to Bookmarks
+      </Snackbar>
     </View>
   );
 };

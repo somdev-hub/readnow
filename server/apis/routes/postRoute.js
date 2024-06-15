@@ -26,7 +26,8 @@ const {
   getFeedsController,
   likePostController,
   commentPostController,
-  deletePostController
+  deletePostController,
+  getPostByIdController
 } = require("../controllers/postController");
 const authenticateToken = require("../middlewares/authenticateToken");
 
@@ -41,7 +42,7 @@ const uploadMiddleware = multer({ storage });
 router.post(
   "/add-post",
   // authenticateToken,
-  uploadMiddleware.single("postImage"),
+  uploadMiddleware.single("postMainImage"),
   addPostController
 );
 // hit this route to get feeds
@@ -52,5 +53,7 @@ router.post("/like-post", authenticateToken, likePostController);
 router.post("/comment-post", authenticateToken, commentPostController);
 // hit this route to delete post
 router.delete("/delete-post/:postId", authenticateToken, deletePostController);
+
+router.get("/get-post/:postId", authenticateToken, getPostByIdController);
 
 module.exports = router;

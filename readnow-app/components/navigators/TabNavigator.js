@@ -122,11 +122,9 @@ const TabNavigator = () => {
         visible={bookmarkNotification.addToBookmark}
         style={{ position: "absolute", bottom: 60 }}
         onDismiss={() => {}}
-        // duration={200}
         action={{
           label: "Done",
           onPress: () => {
-            // console.log("click");
             dispatch({
               type: "notify/addBookmark",
               payload: {

@@ -12,24 +12,20 @@ import { EvilIcons } from "@expo/vector-icons";
 import { RadioButton } from "react-native-paper";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchEmail } from "../../redux/groupSlice";
-import * as ImagePicker from "expo-image-picker";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
 import { PRIMARY_COLOR } from "../../styles/colors";
 import { getSpecificGroup } from "../../api/apis";
-// import RNFetchBlob from 'react-native-fetch-blob';
-// import RNFS from 'react-native-fs';
-import * as FileSystem from "expo-file-system";
-import * as DocumentPicker from "expo-document-picker";
 import { pickImage } from "../../services/PickImage";
+import * as SecureStorage from "expo-secure-store";
 
 const CreateGroup = () => {
-  const ref = React.useRef(true);
+  // const ref = React.useRef(true);
   const dispatch = useDispatch();
   const navigator = useNavigation();
   const groupData = useSelector((state) => state.group.groupData);
   const groupGenres = useSelector((state) => state.group.groupGenres);
-  const groupEditMode = useSelector((state) => state.group.isEditedGroup);
+  // const groupEditMode = useSelector((state) => state.group.isEditedGroup);
   const router = useRoute();
   const { groupId, edit } = router.params;
   const [groupCreationData, setGroupCreationData] = React.useState({
@@ -82,7 +78,7 @@ const CreateGroup = () => {
       type: "group/updateGroupData",
       payload: { ...groupCreationData }
     });
-    dispatch(fetchEmail());
+    // dispatch(fetchEmail());
   }, [groupCreationData]);
 
   useEffect(() => {
@@ -92,11 +88,8 @@ const CreateGroup = () => {
         payload: true
       });
 
-      // console.log(groupId);
-
       const getGroupData = async () => {
         const response = await getSpecificGroup(groupId);
-
         setGroupCreationData({
           ...groupCreationData,
           groupName: response?.groupName,
@@ -120,6 +113,17 @@ const CreateGroup = () => {
         payload: false
       });
     }
+
+    const getEmail = async () => {
+      const email = await SecureStorage.getItemAsync("email");
+      // dispatch(fetchEmail(email));
+      setGroupCreationData({
+        ...groupCreationData,
+        groupAdmins: [...groupCreationData.groupAdmins, email]
+      });
+    };
+
+    getEmail();
   }, []);
   return (
     <View style={{ flex: 1 }}>

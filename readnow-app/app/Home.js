@@ -90,7 +90,7 @@ const Home = () => {
           <View style={{ marginTop: 20 }}>
             <Carousel
               layout="default"
-              key={headlines.length}
+              key={headlines?.length}
               layoutCardOffset={9}
               activeSlideAlignment="center"
               firstItem={1}
@@ -107,7 +107,7 @@ const Home = () => {
             />
 
             <Pagination
-              dotsLength={headlines.length}
+              dotsLength={headlines?.length}
               activeDotIndex={index}
               carouselRef={isCarousel}
               dotStyle={{
@@ -196,9 +196,9 @@ const Home = () => {
                             lineHeight: 20
                           }}
                         >
-                          {item.title.length > 80
-                            ? item.title.slice(0, 80) + "..."
-                            : item.title}
+                          {item?.title?.length > 80
+                            ? item?.title.slice(0, 80) + "..."
+                            : item?.title}
                         </Text>
                         <View
                           style={{
@@ -209,9 +209,9 @@ const Home = () => {
                           }}
                         >
                           <Text style={{ color: "#A9A9A9" }}>
-                            {item.source.name.length > 12
-                              ? item.source.name.slice(0, 12) + "..."
-                              : item.source.name}
+                            {item?.source?.name?.length > 12
+                              ? item?.source?.name.slice(0, 12) + "..."
+                              : item?.source?.name}
                           </Text>
                           <Text style={{ color: "#A9A9A9" }}>
                             {new Date(item.publishedAt).toDateString()}

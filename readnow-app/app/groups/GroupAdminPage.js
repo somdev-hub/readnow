@@ -302,7 +302,7 @@ const GroupAdminPage = () => {
           </View>
           <TouchableOpacity
             onPress={() =>
-              navigator.navigate("Add Post", { visibility: "group" })
+              navigator.navigate("Add Post", { visibility: "group", groupId})
             }
             style={{
               flex: 1

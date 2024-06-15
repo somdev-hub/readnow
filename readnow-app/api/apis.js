@@ -323,20 +323,27 @@ export async function addIndividualPost(postData) {
   const formData = new FormData();
   formData.append("description", postData.description);
   formData.append("postedBy", postData.postedBy);
-  formData.append("postImage", {
-    uri: postData.image,
-    name: "postImage.jpg",
-    type: "image/jpg"
-  });
 
-  const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-      // Authorization: `Bearer ${token}`
-    }
-  });
+  if (postData.image) {
+    formData.append("postMainImage", {
+      uri: postData.image,
+      name: "postImage.jpg",
+      type: "image/jpg"
+    });
+  }
 
-  return response;
+  try {
+    const response = await axios.post(`${ADDRESS}/post/add-post`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+        // Authorization: `Bearer ${token}`
+      }
+    });
+
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 export const getFeeds = async () => {
@@ -344,6 +351,15 @@ export const getFeeds = async () => {
     // const response = await axios.get(`${ADDRESS}/post/get-feeds`);
     const response = await api.get("/post/get-feeds");
     // console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getPost = async (postId) => {
+  try {
+    const response = await api.get(`/post/get-post/${postId}`);
     return response.data;
   } catch (error) {
     console.log(error);
@@ -545,16 +561,20 @@ export const createGroup = async (data) => {
 export const editGroup = async (data) => {
   const formData = new FormData();
 
-  formData.append("groupImage", {
-    uri: data.groupImage,
-    name: "groupImage.jpg",
-    type: "image/jpg"
-  });
-  formData.append("groupCoverImage", {
-    uri: data.groupCoverImage,
-    name: "groupCoverImage.jpg",
-    type: "image/jpg"
-  });
+  if (data.groupImage) {
+    formData.append("groupImage", {
+      uri: data.groupImage,
+      name: "groupImage.jpg",
+      type: "image/jpg"
+    });
+  }
+  if (data.groupCoverImage) {
+    formData.append("groupCoverImage", {
+      uri: data.groupCoverImage,
+      name: "groupCoverImage.jpg",
+      type: "image/jpg"
+    });
+  }
   formData.append("groupName", data.groupName);
   formData.append("groupDescription", data.groupDescription);
   formData.append("groupAdmins", JSON.stringify(data.groupAdmins));
@@ -669,11 +689,13 @@ export const addGroupPost = async (data) => {
   formData.append("description", data.description);
   formData.append("postedBy", data.postedBy);
   formData.append("group", data.group);
-  formData.append("image", {
-    uri: data.image,
-    name: "postImage.jpg",
-    type: "image/jpg"
-  });
+  if (data.image) {
+    formData.append("image", {
+      uri: data.image,
+      name: "postImage.jpg",
+      type: "image/jpg"
+    });
+  }
   try {
     // const response = await axios.post(
     //   `${ADDRESS}/group/add-group-post`,
@@ -858,11 +880,13 @@ export const createEvent = async (data) => {
 
 export const editEvent = async (data) => {
   const formData = new FormData();
-  formData.append("eventCover", {
-    uri: data.eventCover,
-    name: "eventCover.jpg",
-    type: "image/jpg"
-  });
+  if (data.eventCover) {
+    formData.append("eventCover", {
+      uri: data.eventCover,
+      name: "eventCover.jpg",
+      type: "image/jpg"
+    });
+  }
   // formData.append("eventId", data.eventId);
   formData.append("eventOrganizer", data.eventOrganizer);
   formData.append("eventName", data.eventName);

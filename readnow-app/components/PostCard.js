@@ -15,6 +15,7 @@ import * as SecureStorage from "expo-secure-store";
 import { addBookmark, likePost } from "../api/apis";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
 
 const size = Dimensions.get("window");
 
@@ -26,32 +27,74 @@ const PostCard = ({
   image,
   likes,
   comments,
-  post,
-  fetchData,
-  optionsContent
+  id
+  // optionsContent
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const route = useRoute();
-  // console.log(route.name);
   const [visible, setVisible] = useState(false);
   const [liked, setLiked] = useState(false);
   const email = SecureStorage.getItemAsync("email").then((res) => res);
   const navigator = useNavigation();
+  const dispatch = useDispatch();
+
+  const addToBookmark = async (feedId) => {
+    const userMail = await SecureStorage.getItemAsync("email");
+    addBookmark(feedId, "post", userMail).then((data) => {
+      console.log(data);
+    });
+    dispatch({
+      type: "notify/addBookmark",
+      payload: {
+        addToBookmark: true
+      }
+    });
+  };
+
+  const optionsContent = [
+    {
+      option: "Add to Bookmark",
+      function: (feedId) => {
+        addToBookmark(feedId);
+      }
+    },
+    {
+      option: "Add to Story",
+      function: () => {
+        console.log("Add to Story");
+      }
+    },
+    {
+      option: "Share",
+      function: () => {
+        console.log("Share");
+      }
+    },
+    {
+      option: "Send",
+      function: () => {
+        console.log("Send");
+      }
+    },
+    {
+      option: "Report",
+      function: () => {
+        console.log("Report");
+      }
+    }
+  ];
 
   const handleLike = async () => {
     const userId = await SecureStorage.getItemAsync("email");
-    const response = await likePost(post.id, userId);
-    // console.log(response);
+    const response = await likePost(id, userId);
     setLiked(!liked);
   };
-  // console.log(post.id);
   const openMenu = () => setVisible(true);
 
   const closeMenu = () => setVisible(false);
 
   useEffect(() => {
-    if (likes.includes(email)) {
-      // console.log("true");
+    if (likes?.includes(email)) {
       setLiked(true);
     }
   }, []);
@@ -85,6 +128,8 @@ const PostCard = ({
             <Image
               source={{
                 uri: profilePicture
+                  ? profilePicture
+                  : "https://www.pngitem.com/pimgs/m/146-1468479_my-profile-icon-blank-profile-picture-circle-hd.png"
               }}
               style={{
                 width: "100%",
@@ -115,7 +160,7 @@ const PostCard = ({
             return (
               <Menu.Item
                 onPress={() => {
-                  option.function(post.id);
+                  option.function(id);
                   closeMenu();
                 }}
                 title={option.option}
@@ -130,10 +175,32 @@ const PostCard = ({
           {isExpanded ? description : `${description?.substring(0, 100)}...`}
         </Text>
         {description?.length > 100 && (
-          <TouchableOpacity onPress={() => setIsExpanded(!isExpanded)}>
-            <Text style={{ color: "blue", marginHorizontal: 15 }}>
+          <TouchableOpacity
+            onPress={() => setIsExpanded(!isExpanded)}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 10,
+              borderColor: "#000",
+              borderWidth: 1,
+              flex: 1,
+              alignSelf: "center",
+              borderRadius: 50,
+              padding: 7,
+              gap: 5,
+              paddingHorizontal: 10,
+              alignItems: "center"
+            }}
+          >
+            <Text style={{ fontWeight: "500" }}>
               {isExpanded ? "Read Less" : "Read More"}
             </Text>
+            <Entypo
+              name={isExpanded ? "chevron-up" : "chevron-down"}
+              size={20}
+              color="black"
+            />
           </TouchableOpacity>
         )}
         {image && (
@@ -162,10 +229,10 @@ const PostCard = ({
           }}
         >
           <View>
-            <Text>{likes.length} likes</Text>
+            <Text>{likes?.length} likes</Text>
           </View>
           <View>
-            <Text>{comments.length} comments</Text>
+            <Text>{comments?.length} comments</Text>
           </View>
         </View>
         <View
@@ -199,18 +266,8 @@ const PostCard = ({
             onPress={() => {
               route.name === "Feed" &&
                 navigator.navigate("Post", {
-                  item: {
-                    user,
-                    header,
-                    profilePicture,
-                    description,
-                    image,
-                    likes,
-                    comments,
-                    // fetchData,
-                    id: post.id,
-                    optionsContent
-                  }
+                  id: id,
+                  type: "post"
                 });
             }}
             style={{ flexDirection: "row", gap: 5, alignItems: "center" }}

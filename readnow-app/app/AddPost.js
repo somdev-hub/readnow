@@ -22,12 +22,13 @@ import {
   Modal,
   Portal,
   RadioButton,
-  Dialog
+  Dialog,
+  Snackbar
 } from "react-native-paper";
 import { getAIResponse, getFollowedGroups, getUserGroups } from "../api/apis";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { PRIMARY_COLOR, WHITE_COLOR } from "../styles/colors";
 import { pickImage } from "../services/PickImage";
 
@@ -92,7 +93,8 @@ const Option = ({
 
 const AddPost = () => {
   const route = useRoute();
-  const { visibility } = route.params;
+  const navigator = useNavigation();
+  const { visibility, groupId } = route.params;
   const [postImage, setPostImage] = useState(null);
   const dispatch = useDispatch();
   const [postData, setPostData] = useState({
@@ -108,12 +110,11 @@ const AddPost = () => {
   );
   const [groupSelectionModal, setGroupSelectionModal] = useState(false);
   const postVisibility = useSelector((state) => state.post.postVisibility);
-  const [userGroups, setUserGroups] = useState([]); // ["React Native Developers", "Plant Lovers"
-  // const [selectedGroup, setSelectedGroup] = useState("");
+  const [userGroups, setUserGroups] = useState([]);
   const alertModel = useSelector((state) => state.post.alertModel);
   const selectedGroup = useSelector((state) => state.post.selectedGroup);
-
-  // console.log(userGroups);
+  const postSnackbar = useSelector((state) => state.post.postSnackbar);
+  const postSuccess = useSelector((state) => state.post.postSuccess);
 
   const firstRender = useRef(true);
 
@@ -159,38 +160,38 @@ const AddPost = () => {
       firstRender.current = false;
       dispatch({
         type: "post/updatePostData",
-        payload: {
-          description: "",
-          postedBy: "",
-          image: null
-        }
+        payload: { description: "", postedBy: "", image: null }
       });
     }
 
-    const getEmail = async () => {
+    const initializeEmailAndGroups = async () => {
       const email = await SecureStorage.getItemAsync("email");
-      const groups = await getFollowedGroups(email);
-      setUserGroups(groups);
-      setPostData({
-        ...postData,
-        postedBy: email
-      });
+      setUserGroups(await getFollowedGroups(email));
+      setPostData((prevData) => ({ ...prevData, postedBy: email }));
     };
 
-    getEmail();
+    initializeEmailAndGroups();
 
     dispatch({
       type: "post/updatePostVisibilityOption",
-      payload: visibility ? visibility : "anyone"
+      payload: visibility || "anyone"
     });
+    if (visibility === "group" && groupId) {
+      dispatch({
+        type: "post/updateSelectedGroup",
+        payload: groupId
+      });
+    }
+    dispatch({ type: "post/updatePostSuccess", payload: false });
   }, []);
 
   useEffect(() => {
-    dispatch({
-      type: "post/updatePostData",
-      payload: postData
-    });
+    dispatch({ type: "post/updatePostData", payload: postData });
   }, [postData]);
+
+  useEffect(() => {
+    if (postSuccess) navigator.navigate("Home");
+  }, [postSuccess]);
 
   return (
     <View>
@@ -404,7 +405,7 @@ const AddPost = () => {
             <Option
               icon={<MaterialIcons name="groups" size={24} color="black" />}
               text="Groups"
-              checked={postVisibility.groups}
+              checked={postVisibility.group}
               onCheck={() => {
                 dispatch({
                   type: "post/updatePostVisibilityOption",
@@ -446,7 +447,7 @@ const AddPost = () => {
                   key={index}
                   groupImage={group.groupImage}
                   text={group.groupName}
-                  checked={selectedGroup === group.groupName}
+                  checked={selectedGroup === group._id}
                   onCheck={() => {
                     dispatch({
                       type: "post/updateSelectedGroup",
@@ -511,6 +512,35 @@ const AddPost = () => {
           </Dialog.Actions>
         </Dialog>
       </Portal>
+      <Snackbar
+        visible={postSnackbar.visible}
+        onDismiss={() =>
+          dispatch({
+            type: "post/updatePostSnackbar",
+            payload: {
+              visible: false,
+              message: ""
+            }
+          })
+        }
+        action={
+          <Pressable
+            onPress={() =>
+              dispatch({
+                type: "post/updatePostSnackbar",
+                payload: {
+                  visible: false,
+                  message: ""
+                }
+              })
+            }
+          >
+            <Text style={{ color: "white" }}>Ok</Text>
+          </Pressable>
+        }
+      >
+        {postSnackbar.message}
+      </Snackbar>
     </View>
   );
 };

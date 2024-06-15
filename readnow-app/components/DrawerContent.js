@@ -96,7 +96,10 @@ const DrawerContent = () => {
           <View style={{ marginTop: 30, gap: 30, marginHorizontal: 10 }}>
             <Pressable
               onPress={() =>
-                navigator.navigate("Add Post", { visibility: "anyone" })
+                navigator.navigate("Add Post", {
+                  visibility: "anyone",
+                  groupId: null
+                })
               }
               style={{ flexDirection: "row", gap: 10 }}
             >

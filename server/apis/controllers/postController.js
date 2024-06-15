@@ -6,12 +6,12 @@ const uploadImageAndGetId = require("../utils/uploadImageAndGetId");
 const addPostController = async (req, res) => {
   const { description, postedBy } = req.body;
   console.log(description);
-  const postImage = req?.file;
+  const postMainImage = req.file;
 
   try {
     let imageId = null;
-    if (postImage) {
-      imageId = await uploadImageAndGetId(postImage, "posts");
+    if (postMainImage) {
+      imageId = await uploadImageAndGetId(postMainImage, "posts");
     }
 
     const data = {
@@ -164,10 +164,34 @@ const deletePostController = async (req, res) => {
   }
 };
 
+const getPostByIdController = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/posts/${postId}?populate=*`
+    );
+
+    const post = response.data.data;
+    res.status(200).json({
+      post: {
+        ...post.attributes,
+        id: post.id,
+        image:
+          post?.attributes?.image?.data?.attributes?.url &&
+          `${process.env.STRAPI_API}${post?.attributes?.image?.data?.attributes?.url}`
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "An error occurred while fetching post" });
+  }
+};
+
 module.exports = {
   addPostController,
   getFeedsController,
   likePostController,
   commentPostController,
-  deletePostController
+  deletePostController,
+  getPostByIdController
 };

@@ -312,7 +312,7 @@ const StackNavigator = () => {
                     } else {
                       dispatch(postGroupData(groupData));
                     }
-                    navigator.navigate("GroupsPage");
+                    // navigator.navigate("GroupsPage");
                   }}
                 >
                   <Text

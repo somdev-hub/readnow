@@ -38,52 +38,52 @@ const Feeds = () => {
     fetchMyStories();
   }, []);
 
-  const addToBookmark = async (feedId) => {
-    const userMail = await SecureStorage.getItemAsync("email");
-    console.log(feedId);
-    addBookmark(feedId, "post", userMail).then((data) => {
-      console.log(data);
-    });
-    dispatch({
-      type: "notify/addBookmark",
-      payload: {
-        addToBookmark: true
-      }
-    });
-  };
+  // const addToBookmark = async (feedId) => {
+  //   const userMail = await SecureStorage.getItemAsync("email");
+  //   console.log(feedId);
+  //   addBookmark(feedId, "post", userMail).then((data) => {
+  //     console.log(data);
+  //   });
+  //   dispatch({
+  //     type: "notify/addBookmark",
+  //     payload: {
+  //       addToBookmark: true
+  //     }
+  //   });
+  // };
 
-  const optionsContent = [
-    {
-      option: "Add to Bookmark",
-      function: (feedId) => {
-        addToBookmark(feedId);
-      }
-    },
-    {
-      option: "Add to Story",
-      function: () => {
-        console.log("Add to Story");
-      }
-    },
-    {
-      option: "Share",
-      function: () => {
-        console.log("Share");
-      }
-    },
-    {
-      option: "Send",
-      function: () => {
-        console.log("Send");
-      }
-    },
-    {
-      option: "Report",
-      function: () => {
-        console.log("Report");
-      }
-    }
-  ];
+  // const optionsContent = [
+  //   {
+  //     option: "Add to Bookmark",
+  //     function: (feedId) => {
+  //       addToBookmark(feedId);
+  //     }
+  //   },
+  //   {
+  //     option: "Add to Story",
+  //     function: () => {
+  //       console.log("Add to Story");
+  //     }
+  //   },
+  //   {
+  //     option: "Share",
+  //     function: () => {
+  //       console.log("Share");
+  //     }
+  //   },
+  //   {
+  //     option: "Send",
+  //     function: () => {
+  //       console.log("Send");
+  //     }
+  //   },
+  //   {
+  //     option: "Report",
+  //     function: () => {
+  //       console.log("Report");
+  //     }
+  //   }
+  // ];
 
   const fetchData = async () => {
     setRefreshing(true);
@@ -294,13 +294,7 @@ const Feeds = () => {
                 likes={item.likedBy}
                 comments={item.comments}
                 profilePicture={item.profilePicture}
-                onPressBookmark={() => {
-                  addToBookmark(rest);
-                  console.log(rest);
-                }}
-                post={rest}
-                fetchData={fetchData}
-                optionsContent={optionsContent}
+                id={item.id}
               />
             );
           })}

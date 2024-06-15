@@ -43,11 +43,6 @@ export const postGroupFormData = createAsyncThunk(
   }
 );
 
-// export const fetchEmail = createAsyncThunk("post/fetchEmail", async () => {
-//   const email = await SecureStorage.getItemAsync("email");
-//   return email;
-// });
-
 const postSlice = createSlice({
   name: "post",
   initialState: {
@@ -60,7 +55,7 @@ const postSlice = createSlice({
     postVisibility: {
       anyone: false,
       followersOnly: false,
-      groups: false
+      group: false
     },
     alertModel: {
       visible: false,
@@ -70,7 +65,12 @@ const postSlice = createSlice({
     selectedGroup: "",
     loading: false,
     error: "",
-    switch: false
+    switch: false,
+    postSnackbar: {
+      visible: false,
+      message: ""
+    },
+    postSuccess: false
   },
   reducers: {
     updatePostData: (state, action) => {
@@ -97,6 +97,13 @@ const postSlice = createSlice({
       state.alertModel.visible = action.payload.visible;
       state.alertModel.title = action.payload.title;
       state.alertModel.message = action.payload.message;
+    },
+    updatePostSnackbar: (state, action) => {
+      state.postSnackbar.visible = action.payload.visible;
+      state.postSnackbar.message = action.payload.message;
+    },
+    updatePostSuccess: (state, action) => {
+      state.postSuccess = action.payload;
     }
   },
   extraReducers: (builder) => {
@@ -107,14 +114,19 @@ const postSlice = createSlice({
       })
       .addCase(postFormData.fulfilled, (state, action) => {
         state.loading = false;
+        if (action.payload.status === 200) {
+          state.postSuccess = true;
+        } else {
+          state.postSuccess = false;
+          state.postSnackbar.visible = true;
+          state.postSnackbar.message = action.payload.message;
+        }
       })
       .addCase(postFormData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      // .addCase(fetchEmail.fulfilled, (state, action) => {
-      //   state.postData.postedBy = action.payload;
-      // })
+
       .addCase(postGroupFormData.pending, (state, action) => {
         state.loading = true;
         state.error = null;

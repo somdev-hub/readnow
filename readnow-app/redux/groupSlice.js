@@ -19,6 +19,7 @@ export const fetchEmail = createAsyncThunk("group/fetchEmail", async () => {
 export const editGroupData = createAsyncThunk(
   "group/editGroupData",
   async (groupData) => {
+    console.log(groupData);
     // console.log(groupData.groupId);
     const response = await editGroup(groupData);
     return response;
@@ -49,7 +50,7 @@ const groupSlice = createSlice({
     groupGenres: [],
     loading: false,
     error: "",
-    isEditedGroup: false,
+    isEditedGroup: false
   },
   reducers: {
     updateGroupData: (state, action) => {
@@ -80,7 +81,7 @@ const groupSlice = createSlice({
     },
     updateGroupEditMode: (state, action) => {
       state.isEditedGroup = action.payload;
-    },
+    }
     // updateGroupId: (state, action) => {
     //   state.groupId = action.payload;
     // }

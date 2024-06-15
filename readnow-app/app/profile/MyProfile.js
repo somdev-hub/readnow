@@ -326,7 +326,12 @@ const MyProfile = () => {
               </View>
             </View>
             <TouchableOpacity
-              onPress={() => navigator.navigate("Add Post")}
+              onPress={() =>
+                navigator.navigate("Add Post", {
+                  visibility: "anyone",
+                  groupId: null
+                })
+              }
               style={{
                 backgroundColor: PRIMARY_COLOR,
                 marginHorizontal: 20,
