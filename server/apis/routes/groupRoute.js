@@ -21,7 +21,8 @@ const {
   addGroupAdminController,
   removeAdminController,
   removeMemberController,
-  handleSearchGroupController
+  handleSearchGroupController,
+  getGroupPostController
 } = require("../controllers/groupController");
 const authenticateToken = require("../middlewares/authenticateToken");
 
@@ -81,6 +82,12 @@ router.post(
   authenticateToken,
   uploadMiddleware.single("image"),
   addGroupPostController
+);
+
+router.get(
+  "/get-group-post/:postId",
+  authenticateToken,
+  getGroupPostController
 );
 
 router.get(

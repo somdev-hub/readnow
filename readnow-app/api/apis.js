@@ -469,7 +469,7 @@ export const commentPost = async (postId, userId, comment) => {
       userId,
       comment
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.log(error);
   }
@@ -741,6 +741,16 @@ export const getShortGroupInfo = async (id) => {
   }
 };
 
+export const getGroupPost = async (postId) => {
+  try {
+    // const response = await axios.get(`${ADDRESS}/group/get-group-post/${postId}`);
+    const response = await api.get(`/group/get-group-post/${postId}`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const likeGroupPost = async (postId, userId) => {
   try {
     // const response = await axios.post(`${ADDRESS}/group/like-group-post`, {
@@ -769,7 +779,7 @@ export const commentGroupPost = async (postId, userId, comment) => {
       userId,
       comment
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.log(error);
   }

@@ -51,15 +51,39 @@ const ViewPost = () => {
     if (userComment === "") return;
     setRefreshing(true);
     const email = await SecureStore.getItemAsync("email");
-    if (item.type === "group-post") {
+    if (type === "group-post") {
       const res = await commentGroupPost(id, email, userComment);
-      console.log(res);
+      // console.log(res);
+      if (res.status === 200) {
+        setPostData({
+          ...postData,
+          comments: [
+            ...postData.comments,
+            {
+              comment: userComment,
+              commentedBy: email
+            }
+          ]
+        });
+      }
     } else {
       const res = await commentPost(id, email, userComment);
-      console.log(res);
+      if (res.status === 200) {
+        setPostData({
+          ...postData,
+          comments: [
+            ...postData.comments,
+            {
+              comment: userComment,
+              commentedBy: email
+            }
+          ]
+        });
+      }
+      // console.log(res);
     }
     setUserComment("");
-    item.fetchData();
+    // item.fetchData();
     setRefreshing(false);
   };
 
@@ -114,7 +138,26 @@ const ViewPost = () => {
       });
     };
 
-    fetchPost();
+    const fetchGroupPost = async () => {
+      const response = await getPost(id);
+      const responseWithProfileInfo = await getShortProfileInfo(
+        response?.post?.postedBy
+      );
+      setPostData({
+        ...response.post,
+        group: response.post.group,
+        user: responseWithProfileInfo.data.name,
+        profilePicture: responseWithProfileInfo.data.profilePicture,
+        header: responseWithProfileInfo.data.header,
+        likes: response.post.likedBy
+      });
+    };
+
+    if (type === "group-post") {
+      fetchGroupPost();
+    } else {
+      fetchPost();
+    }
   }, []);
   return (
     <View style={{ flex: 1 }}>

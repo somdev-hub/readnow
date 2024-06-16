@@ -204,8 +204,7 @@ const getFollowedGroupsController = async (req, res) => {
       }
     }).select("groupImage groupName groupMembers");
 
-    if (!groups || groups.length === 0)
-      return res.status(200).json([]);
+    if (!groups || groups.length === 0) return res.status(200).json([]);
     return res.status(200).json(groups);
   } catch (error) {
     console.log(error);
@@ -293,6 +292,24 @@ const addGroupPostController = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("An error occurred while adding the post");
+  }
+};
+
+const getGroupPostController = async (req, res) => {
+  const { postId } = req.params;
+  try {
+    const response = await axios.get(
+      `${process.env.STRAPI_API}/api/group-posts/${postId}?populate=*`
+    );
+    const post = {
+      ...response.data.data.attributes,
+      id: response.data.data.id,
+      image: `${process.env.STRAPI_API}${response.data.data.attributes.image.data.attributes?.url}`
+    };
+    res.status(200).json({ post: post });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("An error occurred while fetching the post");
   }
 };
 
@@ -528,5 +545,6 @@ module.exports = {
   addGroupAdminController,
   removeAdminController,
   removeMemberController,
-  handleSearchGroupController
+  handleSearchGroupController,
+  getGroupPostController
 };
